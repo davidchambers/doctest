@@ -27,7 +27,6 @@ path should be one of the following:
 
 This can easily be done from a browser console:
 
-    :::text
     > doctest("./math-extensions.js")
     retrieving /scripts/./math-extensions.js...
     running doctests in /scripts/./math-extensions.js...
