@@ -12,6 +12,8 @@ window.doctest = (url) ->
     for {pass, expected, actual, num} in (r for r in results when not r.pass)
       console.warn "expected #{q expected} on line #{num} (got #{q actual})"
 
+window.doctest.version = '0.1.0'
+
 commented_lines = (text) ->
   lines = []
   for line, idx in text.split /\r?\n|\r/

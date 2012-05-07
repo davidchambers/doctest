@@ -41,6 +41,8 @@
     });
   };
 
+  window.doctest.version = '0.1.0';
+
   commented_lines = function(text) {
     var idx, line, lines, match, _i, _len, _ref;
     lines = [];
