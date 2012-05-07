@@ -40,9 +40,9 @@ Oops. Looks like we have a bug.
 All expressions are eval'd in the global scope, so the following will leave
 a `user` property attached to the global object:
 
-    > user = {first_name: "Sheldon", last_name: "Cooper"}
-    > user.first_name + " " + user.last_name
-    "Sheldon Cooper"
+    // > user = {first_name: "Sheldon", last_name: "Cooper"}
+    // > user.first_name + " " + user.last_name
+    // "Sheldon Cooper"
 
 This shouldn't be a problem in practice (and it's actually rather useful in
 some cases), but it's worth bearing in mind that variables are available to
