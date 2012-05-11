@@ -16,7 +16,7 @@
         var _i, _len, _results;
         _results = [];
         for (_i = 0, _len = results.length; _i < _len; _i++) {
-          pass = results[_i].pass;
+          pass = results[_i][0];
           _results.push(pass ? '.' : 'x');
         }
         return _results;
@@ -26,7 +26,7 @@
         _results1 = [];
         for (_j = 0, _len = results.length; _j < _len; _j++) {
           r = results[_j];
-          if (!r.pass) {
+          if (!r[0]) {
             _results1.push(r);
           }
         }
@@ -34,14 +34,14 @@
       })();
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        _ref1 = _ref[_i], pass = _ref1.pass, expected = _ref1.expected, actual = _ref1.actual, num = _ref1.num;
-        _results.push(console.warn("expected " + (q(expected)) + " on line " + num + " (got " + (q(actual)) + ")"));
+        _ref1 = _ref[_i], pass = _ref1[0], expected = _ref1[1], actual = _ref1[2], num = _ref1[3];
+        _results.push(console.warn("expected " + expected + " on line " + num + " (got " + actual + ")"));
       }
       return _results;
     });
   };
 
-  window.doctest.version = '0.1.0';
+  window.doctest.version = '0.1.1';
 
   commented_lines = function(text) {
     var idx, line, lines, match, _i, _len, _ref;
@@ -69,14 +69,16 @@
       } else if (match = /^[.](.*)/.exec(line)) {
         expr += '\n' + match[1];
       } else if (expr) {
-        actual = eval(expr);
         expected = eval(line);
-        results.push({
-          actual: actual,
-          expected: expected,
-          num: num,
-          pass: _.isEqual(expected, actual)
-        });
+        results.push((function() {
+          try {
+            actual = eval(expr);
+            return [_.isEqual(actual, expected), q(expected), q(actual), num];
+          } catch (error) {
+            actual = error.constructor;
+            return [actual === expected, (expected != null ? expected.name : void 0) || q(expected), error.name, num];
+          }
+        })());
         expr = '';
       }
     }

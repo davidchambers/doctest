@@ -35,6 +35,15 @@ This can easily be done from a browser console:
 
 Oops. Looks like we have a bug.
 
+### Errors
+
+It's easy to indicate that an error (of a particular kind) is expected:
+
+    // > (var x = 5)
+    // SyntaxError
+    // > null.length
+    // TypeError
+
 ### Scoping
 
 All expressions are eval'd in the global scope, so the following will leave

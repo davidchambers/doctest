@@ -8,11 +8,11 @@ window.doctest = (url) ->
   jQuery.get url, (text) ->
     results = test text
     console.log "running doctests in #{url}..."
-    console.log ((if pass then '.' else 'x') for {pass} in results).join ''
-    for {pass, expected, actual, num} in (r for r in results when not r.pass)
-      console.warn "expected #{q expected} on line #{num} (got #{q actual})"
+    console.log ((if pass then '.' else 'x') for [pass] in results).join ''
+    for [pass, expected, actual, num] in (r for r in results when not r[0])
+      console.warn "expected #{expected} on line #{num} (got #{actual})"
 
-window.doctest.version = '0.1.0'
+window.doctest.version = '0.1.1'
 
 commented_lines = (text) ->
   lines = []
@@ -30,9 +30,13 @@ test = (text) ->
     else if match = /^[.](.*)/.exec line
       expr += '\n' + match[1]
     else if expr
-      actual = eval expr
       expected = eval line
-      results.push {actual, expected, num, pass: _.isEqual expected, actual}
+      results.push try
+        actual = eval expr
+        [_.isEqual(actual, expected), q(expected), q(actual), num]
+      catch error
+        actual = error.constructor
+        [actual is expected, expected?.name or q(expected), error.name, num]
       expr = ''
   results
 
