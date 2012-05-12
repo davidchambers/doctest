@@ -18,8 +18,8 @@ those rare occasions when tests of this nature are actually appropriate.
       }
     }
 
-To run doctests, pass `doctest` a path to the "module" to be tested. The
-path should be one of the following:
+To run doctests, pass `doctest` paths to one or more "modules" to be tested.
+Each path should be one of the following:
 
   - an absolute URL; e.g. "http://example.com/scripts/math-extensions.js"
   - a root-relative URL; e.g. "/scripts/math-extensions.js"

@@ -1,5 +1,8 @@
-window.doctest = (url) ->
+window.doctest = (urls...) ->
+  fetch url for url in urls
+  return
 
+fetch = (url) ->
   # Support relative paths; e.g. `doctest("./foo.js")`.
   if /^[.]/.test(url) and ($script = jQuery 'script[src$="doctest.js"]').length
     url = $script.attr('src').replace(/doctest[.]js$/, url)
@@ -12,7 +15,7 @@ window.doctest = (url) ->
     for [pass, expected, actual, num] in (r for r in results when not r[0])
       console.warn "expected #{expected} on line #{num} (got #{actual})"
 
-window.doctest.version = '0.1.1'
+window.doctest.version = '0.1.2'
 
 commented_lines = (text) ->
   lines = []
