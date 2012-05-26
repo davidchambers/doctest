@@ -20,14 +20,14 @@ fetch = (url) ->
     url = $script.attr('src').replace(/doctest[.]js$/, url)
 
   console.log "retrieving #{url}..."
-  jQuery.get url, (text) ->
+  jQuery.ajax url, dataType: 'text', success: (text) ->
     results = test text
     console.log "running doctests in #{url}..."
     console.log ((if pass then '.' else 'x') for [pass] in results).join ''
     for [pass, expected, actual, num] in (r for r in results when not r[0])
       console.warn "expected #{expected} on line #{num} (got #{actual})"
 
-window.doctest.version = '0.1.2'
+window.doctest.version = '0.1.3'
 
 commented_lines = (text) ->
   lines = []
