@@ -1,22 +1,24 @@
 # doctest
 
-A quick and (very) dirty implementation of JavaScript [doctests][1], for
-those rare occasions when tests of this nature are actually appropriate.
+A quick and (very) dirty implementation of JavaScript [doctests][1] (which are
+occasionally very useful).
 
-    Math.product = function () {
-      // > Math.product(3, 4, 5)
-      // 60
-      // > Math.product(2, "ten")
-      // NaN
-      // > Math.product(6)
-      // undefined
-      var idx = arguments.length
-      if (idx) {
-        var product = arguments[0]
-        while (--idx) product *= arguments[idx]
-        return product
-      }
-    }
+```javascript
+// > Math.product(3, 4, 5)
+// 60
+// > Math.product(2, "ten")
+// NaN
+// > Math.product(6)
+// undefined
+Math.product = function() {
+  var idx = arguments.length
+  if (idx) {
+    var product = arguments[0]
+    while (--idx) product *= arguments[idx]
+    return product
+  }
+}
+```
 
 To run doctests, pass `doctest` paths to one or more "modules" to be tested.
 Each path should be one of the following:
@@ -29,7 +31,7 @@ This can easily be done from a browser console:
 
     > doctest("./math-extensions.js")
     retrieving /scripts/./math-extensions.js...
-    running doctests in /scripts/./math-extensions.js...
+    running doctests in math-extensions.js...
     ..x
     expected undefined on line 7 (got 6)
 
@@ -39,23 +41,104 @@ Oops. Looks like we have a bug.
 
 It's easy to indicate that an error (of a particular kind) is expected:
 
-    // > (var x = 5)
-    // SyntaxError
     // > null.length
     // TypeError
 
 ### Scoping
 
-All expressions are eval'd in the global scope, so the following will leave
-a `user` property attached to the global object:
+doctest doesn't use a parser; it treats JavaScript files as lines of text.
+In spite of this, each doctest has access to variables in its scope chain:
 
-    // > user = {first_name: "Sheldon", last_name: "Cooper"}
-    // > user.first_name + " " + user.last_name
-    // "Sheldon Cooper"
+```javascript
+!function() {
 
-This shouldn't be a problem in practice (and it's actually rather useful in
-some cases), but it's worth bearing in mind that variables are available to
-all subsequent tests.
+  var x = 6
+  var y = 7
+  // > x * y
+  // 42
+
+}()
+```
+
+It's even possible to reference variables that have not yet been defined:
+
+```javascript
+!function() {
+
+  // > toUsername("Jesper Nøhr")
+  // "jespernhr"
+  // > toUsername(15 * 15)
+  // "225"
+  var toUsername = function(text) {
+    return ('' + text).replace(/\W/g, '').toLowerCase()
+  }
+
+}()
+```
+
+It's important to be familiar with the hack doctest employs to achieve this,
+since it places constraints on where doctests may appear in a file.
+
+Once doctest has retrieved a file via XMLHttpRequest, three things happen:
+
+1.  Input lines (single-line comments beginning with ">") and associated
+    output lines are rewritten as executable code (calls to `doctest.input`
+    and `doctest.output`, specifically).
+
+2.  The rewritten file is eval'd.
+
+3.  `doctest.run` is called, invoking functions queued in the previous step.
+
+In the first step, the code example above would be rewritten as:
+
+```javascript
+!function() {
+
+  doctest.input(function() { return toUsername("Jesper Nøhr") })
+  doctest.output(4, function() { return "jespernhr" })
+  doctest.input(function() { return 15 * 15 })
+  doctest.output(6, function() { return "225" })
+  var toUsername = function(text) {
+    return ('' + text).replace(/\W/g, '').toLowerCase()
+  }
+
+}()
+```
+
+The naive nature of the rewriter prevents this from working:
+
+```javascript
+MyApp.utils = {
+  // MyApp.utils.foo()
+  // "foo"
+  foo: function() {
+    return 'foo'
+  },
+  // MyApp.utils.bar()
+  // "bar"
+  bar: function() {
+    return 'bar'
+  }
+}
+```
+
+The code could be restructured to accommodate the rewriter:
+
+```javascript
+MyApp.utils = {}
+
+// MyApp.utils.foo()
+// "foo"
+MyApp.utils.foo = function() {
+  return 'foo'
+}
+
+// MyApp.utils.bar()
+// "bar"
+MyApp.utils.bar = function() {
+  return 'bar'
+}
+```
 
 ### Dependencies
 

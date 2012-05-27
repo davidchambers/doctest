@@ -13,16 +13,83 @@
 
 
 (function() {
-  var commented_lines, fetch, q, test,
+  var doctest, fetch, q, rewrite,
     __slice = [].slice;
 
-  window.doctest = function() {
-    var url, urls, _i, _len;
+  doctest = function() {
+    var urls;
     urls = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    for (_i = 0, _len = urls.length; _i < _len; _i++) {
-      url = urls[_i];
-      fetch(url);
+    return _.each(urls, fetch);
+  };
+
+  doctest.version = '0.2.0';
+
+  doctest.queue = [];
+
+  doctest.input = function(fn) {
+    return this.queue.push(fn);
+  };
+
+  doctest.output = function(num, fn) {
+    fn.line = num;
+    return this.queue.push(fn);
+  };
+
+  doctest.run = function() {
+    var actual, expected, fn, input, num, results;
+    results = [];
+    input = null;
+    while (fn = this.queue.shift()) {
+      if (!(num = fn.line)) {
+        if (typeof input === "function") {
+          input();
+        }
+        input = fn;
+        continue;
+      }
+      expected = fn();
+      results.push((function() {
+        try {
+          actual = input();
+          return [_.isEqual(actual, expected), q(expected), q(actual), num];
+        } catch (error) {
+          actual = error.constructor;
+          return [actual === expected, (expected != null ? expected.name : void 0) || q(expected), error.name, num];
+        }
+      })());
+      input = null;
     }
+    return this.complete(results);
+  };
+
+  doctest.complete = function(results) {
+    var actual, expected, num, pass, r, _i, _len, _ref, _ref1, _results;
+    console.log(((function() {
+      var _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = results.length; _i < _len; _i++) {
+        pass = results[_i][0];
+        _results.push(pass ? '.' : 'x');
+      }
+      return _results;
+    })()).join(''));
+    _ref = (function() {
+      var _j, _len, _results1;
+      _results1 = [];
+      for (_j = 0, _len = results.length; _j < _len; _j++) {
+        r = results[_j];
+        if (!r[0]) {
+          _results1.push(r);
+        }
+      }
+      return _results1;
+    })();
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      _ref1 = _ref[_i], pass = _ref1[0], expected = _ref1[1], actual = _ref1[2], num = _ref1[3];
+      _results.push(console.warn("expected " + expected + " on line " + num + " (got " + actual + ")"));
+    }
+    return _results;
   };
 
   fetch = function(url) {
@@ -34,81 +101,39 @@
     return jQuery.ajax(url, {
       dataType: 'text',
       success: function(text) {
-        var actual, expected, num, pass, r, results, _i, _len, _ref, _ref1, _results;
-        results = test(text);
-        console.log("running doctests in " + url + "...");
-        console.log(((function() {
-          var _i, _len, _results;
-          _results = [];
-          for (_i = 0, _len = results.length; _i < _len; _i++) {
-            pass = results[_i][0];
-            _results.push(pass ? '.' : 'x');
-          }
-          return _results;
-        })()).join(''));
-        _ref = (function() {
-          var _j, _len, _results1;
-          _results1 = [];
-          for (_j = 0, _len = results.length; _j < _len; _j++) {
-            r = results[_j];
-            if (!r[0]) {
-              _results1.push(r);
-            }
-          }
-          return _results1;
-        })();
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          _ref1 = _ref[_i], pass = _ref1[0], expected = _ref1[1], actual = _ref1[2], num = _ref1[3];
-          _results.push(console.warn("expected " + expected + " on line " + num + " (got " + actual + ")"));
-        }
-        return _results;
+        console.log("running doctests in " + (/[^/]+$/.exec(url)) + "...");
+        eval(rewrite(text));
+        return doctest.run();
       }
     });
   };
 
-  window.doctest.version = '0.1.3';
-
-  commented_lines = function(text) {
-    var idx, line, lines, match, _i, _len, _ref;
+  rewrite = function(text) {
+    var comment, expr, idx, line, lines, match, _i, _len, _ref;
     lines = [];
+    expr = '';
     _ref = text.split(/\r?\n|\r/);
     for (idx = _i = 0, _len = _ref.length; _i < _len; idx = ++_i) {
       line = _ref[idx];
       if (match = /^[ \t]*\/\/[ \t]*(.+)/.exec(line)) {
-        lines.push([idx + 1, match[1]]);
-      }
-    }
-    return lines;
-  };
-
-  test = function(text) {
-    var actual, expected, expr, line, match, num, results, _i, _len, _ref, _ref1;
-    results = [];
-    expr = '';
-    _ref = commented_lines(text);
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      _ref1 = _ref[_i], num = _ref1[0], line = _ref1[1];
-      if (match = /^>(.*)/.exec(line)) {
-        eval(expr);
-        expr = match[1];
-      } else if (match = /^[.](.*)/.exec(line)) {
-        expr += '\n' + match[1];
-      } else if (expr) {
-        expected = eval(line);
-        results.push((function() {
-          try {
-            actual = eval(expr);
-            return [_.isEqual(actual, expected), q(expected), q(actual), num];
-          } catch (error) {
-            actual = error.constructor;
-            return [actual === expected, (expected != null ? expected.name : void 0) || q(expected), error.name, num];
+        comment = match[1];
+        if (match = /^>(.*)/.exec(comment)) {
+          if (expr) {
+            lines.push("doctest.input(function(){return " + expr + "})");
           }
-        })());
-        expr = '';
+          expr = match[1];
+        } else if (match = /^[.](.*)/.exec(comment)) {
+          expr += '\n' + match[1];
+        } else if (expr) {
+          lines.push("doctest.input(function(){return " + expr + "})");
+          lines.push("doctest.output(" + (idx + 1) + ",function(){return " + comment + "})");
+          expr = '';
+        }
+      } else {
+        lines.push(line);
       }
     }
-    return results;
+    return lines.join('\n');
   };
 
   q = function(object) {
@@ -118,5 +143,7 @@
       return object;
     }
   };
+
+  window.doctest = doctest;
 
 }).call(this);
