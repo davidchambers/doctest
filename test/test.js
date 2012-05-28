@@ -58,23 +58,25 @@ global = 'global'
     return 3 * n
   }
 
+  12.
   // > [1,2,3,
   // .  4,5,6,
   // .  7,8,9]
   // [1,2,3,4,5,6,7,8,9]
-  //
+  13.
   // > text = "input " +
   // . "may span many " +
   // . "lines"
   // > text
   // "input may span many lines"
 
+  14.
   //>"no spaces"
   //"no spaces"
-  //
+  15.
   //     > "Docco-compatible whitespace"
   //     "Docco-compatible whitespace"
-  //
+  16.
   // > 2 > 1
   // true
 
