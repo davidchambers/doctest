@@ -12,7 +12,7 @@
 
 doctest = (urls...) -> _.each urls, fetch
 
-doctest.version = '0.2.0'
+doctest.version = '0.2.1'
 
 doctest.queue = []
 
@@ -32,13 +32,9 @@ doctest.run = ->
       input = fn
       continue
 
+    actual = try input() catch error then error.constructor
     expected = fn()
-    results.push try
-      actual = input()
-      [_.isEqual(actual, expected), q(expected), q(actual), num]
-    catch error
-      actual = error.constructor
-      [actual is expected, expected?.name or q(expected), error.name, num]
+    results.push [_.isEqual(actual, expected), q(expected), q(actual), num]
     input = null
 
   @complete results
@@ -81,7 +77,12 @@ rewrite = (text) ->
 
 
 q = (object) ->
-  if typeof object is 'string' then "\"#{object}\"" else object
+  switch typeof object
+    when 'string' then return "\"#{object}\""
+    when 'function'
+      try throw object()
+      catch error then return object.name if error instanceof Error
+  object
 
 
 window.doctest = doctest

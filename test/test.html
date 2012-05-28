@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>doctest test suite</title>
+  <script src="/doctest.js"></script>
+  <script src="https://raw.github.com/documentcloud/underscore/master/underscore.js"></script>
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <script src="http://code.jquery.com/qunit/git/qunit.js"></script>
+  <link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" />
+  <script>
+    jQuery(function($) {
+
+      doctest.complete = function(results) {
+        var idx = 0
+        var t = function(message, expected) {
+          if (expected[0]) expected[2] = expected[1]
+          deepEqual(results[idx++], expected, message)
+        }
+
+        t('global variable accessible in outer scope',
+          [true, '"global"', , 3])
+
+        t('global variable accessible in inner scope',
+          [true, '"global"', , 10])
+
+        t('local variable referenced, not shadowed global',
+          [true, '"shadowed"', , 14])
+
+        t('local variable accessible before declaratation',
+          [true, 2, , 20])
+
+        t('assignment is an expression',
+          [true, 3, , 25])
+
+        t('variable declared in doctest remains accessible',
+          [true, [1, 2, 3], , 28])
+
+        t('arithmetic error reported',
+          [false, 5, 4, 31])
+
+        t('TypeError captured and reported',
+          [true, 'TypeError', , 35])
+
+        t('TypeError expected but not reported',
+          [false, 'TypeError', 0, 38])
+
+        t('function accessible before declaration',
+          [true, 12, , 42])
+
+        t('NaN can be used as expected result',
+          [true, NaN, , 45])
+
+        t('function accessible after declaration',
+          [true, 4, , 53])
+
+        t('multiline input',
+          [true, [1, 2, 3, 4, 5, 6, 7, 8, 9], , 64])
+
+        t('multiline assignment',
+          [true, '"input may span many lines"', , 70])
+
+        t('spaces following "//" and ">" are optional',
+          [true, '"no spaces"', , 73])
+
+        t('indented doctest',
+          [true, '"Docco-compatible whitespace"', , 76])
+
+        t('">" in doctest',
+          [true, true, true, 79])
+
+        start()
+      }
+      asyncTest('all tests', function() {
+        doctest('./test.js')
+      })
+
+    })
+  </script>
+</head>
+<body>
+  <h1 id="qunit-header">doctest test suite</h1>
+  <h2 id="qunit-banner"></h2>
+  <div id="qunit-testrunner-toolbar"></div>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+</body>
+</html>

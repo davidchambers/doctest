@@ -22,7 +22,7 @@
     return _.each(urls, fetch);
   };
 
-  doctest.version = '0.2.0';
+  doctest.version = '0.2.1';
 
   doctest.queue = [];
 
@@ -47,16 +47,15 @@
         input = fn;
         continue;
       }
-      expected = fn();
-      results.push((function() {
+      actual = (function() {
         try {
-          actual = input();
-          return [_.isEqual(actual, expected), q(expected), q(actual), num];
+          return input();
         } catch (error) {
-          actual = error.constructor;
-          return [actual === expected, (expected != null ? expected.name : void 0) || q(expected), error.name, num];
+          return error.constructor;
         }
-      })());
+      })();
+      expected = fn();
+      results.push([_.isEqual(actual, expected), q(expected), q(actual), num]);
       input = null;
     }
     return this.complete(results);
@@ -137,11 +136,19 @@
   };
 
   q = function(object) {
-    if (typeof object === 'string') {
-      return "\"" + object + "\"";
-    } else {
-      return object;
+    switch (typeof object) {
+      case 'string':
+        return "\"" + object + "\"";
+      case 'function':
+        try {
+          throw object();
+        } catch (error) {
+          if (error instanceof Error) {
+            return object.name;
+          }
+        }
     }
+    return object;
   };
 
   window.doctest = doctest;

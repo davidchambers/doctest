@@ -145,6 +145,13 @@ MyApp.utils.bar = function() {
   - [jQuery][2]
   - [Underscore][3]
 
+### Running the test suite
+
+    npm install express
+    node test/server
+
+Visit [localhost:3000](http://localhost:3000/).
+
 
 [1]: http://docs.python.org/library/doctest.html
 [2]: http://jquery.com/
