@@ -12,7 +12,7 @@
 
 doctest = (urls...) -> _.each urls, fetch
 
-doctest.version = '0.2.1'
+doctest.version = '0.2.2'
 
 doctest.queue = []
 
@@ -58,18 +58,19 @@ fetch = (url) ->
 
 
 rewrite = (text) ->
+  f = (expr) -> "function() {\n  return #{expr}\n}"
   lines = []; expr = ''
   for line, idx in text.split /\r?\n|\r/
     if match = /^[ \t]*\/\/[ \t]*(.+)/.exec line
       comment = match[1]
       if match = /^>(.*)/.exec comment
-        lines.push "doctest.input(function(){return #{expr}})" if expr
+        lines.push "doctest.input(#{f expr});" if expr
         expr = match[1]
       else if match = /^[.](.*)/.exec comment
         expr += '\n' + match[1]
       else if expr
-        lines.push "doctest.input(function(){return #{expr}})"
-        lines.push "doctest.output(#{idx + 1},function(){return #{comment}})"
+        lines.push "doctest.input(#{f expr});"
+        lines.push "doctest.output(#{idx + 1}, #{f comment});"
         expr = ''
     else
       lines.push line

@@ -67,7 +67,13 @@
           [true, '"Docco-compatible whitespace"', , 78])
 
         t('">" in doctest',
-          [true, true, true, 81])
+          [true, true, , 81])
+
+        t('comment on input line',
+          [true, '"foobar"', , 85])
+
+        t('comment on output line',
+          [true, 25, , 88])
 
         start()
       }

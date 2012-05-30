@@ -94,10 +94,18 @@ In the first step, the code example above would be rewritten as:
 ```javascript
 !function() {
 
-  doctest.input(function() { return toUsername("Jesper Nøhr") })
-  doctest.output(4, function() { return "jespernhr" })
-  doctest.input(function() { return 15 * 15 })
-  doctest.output(6, function() { return "225" })
+  doctest.input(function() {
+    return toUsername("Jesper Nøhr")
+  });
+  doctest.output(4, function() {
+    return "jespernhr"
+  });
+  doctest.input(function() {
+    return 15 * 15
+  });
+  doctest.output(6, function() {
+    return "225"
+  });
   var toUsername = function(text) {
     return ('' + text).replace(/\W/g, '').toLowerCase()
   }

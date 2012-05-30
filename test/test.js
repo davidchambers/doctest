@@ -80,4 +80,16 @@ global = 'global'
   // > 2 > 1
   // true
 
+  17.
+  // > "foo" + "bar" // comment
+  // "foobar"
+  18.
+  // > 5 * 5
+  // 25 // comment
+
+  19.
+  // > "the rewriter should not rely"
+  // "on automatic semicolon insertion"
+  (4 + 4)
+
 }()

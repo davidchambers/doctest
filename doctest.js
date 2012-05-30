@@ -22,7 +22,7 @@
     return _.each(urls, fetch);
   };
 
-  doctest.version = '0.2.1';
+  doctest.version = '0.2.2';
 
   doctest.queue = [];
 
@@ -108,7 +108,10 @@
   };
 
   rewrite = function(text) {
-    var comment, expr, idx, line, lines, match, _i, _len, _ref;
+    var comment, expr, f, idx, line, lines, match, _i, _len, _ref;
+    f = function(expr) {
+      return "function() {\n  return " + expr + "\n}";
+    };
     lines = [];
     expr = '';
     _ref = text.split(/\r?\n|\r/);
@@ -118,14 +121,14 @@
         comment = match[1];
         if (match = /^>(.*)/.exec(comment)) {
           if (expr) {
-            lines.push("doctest.input(function(){return " + expr + "})");
+            lines.push("doctest.input(" + (f(expr)) + ");");
           }
           expr = match[1];
         } else if (match = /^[.](.*)/.exec(comment)) {
           expr += '\n' + match[1];
         } else if (expr) {
-          lines.push("doctest.input(function(){return " + expr + "})");
-          lines.push("doctest.output(" + (idx + 1) + ",function(){return " + comment + "})");
+          lines.push("doctest.input(" + (f(expr)) + ");");
+          lines.push("doctest.output(" + (idx + 1) + ", " + (f(comment)) + ");");
           expr = '';
         }
       } else {
