@@ -88,6 +88,11 @@ global = 'global'
   // 25 // comment
 
   20.
+  // > text = "The quick brown fox jumps over the lazy dog"
+  // > window.text
+  // "The quick brown fox jumps over the lazy dog"
+
+  21.
   // > "the rewriter should not rely"
   // "on automatic semicolon insertion"
   (4 + 4)

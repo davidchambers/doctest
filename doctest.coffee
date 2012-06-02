@@ -53,7 +53,11 @@ fetch = (url) ->
   console.log "retrieving #{url}..."
   jQuery.ajax url, dataType: 'text', success: (text) ->
     console.log "running doctests in #{/[^/]+$/.exec url}..."
-    eval rewrite text
+    # Functions created via `Function` are always run in the `window`
+    # context, which ensures that doctests can't access variables in
+    # _this_ context. A doctest which assigns to or references `text`
+    # sets/gets `window.text`, not this function's `text` parameter.
+    do Function rewrite text
     doctest.run()
 
 

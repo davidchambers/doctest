@@ -101,7 +101,7 @@
       dataType: 'text',
       success: function(text) {
         console.log("running doctests in " + (/[^/]+$/.exec(url)) + "...");
-        eval(rewrite(text));
+        Function(rewrite(text))();
         return doctest.run();
       }
     });
