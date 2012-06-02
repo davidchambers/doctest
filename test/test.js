@@ -1,46 +1,46 @@
-0.
+1.
 // > global
 // "global"
 global = 'global'
 
 !function() {
 
-  1.
+  2.
   // > global
   // "global"
   !function() {
-    2.
+    3.
     // > global
     // "shadowed"
     var global = 'shadowed'
   }()
 
-  3.
+  4.
   // > one * two
   // 2
   var one = 1
   var two = 2
-  4.
+  5.
   // > three = one + two
   // 3
-  5.
+  6.
   // > [one, two, three]
   // [1, 2, 3]
-  6.
+  7.
   // > two + two
   // 5
 
-  7.
+  8.
   // > null.length
   // TypeError
-  8.
+  9.
   // > [].length
   // TypeError
 
-  9.
+  10.
   // > double(6)
   // 12
-  10.
+  11.
   // > double()
   // NaN
   var double = function(n) {
@@ -48,7 +48,7 @@ global = 'global'
     // invoked immediately (i.e. at the top level or within an IIFE)
     return 2 * n
   }
-  11.
+  12.
   // > double.call(null, 2)
   // 4
 
@@ -58,36 +58,36 @@ global = 'global'
     return 3 * n
   }
 
-  12.
+  13.
   // > [1,2,3,
   // .  4,5,6,
   // .  7,8,9]
   // [1,2,3,4,5,6,7,8,9]
-  13.
+  14.
   // > text = "input " +
   // . "may span many " +
   // . "lines"
   // > text
   // "input may span many lines"
 
-  14.
+  15.
   //>"no spaces"
   //"no spaces"
-  15.
+  16.
   //     > "Docco-compatible whitespace"
   //     "Docco-compatible whitespace"
-  16.
+  17.
   // > 2 > 1
   // true
 
-  17.
+  18.
   // > "foo" + "bar" // comment
   // "foobar"
-  18.
+  19.
   // > 5 * 5
   // 25 // comment
 
-  19.
+  20.
   // > "the rewriter should not rely"
   // "on automatic semicolon insertion"
   (4 + 4)
