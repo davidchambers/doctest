@@ -1,6 +1,6 @@
 var app = require('express').createServer();
 
-app.get(/^\/((doc)?test[.]js)?$/, function (req, res) {
+app.get(/^\/((doc)?test[.](coffee|js))?$/, function (req, res) {
   res.sendfile(__dirname + '/' + (req.route.params[0] || 'test.html'));
 });
 

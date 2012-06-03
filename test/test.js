@@ -1,46 +1,46 @@
-1.
+1, 'global variable accessible in outer scope'
 // > global
 // "global"
 global = 'global'
 
 !function() {
 
-  2.
+  2, 'global variable accessible in inner scope'
   // > global
   // "global"
   !function() {
-    3.
+    3, 'local variable referenced, not shadowed global'
     // > global
     // "shadowed"
     var global = 'shadowed'
   }()
 
-  4.
+  4, 'local variable accessible before declaration'
   // > one * two
   // 2
   var one = 1
   var two = 2
-  5.
+  5, 'assignment is an expression'
   // > three = one + two
   // 3
-  6.
+  6, 'variable declared in doctest remains accessible'
   // > [one, two, three]
   // [1, 2, 3]
-  7.
+  7, 'arithmetic error reported'
   // > two + two
   // 5
 
-  8.
+  8, 'TypeError captured and reported'
   // > null.length
   // TypeError
-  9.
+  9, 'TypeError expected but not reported'
   // > [].length
   // TypeError
 
-  10.
+  10, 'function accessible before declaration'
   // > double(6)
   // 12
-  11.
+  11, 'NaN can be used as expected result'
   // > double()
   // NaN
   var double = function(n) {
@@ -48,7 +48,7 @@ global = 'global'
     // invoked immediately (i.e. at the top level or within an IIFE)
     return 2 * n
   }
-  12.
+  12, 'function accessible after declaration'
   // > double.call(null, 2)
   // 4
 
@@ -58,41 +58,41 @@ global = 'global'
     return 3 * n
   }
 
-  13.
+  13, 'multiline input'
   // > [1,2,3,
   // .  4,5,6,
   // .  7,8,9]
   // [1,2,3,4,5,6,7,8,9]
-  14.
+  14, 'multiline assignment'
   // > text = "input " +
   // . "may span many " +
   // . "lines"
   // > text
   // "input may span many lines"
 
-  15.
+  15, 'spaces following "//" and ">" are optional'
   //>"no spaces"
   //"no spaces"
-  16.
+  16, 'indented doctest'
   //     > "Docco-compatible whitespace"
   //     "Docco-compatible whitespace"
-  17.
+  17, '">" in doctest'
   // > 2 > 1
   // true
 
-  18.
+  18, 'comment on input line'
   // > "foo" + "bar" // comment
   // "foobar"
-  19.
+  19, 'comment on output line'
   // > 5 * 5
   // 25 // comment
 
-  20.
+  20, 'variable in creation context is not accessible'
   // > text = "The quick brown fox jumps over the lazy dog"
   // > window.text
   // "The quick brown fox jumps over the lazy dog"
 
-  21.
+  21, 'the rewriter should not rely on automatic semicolon insertion'
   // > "the rewriter should not rely"
   // "on automatic semicolon insertion"
   (4 + 4)

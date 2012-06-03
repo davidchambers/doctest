@@ -12,7 +12,7 @@
 
 doctest = (urls...) -> _.each urls, fetch
 
-doctest.version = '0.2.2'
+doctest.version = '0.3.0'
 
 doctest.queue = []
 
@@ -52,29 +52,40 @@ fetch = (url) ->
 
   console.log "retrieving #{url}..."
   jQuery.ajax url, dataType: 'text', success: (text) ->
-    console.log "running doctests in #{/[^/]+$/.exec url}..."
+    [name, type] = /[^/]+[.](coffee|js)$/.exec url
+    console.log "running doctests in #{name}..."
+    source = rewrite text, type
+    source = CoffeeScript.compile source if type is 'coffee'
     # Functions created via `Function` are always run in the `window`
     # context, which ensures that doctests can't access variables in
     # _this_ context. A doctest which assigns to or references `text`
     # sets/gets `window.text`, not this function's `text` parameter.
-    do Function rewrite text
+    do Function source
     doctest.run()
 
 
-rewrite = (text) ->
-  f = (expr) -> "function() {\n  return #{expr}\n}"
+rewrite = (text, type) ->
+  f = (expr) ->
+    switch type
+      when 'coffee' then "->\n#{indent}  #{expr}\n#{indent}"
+      when 'js' then "function() {\n#{indent}  return #{expr}\n#{indent}}"
+
+  comments =
+    coffee: /^([ \t]*)#[ \t]*(.+)/
+    js: /^([ \t]*)\/\/[ \t]*(.+)/
+
   lines = []; expr = ''
   for line, idx in text.split /\r?\n|\r/
-    if match = /^[ \t]*\/\/[ \t]*(.+)/.exec line
-      comment = match[1]
+    if match = comments[type].exec line
+      [match, indent, comment] = match
       if match = /^>(.*)/.exec comment
-        lines.push "doctest.input(#{f expr});" if expr
+        lines.push "#{indent}doctest.input(#{f expr});" if expr
         expr = match[1]
       else if match = /^[.](.*)/.exec comment
-        expr += '\n' + match[1]
+        expr += "\n#{indent}  #{match[1]}"
       else if expr
-        lines.push "doctest.input(#{f expr});"
-        lines.push "doctest.output(#{idx + 1}, #{f comment});"
+        lines.push "#{indent}doctest.input(#{f expr});"
+        lines.push "#{indent}doctest.output(#{idx + 1}, #{f comment});"
         expr = ''
     else
       lines.push line

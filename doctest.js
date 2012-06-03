@@ -22,7 +22,7 @@
     return _.each(urls, fetch);
   };
 
-  doctest.version = '0.2.2';
+  doctest.version = '0.3.0';
 
   doctest.queue = [];
 
@@ -100,35 +100,50 @@
     return jQuery.ajax(url, {
       dataType: 'text',
       success: function(text) {
-        console.log("running doctests in " + (/[^/]+$/.exec(url)) + "...");
-        Function(rewrite(text))();
+        var name, source, type, _ref;
+        _ref = /[^/]+[.](coffee|js)$/.exec(url), name = _ref[0], type = _ref[1];
+        console.log("running doctests in " + name + "...");
+        source = rewrite(text, type);
+        if (type === 'coffee') {
+          source = CoffeeScript.compile(source);
+        }
+        Function(source)();
         return doctest.run();
       }
     });
   };
 
-  rewrite = function(text) {
-    var comment, expr, f, idx, line, lines, match, _i, _len, _ref;
+  rewrite = function(text, type) {
+    var comment, comments, expr, f, idx, indent, line, lines, match, _i, _len, _ref, _ref1;
     f = function(expr) {
-      return "function() {\n  return " + expr + "\n}";
+      switch (type) {
+        case 'coffee':
+          return "->\n" + indent + "  " + expr + "\n" + indent;
+        case 'js':
+          return "function() {\n" + indent + "  return " + expr + "\n" + indent + "}";
+      }
+    };
+    comments = {
+      coffee: /^([ \t]*)#[ \t]*(.+)/,
+      js: /^([ \t]*)\/\/[ \t]*(.+)/
     };
     lines = [];
     expr = '';
     _ref = text.split(/\r?\n|\r/);
     for (idx = _i = 0, _len = _ref.length; _i < _len; idx = ++_i) {
       line = _ref[idx];
-      if (match = /^[ \t]*\/\/[ \t]*(.+)/.exec(line)) {
-        comment = match[1];
+      if (match = comments[type].exec(line)) {
+        _ref1 = match, match = _ref1[0], indent = _ref1[1], comment = _ref1[2];
         if (match = /^>(.*)/.exec(comment)) {
           if (expr) {
-            lines.push("doctest.input(" + (f(expr)) + ");");
+            lines.push("" + indent + "doctest.input(" + (f(expr)) + ");");
           }
           expr = match[1];
         } else if (match = /^[.](.*)/.exec(comment)) {
-          expr += '\n' + match[1];
+          expr += "\n" + indent + "  " + match[1];
         } else if (expr) {
-          lines.push("doctest.input(" + (f(expr)) + ");");
-          lines.push("doctest.output(" + (idx + 1) + ", " + (f(comment)) + ");");
+          lines.push("" + indent + "doctest.input(" + (f(expr)) + ");");
+          lines.push("" + indent + "doctest.output(" + (idx + 1) + ", " + (f(comment)) + ");");
           expr = '';
         }
       } else {

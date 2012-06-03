@@ -1,41 +1,54 @@
 # doctest
 
-A quick and (very) dirty implementation of JavaScript [doctests][1] (which are
-occasionally very useful).
+[Doctests][1] are executable usage examples sometimes found in "docstrings".
+JavaScript doesn't have docstrings, but inline documentation can be included
+in code comments. doctest executes usage examples in JavaScript/CoffeeScript
+comments to verify that one's code and inline documentation are in agreement.
 
-```javascript
-// > Math.product(3, 4, 5)
-// 60
-// > Math.product(2, "ten")
-// NaN
-// > Math.product(6)
-// undefined
-Math.product = function() {
-  var idx = arguments.length
-  if (idx) {
-    var product = arguments[0]
-    while (--idx) product *= arguments[idx]
-    return product
-  }
-}
+```coffeescript
+# ### Math.product
+#
+# Return the product of two or more numeric values:
+#
+#     > Math.product -2, 2.5, "3"
+#     -15
+#
+# `NaN` is returned if the values cannot all be coerced to numbers:
+#
+#     > Math.product 2, "ten"
+#     NaN
+#
+# `undefined` is returned if fewer than two values are provided:
+#
+#     > Math.product 100
+#     undefined
+#
+Math.product = (numbers...) ->
+  return unless numbers.length
+  product = 1
+  product *= number for number in numbers
+  product
 ```
+
+Doctests needn't be indented, though there's no harm in being
+[Docco-friendly][2].
 
 To run doctests, pass `doctest` paths to one or more "modules" to be tested.
 Each path should be one of the following:
 
-  - an absolute URL; e.g. "http://example.com/scripts/math-extensions.js"
-  - a root-relative URL; e.g. "/scripts/math-extensions.js"
-  - a path relative to doctest.js; e.g. "./math-extensions.js"
+  - an absolute URL; e.g. "http://example.com/scripts/some-module.js"
+  - a root-relative URL; e.g. "/scripts/some-module.js"
+  - a path relative to doctest.js; e.g. "./some-module.js"
 
 This can easily be done from a browser console:
 
-    > doctest("./math-extensions.js")
-    retrieving /scripts/./math-extensions.js...
-    running doctests in math-extensions.js...
+    > doctest("../src/math-extensions.coffee")
+    retrieving /scripts/lib/../src/math-extensions.coffee...
+    running doctests in math-extensions.coffee...
     ..x
-    expected undefined on line 7 (got 6)
+    expected undefined on line 16 (got 100)
 
-Oops. Looks like we have a bug.
+Oops. Looks like we have a disagreement.
 
 ### Errors
 
@@ -150,8 +163,8 @@ MyApp.utils.bar = function() {
 
 ### Dependencies
 
-  - [jQuery][2]
-  - [Underscore][3]
+  - [jQuery][3]
+  - [Underscore][4]
 
 ### Running the test suite
 
@@ -162,5 +175,6 @@ Visit [localhost:3000](http://localhost:3000/).
 
 
 [1]: http://docs.python.org/library/doctest.html
-[2]: http://jquery.com/
-[3]: http://documentcloud.github.com/underscore/
+[2]: http://bit.ly/LaeTsw
+[3]: http://jquery.com/
+[4]: http://documentcloud.github.com/underscore/
