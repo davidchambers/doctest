@@ -131,12 +131,12 @@ The naive nature of the rewriter prevents this from working:
 
 ```javascript
 MyApp.utils = {
-  // MyApp.utils.foo()
+  // > MyApp.utils.foo()
   // "foo"
   foo: function() {
     return 'foo'
   },
-  // MyApp.utils.bar()
+  // > MyApp.utils.bar()
   // "bar"
   bar: function() {
     return 'bar'
@@ -149,13 +149,13 @@ The code could be restructured to accommodate the rewriter:
 ```javascript
 MyApp.utils = {}
 
-// MyApp.utils.foo()
+// > MyApp.utils.foo()
 // "foo"
 MyApp.utils.foo = function() {
   return 'foo'
 }
 
-// MyApp.utils.bar()
+// > MyApp.utils.bar()
 // "bar"
 MyApp.utils.bar = function() {
   return 'bar'
