@@ -6,7 +6,8 @@ in code comments. doctest executes usage examples in JavaScript/CoffeeScript
 comments to verify that one's code and inline documentation are in agreement.
 
 ```coffeescript
-# ### Math.product
+# Math.product
+# ------------
 #
 # Return the product of two or more numeric values:
 #
@@ -46,7 +47,7 @@ This can easily be done from a browser console:
     retrieving /scripts/lib/../src/math-extensions.coffee...
     running doctests in math-extensions.coffee...
     ..x
-    expected undefined on line 16 (got 100)
+    expected undefined on line 17 (got 100)
 
 Oops. Looks like we have a disagreement.
 
@@ -175,6 +176,6 @@ Visit [localhost:3000](http://localhost:3000/).
 
 
 [1]: http://docs.python.org/library/doctest.html
-[2]: http://bit.ly/LaeTsw
+[2]: http://bit.ly/LanyLq
 [3]: http://jquery.com/
 [4]: http://documentcloud.github.com/underscore/
