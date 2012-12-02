@@ -1,6 +1,6 @@
 .PHONY: compile clean setup test
 
-coffee = coffee
+coffee = node_modules/.bin/coffee
 
 compile:
 	@$(coffee) --compile --output lib src
