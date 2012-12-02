@@ -1,1 +1,1 @@
-../doctest.js
+../lib/doctest.js
