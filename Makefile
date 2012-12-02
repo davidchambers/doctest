@@ -10,7 +10,7 @@ clean:
 	@git checkout -- lib
 
 setup:
-	@npm install express
+	@npm install
 
 test:
 	@node test/server

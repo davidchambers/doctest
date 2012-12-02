@@ -1,0 +1,14 @@
+{
+  "name": "doctest",
+  "version": "0.3.0",
+  "description": "Quick and dirty doctests for JavaScript and CoffeeScript",
+  "main": "./lib/doctest",
+  "bin": "./bin/doctest",
+  "dependencies": {
+    "coffee-script": "1.4.x",
+    "underscore": "1.4.x"
+  },
+  "devDependencies": {
+    "express": "3.0.x"
+  }
+}
