@@ -169,8 +169,8 @@ MyApp.utils.bar = function() {
 
 ### Running the test suite
 
-    npm install express
-    node test/server
+    make setup
+    make test
 
 Visit [localhost:3000](http://localhost:3000/).
 
