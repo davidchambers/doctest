@@ -1,0 +1,3 @@
+- `do Function source` is compulsory, must work also with node
+- remove window mock, add window condition
+- makefile, npm test, travis
