@@ -4,7 +4,7 @@ compile:
 	@coffee --compile --output lib src
 
 setup:
-	@npm install express
+	@npm install
 
 test:
 	@node test/server

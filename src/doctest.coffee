@@ -12,6 +12,14 @@
 
 doctest = (urls...) -> _.each urls, fetch
 
+if typeof window isnt 'undefined'
+  {_, CoffeeScript} = window
+  window.doctest = doctest
+else
+  _ = require 'underscore'
+  CoffeeScript = require 'coffee-script'
+  module.exports = doctest
+
 doctest.version = '0.3.0'
 
 doctest.queue = []
@@ -51,7 +59,10 @@ fetch = (url) ->
     url = $script.attr('src').replace(/doctest[.]js$/, url)
 
   console.log "retrieving #{url}..."
-  jQuery.ajax url, dataType: 'text', success: (text) ->
+  jQuery.ajax url, dataType: 'text', success: doctest.generate_fetch_callback url
+
+doctest.generate_fetch_callback = (url) ->
+  (text) ->
     [name, type] = /[^/]+[.](coffee|js)$/.exec url
     console.log "running doctests in #{name}..."
     source = rewrite text, type
@@ -60,7 +71,7 @@ fetch = (url) ->
     # context, which ensures that doctests can't access variables in
     # _this_ context. A doctest which assigns to or references `text`
     # sets/gets `window.text`, not this function's `text` parameter.
-    do Function source
+    if typeof window isnt 'undefined' then do Function source else eval source
     doctest.run()
 
 
@@ -75,6 +86,10 @@ rewrite = (text, type) ->
     js: /^([ \t]*)\/\/[ \t]*(.+)/
 
   lines = []; expr = ''
+  if typeof window is 'undefined'
+    lines.push switch type
+      when 'coffee' then 'doctest = require "./doctest"'
+      when 'js' then 'var doctest = require("./doctest");'
   for line, idx in text.split /\r?\n|\r/
     if match = comments[type].exec line
       [match, indent, comment] = match
@@ -99,6 +114,3 @@ q = (object) ->
       try throw object()
       catch error then return object.name if error instanceof Error
   object
-
-
-window.doctest = doctest
