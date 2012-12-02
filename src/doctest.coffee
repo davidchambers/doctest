@@ -53,26 +53,32 @@ doctest.complete = (results) ->
     console.warn "expected #{expected} on line #{num} (got #{actual})"
 
 
-fetch = (url) ->
-  # Support relative paths; e.g. `doctest("./foo.js")`.
-  if /^[.]/.test(url) and ($script = jQuery 'script[src$="doctest.js"]').length
-    url = $script.attr('src').replace(/doctest[.]js$/, url)
-
-  console.log "retrieving #{url}..."
-  jQuery.ajax url, dataType: 'text', success: doctest.generate_fetch_callback url
-
-doctest.generate_fetch_callback = (url) ->
-  (text) ->
-    [name, type] = /[^/]+[.](coffee|js)$/.exec url
-    console.log "running doctests in #{name}..."
-    source = rewrite text, type
-    source = CoffeeScript.compile source if type is 'coffee'
-    # Functions created via `Function` are always run in the `window`
-    # context, which ensures that doctests can't access variables in
-    # _this_ context. A doctest which assigns to or references `text`
-    # sets/gets `window.text`, not this function's `text` parameter.
-    if typeof window isnt 'undefined' then do Function source else eval source
-    doctest.run()
+fetch = (path) ->
+  console.log "retrieving #{path}..."
+  if typeof window isnt 'undefined'
+    # Support relative paths; e.g. `doctest("./foo.js")`.
+    if path[0] is '.' and (script = jQuery 'script[src$="doctest.js"]').length
+      path = script.attr('src').replace(/doctest[.]js$/, path)
+    jQuery.ajax path, dataType: 'text', success: (text) ->
+      [name, type] = /[^/]+[.](coffee|js)$/.exec path
+      console.log "running doctests in #{name}..."
+      source = rewrite text, type
+      source = CoffeeScript.compile source if type is 'coffee'
+      # Functions created via `Function` are always run in the `window`
+      # context, which ensures that doctests can't access variables in
+      # _this_ context. A doctest which assigns to or references `text`
+      # sets/gets `window.text`, not this function's `text` parameter.
+      do Function source
+      doctest.run()
+  else
+    fs = require 'fs'
+    fs.readFile path, 'utf8', (err, text) ->
+      [name, type] = /[^/]+[.](coffee|js)$/.exec path
+      console.log "running doctests in #{name}..."
+      source = rewrite text, type
+      source = CoffeeScript.compile source if type is 'coffee'
+      eval source
+      doctest.run()
 
 
 rewrite = (text, type) ->
