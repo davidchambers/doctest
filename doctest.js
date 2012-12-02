@@ -13,21 +13,19 @@
 
 
 (function() {
-  var doctest, fetch, q, rewrite, underscore,
+  var doctest, fetch, q, rewrite, _,
     __slice = [].slice;
 
   if (typeof require !== "undefined" && require !== null) {
-    underscore = require('underscore');
+    _ = require('underscore');
+  } else {
+    _ = window._;
   }
 
   doctest = function() {
     var urls;
     urls = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    if (underscore != null) {
-      return underscore.each(urls, fetch);
-    } else {
-      return _.each(urls, fetch);
-    }
+    return _.each(urls, fetch);
   };
 
   doctest.version = '0.3.0';
@@ -63,11 +61,7 @@
         }
       })();
       expected = fn();
-      if (underscore != null) {
-        results.push([underscore.isEqual(actual, expected), q(expected), q(actual), num]);
-      } else {
-        results.push([_.isEqual(actual, expected), q(expected), q(actual), num]);
-      }
+      results.push([_.isEqual(actual, expected), q(expected), q(actual), num]);
       input = null;
     }
     return this.complete(results);

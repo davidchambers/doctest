@@ -10,13 +10,11 @@
 
 ###
 if require?
-    underscore = require 'underscore'
+  _ = require 'underscore'
+else
+  _ = window._
 
-doctest = (urls...) ->
-    if underscore?
-        underscore.each urls, fetch
-    else
-        _.each urls, fetch
+doctest = (urls...) -> _.each urls, fetch
 
 doctest.version = '0.3.0'
 
@@ -40,10 +38,7 @@ doctest.run = ->
 
     actual = try input() catch error then error.constructor
     expected = fn()
-    if underscore?
-        results.push [underscore.isEqual(actual, expected), q(expected), q(actual), num]
-    else
-        results.push [_.isEqual(actual, expected), q(expected), q(actual), num]
+    results.push [_.isEqual(actual, expected), q(expected), q(actual), num]
     input = null
 
   @complete results
@@ -63,19 +58,19 @@ fetch = (url) ->
   jQuery.ajax url, dataType: 'text', success: doctest.generate_fetch_callback url
 
 doctest.generate_fetch_callback = (url) ->
-    return (text) ->
-        [name, type] = /[^/]+[.](coffee|js)$/.exec url
-        console.log "running doctests in #{name}..."
-        source = rewrite text, type
-        if require?
-            CoffeeScript = require 'coffee-script'
-        source = CoffeeScript.compile source if type is 'coffee'
-        # Functions created via `Function` are always run in the `window`
-        # context, which ensures that doctests can't access variables in
-        # _this_ context. A doctest which assigns to or references `text`
-        # sets/gets `window.text`, not this function's `text` parameter.
-        eval source
-        doctest.run()
+  return (text) ->
+    [name, type] = /[^/]+[.](coffee|js)$/.exec url
+    console.log "running doctests in #{name}..."
+    source = rewrite text, type
+    if require?
+      CoffeeScript = require 'coffee-script'
+    source = CoffeeScript.compile source if type is 'coffee'
+    # Functions created via `Function` are always run in the `window`
+    # context, which ensures that doctests can't access variables in
+    # _this_ context. A doctest which assigns to or references `text`
+    # sets/gets `window.text`, not this function's `text` parameter.
+    eval source
+    doctest.run()
 
 rewrite = (text, type) ->
   f = (expr) ->
