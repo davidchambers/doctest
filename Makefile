@@ -13,4 +13,4 @@ setup:
 	@npm install
 
 test:
-	@node test/server
+	@$(coffee) test/server
