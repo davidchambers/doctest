@@ -7,4 +7,4 @@ setup:
 	@npm install
 
 test:
-	@node test/server
+	@node_modules/coffee-script/bin/coffee test/server
