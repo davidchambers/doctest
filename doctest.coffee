@@ -9,8 +9,14 @@
     .....................x.......xx.x.................................
 
 ###
+if require?
+    underscore = require 'underscore'
 
-doctest = (urls...) -> _.each urls, fetch
+doctest = (urls...) ->
+    if underscore?
+        underscore.each urls, fetch
+    else
+        _.each urls, fetch
 
 doctest.version = '0.3.0'
 
@@ -34,7 +40,10 @@ doctest.run = ->
 
     actual = try input() catch error then error.constructor
     expected = fn()
-    results.push [_.isEqual(actual, expected), q(expected), q(actual), num]
+    if underscore?
+        results.push [underscore.isEqual(actual, expected), q(expected), q(actual), num]
+    else
+        results.push [_.isEqual(actual, expected), q(expected), q(actual), num]
     input = null
 
   @complete results
@@ -51,18 +60,22 @@ fetch = (url) ->
     url = $script.attr('src').replace(/doctest[.]js$/, url)
 
   console.log "retrieving #{url}..."
-  jQuery.ajax url, dataType: 'text', success: (text) ->
-    [name, type] = /[^/]+[.](coffee|js)$/.exec url
-    console.log "running doctests in #{name}..."
-    source = rewrite text, type
-    source = CoffeeScript.compile source if type is 'coffee'
-    # Functions created via `Function` are always run in the `window`
-    # context, which ensures that doctests can't access variables in
-    # _this_ context. A doctest which assigns to or references `text`
-    # sets/gets `window.text`, not this function's `text` parameter.
-    do Function source
-    doctest.run()
+  jQuery.ajax url, dataType: 'text', success: doctest.generate_fetch_callback url
 
+doctest.generate_fetch_callback = (url) ->
+    return (text) ->
+        [name, type] = /[^/]+[.](coffee|js)$/.exec url
+        console.log "running doctests in #{name}..."
+        source = rewrite text, type
+        if require?
+            CoffeeScript = require 'coffee-script'
+        source = CoffeeScript.compile source if type is 'coffee'
+        # Functions created via `Function` are always run in the `window`
+        # context, which ensures that doctests can't access variables in
+        # _this_ context. A doctest which assigns to or references `text`
+        # sets/gets `window.text`, not this function's `text` parameter.
+        eval source
+        doctest.run()
 
 rewrite = (text, type) ->
   f = (expr) ->
@@ -74,7 +87,13 @@ rewrite = (text, type) ->
     coffee: /^([ \t]*)#[ \t]*(.+)/
     js: /^([ \t]*)\/\/[ \t]*(.+)/
 
-  lines = []; expr = ''
+  expr = ''
+  if require?
+      switch type
+          when 'coffee' then lines = ['doctest=require "doctest"']
+          when 'js' then lines = ['var doctest=require("doctest");']
+  else
+      lines = []
   for line, idx in text.split /\r?\n|\r/
     if match = comments[type].exec line
       [match, indent, comment] = match
@@ -102,3 +121,5 @@ q = (object) ->
 
 
 window.doctest = doctest
+if module?
+    module.exports = doctest

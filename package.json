@@ -1,0 +1,11 @@
+{
+    "name" : "doctest",
+    "main" : "doctest.js",
+    "bin"  : {"doctest" : "command.js"},
+    "version" : "0.0.0",
+    "dependencies" : {
+        "underscore" : "*",
+        "coffee-script" : "*",
+        "jsdom": "*"
+    }
+}
