@@ -179,7 +179,7 @@ Visit [localhost:3000](http://localhost:3000/).
 #### From the command line
 
     make setup
-    ./node_modules/.bin/doctest test/test.js
+    bin/doctest test/test.js
 
 
 [1]: http://docs.python.org/library/doctest.html
