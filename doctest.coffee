@@ -84,9 +84,9 @@ rewrite = (text, type) ->
 
   expr = ''
   if require?
-      switch type
-          when 'coffee' then lines = ['doctest=require "doctest"']
-          when 'js' then lines = ['var doctest=require("doctest");']
+    switch type
+      when 'coffee' then lines = ['doctest=require "doctest"']
+      when 'js' then lines = ['var doctest=require("doctest");']
   else
       lines = []
   for line, idx in text.split /\r?\n|\r/
@@ -117,4 +117,4 @@ q = (object) ->
 
 window.doctest = doctest
 if module?
-    module.exports = doctest
+  module.exports = doctest
