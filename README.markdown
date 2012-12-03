@@ -171,15 +171,16 @@ MyApp.utils.bar = function() {
 
 #### From the browser
 
-    npm install express
-    node test/server
+    make setup
+    make test
 
 Visit [localhost:3000](http://localhost:3000/).
 
 #### From the command line
 
-    npm install
-    ./node_modules/.bin/doctest test/test.js
+    make setup
+    coffee test/cli
+
 
 [1]: http://docs.python.org/library/doctest.html
 [2]: http://bit.ly/LanyLq

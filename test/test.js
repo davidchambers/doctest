@@ -64,10 +64,10 @@ global = 'global'
   // .  7,8,9]
   // [1,2,3,4,5,6,7,8,9]
   14, 'multiline assignment'
-  // > text = "input " +
+  // > string = "input " +
   // . "may span many " +
   // . "lines"
-  // > text
+  // > string
   // "input may span many lines"
 
   15, 'spaces following "//" and ">" are optional'
@@ -88,9 +88,8 @@ global = 'global'
   // 25 // comment
 
   20, 'variable in creation context is not accessible'
-  // > text = "The quick brown fox jumps over the lazy dog"
-  // > window.text
-  // "The quick brown fox jumps over the lazy dog"
+  // > typeof text
+  // "undefined"
 
   21, 'the rewriter should not rely on automatic semicolon insertion'
   // > "the rewriter should not rely"
