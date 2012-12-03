@@ -21,5 +21,11 @@ app.get '/doctest.js', (req, res) ->
     res.contentType 'js'
     res.send CoffeeScript.compile text
 
+['browser', 'tests'].forEach (name) ->
+  app.get "/#{name}.js", (req, res) ->
+    fs.readFile path.resolve('test', "#{name}.coffee"), 'utf8', (err, text) ->
+      res.contentType 'js'
+      res.send CoffeeScript.compile text
+
 port = process.env.PORT ? 3000
 app.listen port, -> console.log "listening on port #{port}"

@@ -179,7 +179,7 @@ Visit [localhost:3000](http://localhost:3000/).
 #### From the command line
 
     make setup
-    bin/doctest test/test.js
+    coffee test/cli
 
 
 [1]: http://docs.python.org/library/doctest.html
