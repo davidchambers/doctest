@@ -77,7 +77,11 @@ fetch = (path) ->
       console.log "running doctests in #{name}..."
       source = rewrite text, type
       source = CoffeeScript.compile source if type is 'coffee'
-      eval source
+      name += "-#{+new Date}"
+      file = "#{__dirname}/#{name}.js"
+      fs.writeFileSync file, source, 'utf8'
+      require "./#{name}"
+      fs.unlink file
       doctest.run()
 
 
