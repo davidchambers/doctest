@@ -172,7 +172,7 @@ MyApp.utils.bar = function() {
     make setup
     make test
 
-Visit [localhost:3000](http://localhost:3000/).
+This runs doctest's test suite: first headless, then in a browser.
 
 
 [1]: http://docs.python.org/library/doctest.html
