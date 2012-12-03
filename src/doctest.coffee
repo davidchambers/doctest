@@ -71,12 +71,17 @@ fetch = (url) ->
       do Function source
       doctest.run()
   else
-    require('fs').readFile url, 'utf8', (err, text) ->
+    fs = require 'fs'
+    fs.readFile url, 'utf8', (err, text) ->
       [name, type] = /[^/]+[.](coffee|js)$/.exec url
       console.log "running doctests in #{name}..."
       source = rewrite text, type
       source = CoffeeScript.compile source if type is 'coffee'
-      eval source
+      name += "-#{+new Date}"
+      path = "#{__dirname}/#{name}.js"
+      fs.writeFileSync path, source, 'utf8'
+      require "./#{name}"
+      fs.unlink path
       doctest.run()
 
 
