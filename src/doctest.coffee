@@ -9,19 +9,15 @@
     .....................x.......xx.x.................................
 
 ###
-if require?
-  _ = require 'underscore'
-else
-  _ = window._
-
-doctest = (urls...) -> _.each urls, fetch
 
 if typeof window isnt 'undefined'
   {_, CoffeeScript} = window
+  doctest = (urls...) -> _.each urls, fetch
   window.doctest = doctest
 else
   _ = require 'underscore'
   CoffeeScript = require 'coffee-script'
+  doctest = (urls...) -> _.each urls, fetch
   module.exports = doctest
 
 doctest.version = '0.3.0'
@@ -127,9 +123,3 @@ q = (object) ->
       try throw object()
       catch error then return object.name if error instanceof Error
   object
-
-
-if window?
-  window.doctest = doctest
-if module?
-  module.exports = doctest
