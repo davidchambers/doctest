@@ -12,6 +12,14 @@
 
 doctest = (urls...) -> _.each urls, fetch
 
+if typeof window isnt 'undefined'
+  {_, CoffeeScript} = window
+  window.doctest = doctest
+else
+  _ = require 'underscore'
+  CoffeeScript = require 'coffee-script'
+  module.exports = doctest
+
 doctest.version = '0.3.0'
 
 doctest.queue = []
@@ -46,23 +54,35 @@ doctest.complete = (results) ->
 
 
 fetch = (url) ->
-  # Support relative paths; e.g. `doctest("./foo.js")`.
-  if /^[.]/.test(url) and ($script = jQuery 'script[src$="doctest.js"]').length
-    url = $script.attr('src').replace(/doctest[.]js$/, url)
-
   console.log "retrieving #{url}..."
-  jQuery.ajax url, dataType: 'text', success: (text) ->
-    [name, type] = /[^/]+[.](coffee|js)$/.exec url
-    console.log "running doctests in #{name}..."
-    source = rewrite text, type
-    source = CoffeeScript.compile source if type is 'coffee'
-    # Functions created via `Function` are always run in the `window`
-    # context, which ensures that doctests can't access variables in
-    # _this_ context. A doctest which assigns to or references `text`
-    # sets/gets `window.text`, not this function's `text` parameter.
-    do Function source
-    doctest.run()
-
+  if typeof window isnt 'undefined'
+    # Support relative paths; e.g. `doctest("./foo.js")`.
+    if url[0] is '.' and ($script = jQuery 'script[src$="doctest.js"]').length
+      url = $script.attr('src').replace(/doctest[.]js$/, url)
+    jQuery.ajax url, dataType: 'text', success: (text) ->
+      [name, type] = /[^/]+[.](coffee|js)$/.exec url
+      console.log "running doctests in #{name}..."
+      source = rewrite text, type
+      source = CoffeeScript.compile source if type is 'coffee'
+      # Functions created via `Function` are always run in the `window`
+      # context, which ensures that doctests can't access variables in
+      # _this_ context. A doctest which assigns to or references `text`
+      # sets/gets `window.text`, not this function's `text` parameter.
+      do Function source
+      doctest.run()
+  else
+    fs = require 'fs'
+    fs.readFile url, 'utf8', (err, text) ->
+      [name, type] = /[^/]+[.](coffee|js)$/.exec url
+      console.log "running doctests in #{name}..."
+      source = rewrite text, type
+      source = CoffeeScript.compile source if type is 'coffee'
+      name += "-#{+new Date}"
+      path = "#{__dirname}/#{name}.js"
+      fs.writeFileSync path, source, 'utf8'
+      require "./#{name}"
+      fs.unlink path
+      doctest.run()
 
 rewrite = (text, type) ->
   f = (expr) ->
@@ -75,6 +95,10 @@ rewrite = (text, type) ->
     js: /^([ \t]*)\/\/[ \t]*(.+)/
 
   lines = []; expr = ''
+  if typeof window is 'undefined'
+    lines.push switch type
+      when 'coffee' then 'doctest = require "./doctest"'
+      when 'js' then 'var doctest = require("./doctest");'
   for line, idx in text.split /\r?\n|\r/
     if match = comments[type].exec line
       [match, indent, comment] = match
@@ -99,6 +123,3 @@ q = (object) ->
       try throw object()
       catch error then return object.name if error instanceof Error
   object
-
-
-window.doctest = doctest
