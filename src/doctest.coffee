@@ -10,14 +10,14 @@
 
 ###
 
+doctest = (urls...) -> _.each urls, fetch
+
 if typeof window isnt 'undefined'
   {_, CoffeeScript} = window
-  doctest = (urls...) -> _.each urls, fetch
   window.doctest = doctest
 else
   _ = require 'underscore'
   CoffeeScript = require 'coffee-script'
-  doctest = (urls...) -> _.each urls, fetch
   module.exports = doctest
 
 doctest.version = '0.3.0'
