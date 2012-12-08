@@ -34,14 +34,18 @@ Math.product = (numbers...) ->
 Doctests needn't be indented, though there's no harm in being
 [Docco-friendly][2].
 
+### Running doctests
+
 To run doctests, pass `doctest` paths to one or more "modules" to be tested.
-Each path should be one of the following:
+Doctests can be run from the command line or from a browser console: provide
+local file system paths in the former case, URLs in the latter. Specifically,
+each URL should be one of the following:
 
   - an absolute URL; e.g. "http://example.com/scripts/some-module.js"
   - a root-relative URL; e.g. "/scripts/some-module.js"
   - a path relative to doctest.js; e.g. "./some-module.js"
 
-This can easily be done from a browser console:
+For example:
 
     > doctest("../src/math-extensions.coffee")
     retrieving /scripts/lib/../src/math-extensions.coffee...
@@ -164,6 +168,8 @@ MyApp.utils.bar = function() {
 
 ### Dependencies
 
+The following libraries are required to run doctests from a browser console:
+
   - [jQuery][3]
   - [Underscore][4]
 
@@ -178,4 +184,4 @@ This runs doctest's test suite: first headless, then in a browser.
 [1]: http://docs.python.org/library/doctest.html
 [2]: http://bit.ly/LanyLq
 [3]: http://jquery.com/
-[4]: http://documentcloud.github.com/underscore/
+[4]: http://underscorejs.org/

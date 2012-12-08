@@ -20,7 +20,7 @@ else
   CoffeeScript = require 'coffee-script'
   module.exports = doctest
 
-doctest.version = '0.3.0'
+doctest.version = '0.4.0'
 
 doctest.queue = []
 
