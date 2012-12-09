@@ -1,6 +1,6 @@
 {
   "name": "doctest",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Quick and dirty doctests for JavaScript and CoffeeScript",
   "author": "David Chambers <dc@hashify.me>",
   "keywords": ["doctests", "test", "browser"],
