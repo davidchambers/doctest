@@ -60,7 +60,7 @@ global = 'global'
 
   13, 'multiline input'
   // > [1,2,3,
-  // ...  4,5,6,
+  // .  4,5,6,
   // .  7,8,9]
   // [1,2,3,4,5,6,7,8,9]
   14, 'multiline assignment'
@@ -96,7 +96,15 @@ global = 'global'
   // ..5
   // 9.5
 
-  22, 'the rewriter should not rely on automatic semicolon insertion'
+  22, 'wrapped lines may begin with more than one "."'
+  // > 1000 +
+  // .. 200 +
+  // ... 30 +
+  // .... 4 +
+  // ..... .5
+  // 1234.5
+
+  23, 'the rewriter should not rely on automatic semicolon insertion'
   // > "the rewriter should not rely"
   // "on automatic semicolon insertion"
   (4 + 4)

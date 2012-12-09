@@ -96,7 +96,15 @@ do ->
   # ..5
   # 9.5
 
-  22: 'the rewriter should not rely on automatic semicolon insertion'
+  22: 'wrapped lines may begin with more than one "."'
+  # > 1000 +
+  # .. 200 +
+  # ... 30 +
+  # .... 4 +
+  # ..... .5
+  # 1234.5
+
+  23: 'the rewriter should not rely on automatic semicolon insertion'
   # > "the rewriter should not rely"
   # "on automatic semicolon insertion"
   (4 + 4)

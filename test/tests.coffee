@@ -63,6 +63,9 @@ tests =
 '"." should not follow leading "." in multiline expressions':
   [no, 9.5, 5, 97]
 
+'wrapped lines may begin with more than one "."':
+  [yes, 1234.5, 1234.5, 105]
+
 
 if typeof window isnt 'undefined'
   window.tests = tests
