@@ -91,7 +91,12 @@ do ->
   # > typeof text
   # "undefined"
 
-  21: 'the rewriter should not rely on automatic semicolon insertion'
+  21: '"." can follow leading "." in multiline expressions'
+  # >10 -
+  # ..5
+  # 9.5
+
+  22: 'the rewriter should not rely on automatic semicolon insertion'
   # > "the rewriter should not rely"
   # "on automatic semicolon insertion"
   (4 + 4)

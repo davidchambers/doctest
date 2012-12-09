@@ -60,6 +60,9 @@ tests =
 'variable in creation context is not accessible':
   [yes, '"undefined"', '"undefined"', 92]
 
+'"." can follow leading "." in multiline expressions':
+  [yes, 9.5, 9.5, 97]
+
 
 if typeof window isnt 'undefined'
   window.tests = tests
