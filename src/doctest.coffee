@@ -106,7 +106,7 @@ rewrite = (text, type) ->
       if match = /^>(.*)/.exec comment
         lines.push "#{indent}doctest.input(#{f expr});" if expr
         expr = match[1]
-      else if match = /^[.](.*)/.exec comment
+      else if match = /^[.]+(.*)/.exec comment
         expr += "\n#{indent}  #{match[1]}"
       else if expr
         lines.push "#{indent}doctest.input(#{f expr});"
