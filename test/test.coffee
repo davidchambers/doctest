@@ -91,7 +91,7 @@ do ->
   # > typeof text
   # "undefined"
 
-  21: '"." can follow leading "." in multiline expressions'
+  21: '"." should not follow leading "." in multiline expressions'
   # >10 -
   # ..5
   # 9.5
