@@ -1,3 +1,7 @@
 #!/usr/bin/env node
 
-require('../lib/doctest').apply(null, process.argv.slice(2));
+var argv = require('optimist')
+    .demand(1)
+    .usage('Usage:\n$0 <file>.js <file>.js\nOr:\n$0 <file>.coffee <file>.coffee')
+    .argv;
+require('../lib/doctest').apply(null, argv._);
