@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "coffee-script": "1.4.x",
-    "underscore": "1.4.x"
+    "underscore": "1.4.x",
+    "optimist": "*"
   },
   "devDependencies": {
     "express": "3.0.x"
