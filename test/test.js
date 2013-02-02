@@ -109,4 +109,9 @@ global = 'global'
   // "on automatic semicolon insertion"
   (4 + 4)
 
+  24, 'ignores block comments'
+  /*
+  // > "ignored"
+  */
+
 }()

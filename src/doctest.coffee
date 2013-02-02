@@ -20,6 +20,8 @@ else
   CoffeeScript = require 'coffee-script'
   module.exports = doctest
 
+# > doctest.version
+# '0.4.1'
 doctest.version = '0.4.1'
 
 doctest.queue = []
@@ -62,7 +64,8 @@ fetch = (path) ->
     jQuery.ajax path, dataType: 'text', success: (text) ->
       [name, type] = /[^/]+[.](coffee|js)$/.exec path
       console.log "running doctests in #{name}..."
-      source = rewrite text, type
+      rewriter = new Rewriter(type)
+      source = rewriter.rewrite text
       source = CoffeeScript.compile source if type is 'coffee'
       # Functions created via `Function` are always run in the `window`
       # context, which ensures that doctests can't access variables in
@@ -75,7 +78,8 @@ fetch = (path) ->
     fs.readFile path, 'utf8', (err, text) ->
       [name, type] = /[^/]+[.](coffee|js)$/.exec path
       console.log "running doctests in #{name}..."
-      source = rewrite text, type
+      rewriter = new Rewriter(type)
+      source = rewriter.rewrite text
       source = CoffeeScript.compile source if type is 'coffee'
       name += "-#{+new Date}"
       file = "#{__dirname}/#{name}.js"
@@ -84,37 +88,72 @@ fetch = (path) ->
       fs.unlink file
       doctest.run()
 
+r = {}
+# > r = new Rewriter 'coffee'; ''
+# ''
+# > r.in_block
+# false
+# > r.rewrite '###'
+# '__doctest = require "./doctest"\n###'
+# > r.in_block
+# true
+# > r = new Rewriter 'coffee'; ''
+# ''
+# > r.rewrite '###\n###'
+# '__doctest = require "./doctest"\n###\n###'
+# > r.in_block
+# false
+class Rewriter
+  constructor: (@type) ->
+    comments =
+      coffee: /^([ \t]*)#[ \t]*(.+)/
+      js: /^([ \t]*)\/\/[ \t]*(.+)/
+    @inline = comments[@type]
+    @in_block = false
 
-rewrite = (text, type) ->
-  f = (expr) ->
-    switch type
-      when 'coffee' then "->\n#{indent}  #{expr}\n#{indent}"
-      when 'js' then "function() {\n#{indent}  return #{expr}\n#{indent}}"
+  block: (line) ->
+    if @type is 'coffee'
+      if not @in_block and /^ *\#\#\# *$/.test(line)
+        @in_block = true
+      else if @in_block and /^ *\#\#\# *$/.test(line)
+        @in_block = false # next lines are no more in a block
+        true # but this line is
+      else
+        @in_block
+    else if @type is 'js'
+      if not @in_block and /\/\*/.test(line) and not /\*\//.test(line)
+        @in_block = true
+      else if @in_block and /\*\//.test(line) and not /\/\*/.test(line)
+        @in_block = false # next lines are no more in a block
+        true # but this line is
+      else
+        @in_block
 
-  comments =
-    coffee: /^([ \t]*)#[ \t]*(.+)/
-    js: /^([ \t]*)\/\/[ \t]*(.+)/
-
-  lines = []; expr = ''
-  if typeof window is 'undefined'
-    lines.push switch type
-      when 'coffee' then 'doctest = require "./doctest"'
-      when 'js' then 'var doctest = require("./doctest");'
-  for line, idx in text.split /\r?\n|\r/
-    if match = comments[type].exec line
-      [match, indent, comment] = match
-      if match = /^>(.*)/.exec comment
-        lines.push "#{indent}doctest.input(#{f expr});" if expr
-        expr = match[1]
-      else if match = /^[.]+(.*)/.exec comment
-        expr += "\n#{indent}  #{match[1]}"
-      else if expr
-        lines.push "#{indent}doctest.input(#{f expr});"
-        lines.push "#{indent}doctest.output(#{idx + 1}, #{f comment});"
-        expr = ''
-    else
-      lines.push line
-  lines.join '\n'
+  rewrite: (text) ->
+    lines = []; expr = ''
+    if typeof window is 'undefined'
+      lines.push switch @type
+        when 'coffee' then '__doctest = require "./doctest"'
+        when 'js' then 'var __doctest = require("./doctest");'
+    for line, idx in text.split /\r?\n|\r/
+      if not @block(line) and match = @inline.exec line
+        [match, indent, comment] = match
+        @f = (expr) ->
+          switch @type
+            when 'coffee' then "->\n#{indent}  #{expr}\n#{indent}"
+            when 'js' then "function() {\n#{indent}  return #{expr}\n#{indent}}"
+        if match = /^>(.*)/.exec comment
+          lines.push "#{indent}__doctest.input(#{@f expr});" if expr
+          expr = match[1]
+        else if match = /^[.]+(.*)/.exec comment
+          expr += "\n#{indent}  #{match[1]}"
+        else if expr
+          lines.push "#{indent}__doctest.input(#{@f expr});"
+          lines.push "#{indent}__doctest.output(#{idx + 1}, #{@f comment});"
+          expr = ''
+      else
+        lines.push line
+    lines.join '\n'
 
 
 q = (object) ->
