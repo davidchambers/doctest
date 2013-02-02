@@ -1,10 +1,10 @@
-.PHONY: compile clean release setup test
+.PHONY: clean release setup test
 
 PORT := 3000
-coffee = node_modules/.bin/coffee
+bin = node_modules/.bin
 
-compile:
-	@$(coffee) --compile --output lib src
+lib/doctest.js: src/doctest.coffee
+	@cat $< | $(bin)/coffee --compile --stdio > $@
 
 clean:
 	@rm -rf node_modules
@@ -25,6 +25,6 @@ setup:
 	@npm install
 
 test:
-	@$(coffee) test/cli
+	@$(bin)/coffee test/cli
 	@sleep 0.1 && test/open http://localhost:$(PORT) &
-	@$(coffee) test/server
+	@$(bin)/coffee test/server
