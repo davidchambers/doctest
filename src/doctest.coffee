@@ -107,23 +107,23 @@ class Rewriter
       coffee: /^([ \t]*)#[ \t]*(.+)/
       js: /^([ \t]*)\/\/[ \t]*(.+)/
     @inline = comments[@type]
-    @in_block = false
+    @in_block = no
 
   block: (line) ->
     if @type is 'coffee'
-      if not @in_block and /^ *\#\#\# *$/.test(line)
-        @in_block = true
-      else if @in_block and /^ *\#\#\# *$/.test(line)
+      if not @in_block and /^[ \t]*###[ \t]*$/.test(line)
+        @in_block = yes
+      else if @in_block and /^[ \t]*###[ \t]*$/.test(line)
         @in_block = false # next lines are no more in a block
-        true # but this line is
+        yes # but this line is
       else
         @in_block
     else if @type is 'js'
-      if not @in_block and /\/\*/.test(line) and not /\*\//.test(line)
-        @in_block = true
-      else if @in_block and /\*\//.test(line) and not /\/\*/.test(line)
-        @in_block = false # next lines are no more in a block
-        true # but this line is
+      if not @in_block and /[/][*]/.test(line) and not /[*][/]/.test(line)
+        @in_block = yes
+      else if @in_block and /[*][/]/.test(line) and not /[/][*]/.test(line)
+        @in_block = no # next lines are no more in a block
+        yes # but this line is
       else
         @in_block
 
