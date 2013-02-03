@@ -1,9 +1,11 @@
-.PHONY: clean release setup test
+.PHONY: all clean release setup test
 
 PORT := 3000
 bin = node_modules/.bin
 
-lib/doctest.js: src/doctest.coffee
+all: lib/command.js lib/doctest.js
+
+lib/%.js: src/%.coffee
 	@cat $< | $(bin)/coffee --compile --stdio > $@
 
 clean:
