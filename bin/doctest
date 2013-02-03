@@ -1,7 +1,11 @@
 #!/usr/bin/env node
+var usage = '\nUsage: $0 file [file ...]\n\
+\n\
+`file` must be a JavaScript or CoffeeScript file \n\
+with the appropriate extension'
 
 var argv = require('optimist')
     .demand(1)
-    .usage('Usage:\n$0 <file>.js <file>.js\nOr:\n$0 <file>.coffee <file>.coffee')
+    .usage(usage)
     .argv;
 require('../lib/doctest').apply(null, argv._);
