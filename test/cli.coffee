@@ -1,6 +1,6 @@
 {isEqual} = require 'underscore'
 
-doctest   = require '../src/doctest'
+doctest   = require '../lib/doctest'
 tests     = require './tests'
 
 
@@ -11,7 +11,7 @@ unless process.env.NODE_DISABLE_COLORS or process.platform is 'win32'
   red   = '\x1B[0;31m'
   reset = '\x1B[0m'
 
-queue = ['test/test.js', 'test/test.coffee']
+queue = ['test/test.js']
 next = -> doctest queue.shift() if queue.length
 
 doctest.complete = (results) ->

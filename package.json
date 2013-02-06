@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "coffee-script": "1.4.x",
+    "escodegen": "~0.0.16",
+    "esprima": "1.0.x",
     "optimist": "0.3.x",
     "underscore": "1.4.x"
   },
