@@ -13,11 +13,13 @@
 doctest = (urls...) -> _.each urls, fetch
 
 if typeof window isnt 'undefined'
-  {_, CoffeeScript} = window
+  {_, CoffeeScript, escodegen, esprima} = window
   window.doctest = doctest
 else
   _ = require 'underscore'
   CoffeeScript = require 'coffee-script'
+  escodegen = require 'escodegen'
+  esprima = require 'esprima'
   module.exports = doctest
 
 doctest.version = '0.4.1'
@@ -85,36 +87,54 @@ fetch = (path) ->
       doctest.run()
 
 
-rewrite = (text, type) ->
-  f = (expr) ->
-    switch type
-      when 'coffee' then "->\n#{indent}  #{expr}\n#{indent}"
-      when 'js' then "function() {\n#{indent}  return #{expr}\n#{indent}}"
+rewrite = (input, type) ->
+  rewrite[type] input.replace /\r\n?/g, '\n'
 
-  comments =
-    coffee: /^([ \t]*)#[ \t]*(.+)/
-    js: /^([ \t]*)\/\/[ \t]*(.+)/
 
-  lines = []; expr = ''
-  if typeof window is 'undefined'
-    lines.push switch type
-      when 'coffee' then 'doctest = require "./doctest"'
-      when 'js' then 'var doctest = require("./doctest");'
-  for line, idx in text.split /\r?\n|\r/
-    if match = comments[type].exec line
-      [match, indent, comment] = match
+rewrite.js = (input) ->
+  f = (expr) -> "function() {\n  return #{expr}\n}"
+
+  processComment = do (expr = '') -> ({value}, start) ->
+    lines = []
+    for line in value.split('\n')
+      [match, indent, comment] = /^([ \t]*)(.*)/.exec line
       if match = /^>(.*)/.exec comment
-        lines.push "#{indent}doctest.input(#{f expr});" if expr
+        lines.push "__doctest.input(#{f expr})" if expr
         expr = match[1]
       else if match = /^[.]+(.*)/.exec comment
-        expr += "\n#{indent}  #{match[1]}"
+        expr += "\n#{match[1]}"
       else if expr
-        lines.push "#{indent}doctest.input(#{f expr});"
-        lines.push "#{indent}doctest.output(#{idx + 1}, #{f comment});"
+        lines.push "__doctest.input(#{f expr})"
+        lines.push "__doctest.output(#{start.line}, #{f line})"
         expr = ''
+    escodegen.generate esprima.parse(lines.join('\n')), indent: '  '
+
+  for {loc} in esprima.parse(input, comment: yes, loc: yes).comments
+    [comment] = esprima.parse(input, comment: yes, loc: yes).comments
+    {start, end} = comment.loc
+    lines = input.split('\n')
+    idx = start.line - 1
+    line = lines[idx]
+    if end.line is start.line
+      lines[idx] = line.substr(0, start.column) + line.substr(end.column)
     else
-      lines.push line
-  lines.join '\n'
+      lines[idx] = line.substr(0, start.column)
+      lines[idx] = '' until ++idx is end.line - 1
+      lines[idx] = lines[idx].substr(end.column)
+    line = lines[start.line - 1]
+    lines[start.line - 1] = line.substr(0, start.column) +
+                            processComment(comment, loc.start) +
+                            line.substr(start.column)
+    input = lines.join('\n')
+
+  if typeof window isnt 'undefined'
+    "window.__doctest = doctest;\n#{input}"
+  else
+    "var __doctest = require('../lib/doctest');\n#{input}"
+
+
+rewrite.coffee = (input) ->
+  throw new Error 'Not implemented'
 
 
 q = (object) ->
