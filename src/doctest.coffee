@@ -112,23 +112,21 @@ rewrite = (input, type) ->
   for {loc} in esprima.parse(input, comment: yes, loc: yes).comments
     [comment] = esprima.parse(input, comment: yes, loc: yes).comments
     {start, end} = comment.loc
-    lines = [null, input.split('\n')...]
-    idx = start.line
+    lines = input.split('\n')
+    idx = start.line - 1
     line = lines[idx]
     if end.line is start.line
       lines[idx] = line.substr(0, start.column) + line.substr(end.column)
     else
+      # TODO: Add tests for multiline comments.
       lines[idx] = line.substr(0, start.column)
-      while idx += 1
-        if idx is end.line
-          lines[idx] = lines[idx].substr(end.column)
-          break
-        lines[idx] = ''
-    line = lines[start.line]
-    lines[start.line] = line.substr(0, start.column) +
-                        processComment(comment, loc.start) +
-                        line.substr(start.column)
-    input = lines[1..].join('\n')
+      lines[idx] = '' until ++idx is end.line - 1
+      lines[idx] = lines[idx].substr(end.column)
+    line = lines[start.line - 1]
+    lines[start.line - 1] = line.substr(0, start.column) +
+                            processComment(comment, loc.start) +
+                            line.substr(start.column)
+    input = lines.join('\n')
 
   if typeof window isnt 'undefined'
     "window.__doctest = doctest;\n#{input}"
