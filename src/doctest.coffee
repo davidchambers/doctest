@@ -132,11 +132,12 @@ rewrite = (input, type) ->
                         line.substr(start.column)
     input = lines[1..].join('\n')
 
-  if typeof window is 'undefined'
-    switch type
-      when 'coffee' then "__doctest = require '../lib/doctest'\n#{input}"
-      when 'js' then "var __doctest = require('../lib/doctest');\n#{input}"
-  else input
+  if typeof window isnt 'undefined'
+    "window.__doctest = doctest;\n#{input}"
+  else if type is 'coffee'
+    "__doctest = require '../lib/doctest'\n#{input}"
+  else if type is 'js'
+    "var __doctest = require('../lib/doctest');\n#{input}"
 
 
 q = (object) ->
