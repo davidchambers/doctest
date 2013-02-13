@@ -98,7 +98,6 @@ rewrite = (input, type) ->
     lines = []
     for line in value.split('\n')
       [match, indent, comment] = /^([ \t]*)(.*)/.exec line
-      continue unless comment
       if match = /^>(.*)/.exec comment
         lines.push "#{indent}__doctest.input(#{f indent, expr});" if expr
         expr = match[1]
