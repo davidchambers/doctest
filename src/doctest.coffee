@@ -94,8 +94,7 @@ rewrite = (input, type) ->
       when 'coffee' then "->\n#{indent}  #{expr}\n#{indent}"
       when 'js' then "function() {\n#{indent}  return #{expr}\n#{indent}}"
 
-  expr = ''
-  processComment = ({value}, start) ->
+  processComment = do (expr = '') -> ({value}, start) ->
     lines = []
     for line in value.split('\n')
       [match, indent, comment] = /^([ \t]*)(.*)/.exec line
