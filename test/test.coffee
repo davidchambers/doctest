@@ -108,3 +108,8 @@ do ->
   # > "the rewriter should not rely"
   # "on automatic semicolon insertion"
   (4 + 4)
+
+  24: 'ignores block comments'
+  ###
+  # >>>
+  ###
