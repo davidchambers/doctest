@@ -87,8 +87,7 @@ fetch = (path) ->
       doctest.run()
 
 r = {}
-# > r = new Rewriter 'coffee'; ''
-# ''
+# > r = new Rewriter 'coffee'
 # > r.in_block
 # false
 # > r.rewrite '###'
