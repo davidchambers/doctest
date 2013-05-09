@@ -155,13 +155,13 @@ rewriteCoffee = (text) ->
     if match = comments.exec line
       [match, indent, comment] = match
       if match = /^>(.*)/.exec comment
-        lines.push "#{indent}doctest.input(#{f expr});" if expr
+        lines.push "#{indent}__doctest.input(#{f indent, expr});" if expr
         expr = match[1]
       else if match = /^[.]+(.*)/.exec comment
         expr += "\n#{indent}  #{match[1]}"
       else if expr
-        lines.push "#{indent}doctest.input(#{f expr});"
-        lines.push "#{indent}doctest.output(#{idx + 1}, #{f comment});"
+        lines.push "#{indent}__doctest.input(#{f indent, expr});"
+        lines.push "#{indent}__doctest.output(#{idx + 1}, #{f indent, comment});"
         expr = ''
     else
       lines.push line
