@@ -78,7 +78,11 @@ fetch = (path) ->
       [name, type] = /[^/]+[.](coffee|js)$/.exec path
       console.log "running doctests in #{name}..."
       source = rewrite text, type
-      source = CoffeeScript.compile source if type is 'coffee'
+      try
+        source = CoffeeScript.compile source if type is 'coffee'
+      catch e
+        console.log 'error', e, 'compiling coffee', source
+        return
       name += "-#{+new Date}"
       file = "#{__dirname}/#{name}.js"
       fs.writeFileSync file, source, 'utf8'
@@ -88,11 +92,14 @@ fetch = (path) ->
 
 
 rewrite = (input, type) ->
+  switch type
+    when 'coffee' then rewriteCoffee input
+    when 'js' then rewriteJava input
+
+rewriteJava = (input) ->
   input = input.replace /\r\n?/g, '\n'
   f = (indent, expr) ->
-    switch type
-      when 'coffee' then "->\n#{indent}  #{expr}\n#{indent}"
-      when 'js' then "function() {\n#{indent}  return #{expr}\n#{indent}}"
+      "function() {\n#{indent}  return #{expr}\n#{indent}}"
 
   processComment = do (expr = '') -> ({value}, start) ->
     lines = []
@@ -130,11 +137,35 @@ rewrite = (input, type) ->
 
   if typeof window isnt 'undefined'
     "window.__doctest = doctest;\n#{input}"
-  else if type is 'coffee'
-    "__doctest = require '../lib/doctest'\n#{input}"
-  else if type is 'js'
+  else
     "var __doctest = require('../lib/doctest');\n#{input}"
 
+rewriteCoffee = (text) ->
+  f = (indent, expr) -> "->\n#{indent}  #{expr}\n#{indent}"
+
+  comments = /^([ \t]*)#[ \t]*(.+)/
+
+  lines = []; expr = ''
+  if typeof window isnt 'undefined'
+    lines.push "window.__doctest = doctest"
+  else
+    lines.push "__doctest = require '../lib/doctest'"
+
+  for line, idx in text.split /\r?\n|\r/
+    if match = comments.exec line
+      [match, indent, comment] = match
+      if match = /^>(.*)/.exec comment
+        lines.push "#{indent}doctest.input(#{f expr});" if expr
+        expr = match[1]
+      else if match = /^[.]+(.*)/.exec comment
+        expr += "\n#{indent}  #{match[1]}"
+      else if expr
+        lines.push "#{indent}doctest.input(#{f expr});"
+        lines.push "#{indent}doctest.output(#{idx + 1}, #{f comment});"
+        expr = ''
+    else
+      lines.push line
+  lines.join '\n'
 
 q = (object) ->
   switch typeof object
