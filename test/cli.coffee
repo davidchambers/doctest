@@ -11,17 +11,20 @@ unless process.env.NODE_DISABLE_COLORS or process.platform is 'win32'
   red   = '\x1B[0;31m'
   reset = '\x1B[0m'
 
-queue = ['test/test.js']
+queue = ['test/test.js', 'test/test.coffee']
 next = -> doctest queue.shift() if queue.length
 
 doctest.complete = (results) ->
   for message, expected of tests
-    actual = results.shift()
-    if isEqual actual, expected
-      console.log "#{green} \u2714 #{gray} #{message}#{reset}"
-    else
-      console.warn  "#{red} \u2718 #{gray} #{message}#{reset}"
-      console.log  "#{gray}      expected: #{green}#{expected}#{reset}"
-      console.log  "#{gray}      received: #{red}#{actual}#{reset}"
+    try
+      actual = results.shift()
+      if isEqual actual, expected
+        console.log "#{green} \u2714 #{gray} #{message}#{reset}"
+      else
+        console.warn  "#{red} \u2718 #{gray} #{message}#{reset}"
+        console.log  "#{gray}      expected: #{green}#{expected}#{reset}"
+        console.log  "#{gray}      received: #{red}#{actual}#{reset}"
+    catch e
+      console.log 'exception'
   next()
 next()
