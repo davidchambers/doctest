@@ -12,7 +12,6 @@ unless process.env.NODE_DISABLE_COLORS or process.platform is 'win32'
   reset = '\x1B[0m'
 
 queue = ['test/test.js', 'test/test.coffee']
-queue.pop() # TODO: Reinstate CoffeeScript tests.
 next = -> doctest queue.shift() if queue.length
 
 doctest.complete = (results) ->

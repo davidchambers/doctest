@@ -134,7 +134,31 @@ rewrite.js = (input) ->
 
 
 rewrite.coffee = (input) ->
-  throw new Error 'Not implemented'
+  f = (indent, expr) -> "->\n#{indent}  #{expr}\n#{indent}"
+
+  lines = []
+  lines.push if typeof window isnt 'undefined'
+    'window.__doctest = doctest'
+  else
+    "__doctest = require '../lib/doctest'"
+
+  expr = ''
+  for line, idx in input.split('\n')
+    if match = /^([ \t]*)#[ \t]*(.+)/.exec line
+      [match, indent, comment] = match
+      if match = /^>(.*)/.exec comment
+        lines.push "#{indent}__doctest.input #{f indent, expr}" if expr
+        expr = match[1]
+      else if match = /^[.]+(.*)/.exec comment
+        expr += "\n#{indent}  #{match[1]}"
+      else if expr
+        lines.push "#{indent}__doctest.input #{f indent, expr}"
+        lines.push "#{indent}__doctest.output #{idx + 1}, #{f indent, comment}"
+        expr = ''
+    else
+      lines.push line
+
+  lines.join('\n')
 
 
 q = (object) ->

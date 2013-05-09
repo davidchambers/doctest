@@ -8,5 +8,5 @@ jQuery ($) ->
   asyncTest 'JavaScript doctests', ->
     doctest './test.js'
 
-# asyncTest 'CoffeeScript doctests', ->
-#   doctest './test.coffee'
+  asyncTest 'CoffeeScript doctests', ->
+    doctest './test.coffee'
