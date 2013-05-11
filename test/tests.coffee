@@ -66,6 +66,12 @@ tests =
 'wrapped lines may begin with more than one "."':
   [yes, 1234.5, 1234.5, 105]
 
+'semicolon':
+  [no,'"on automatic semicolon insertion"','"the rewriter should not rely"',109]
+
+'multiline':
+  [yes, 4, 4, 113]
+
 
 if typeof window isnt 'undefined'
   window.tests = tests

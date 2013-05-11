@@ -109,4 +109,12 @@ global = 'global'
   // "on automatic semicolon insertion"
   (4 + 4)
 
+  24, 'multiline doctests are possible'
+  /*
+    This is just explanatory text
+
+    > 2 + 2
+    4
+  */
+
 }()

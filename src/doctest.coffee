@@ -78,6 +78,9 @@ fetch = (path) ->
       [name, type] = /[^/]+[.](coffee|js)$/.exec path
       console.log "running doctests in #{name}..."
       source = rewrite text, type
+      if doctest.dump
+        console.log source
+        return
       try
         source = CoffeeScript.compile source if type is 'coffee'
       catch e
@@ -125,7 +128,6 @@ rewriteJava = (input) ->
     if end.line is start.line
       lines[idx] = line.substr(0, start.column) + line.substr(end.column)
     else
-      # TODO: Add tests for multiline comments.
       lines[idx] = line.substr(0, start.column)
       lines[idx] = '' until ++idx is end.line - 1
       lines[idx] = lines[idx].substr(end.column)
