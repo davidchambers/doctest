@@ -70,7 +70,7 @@ tests =
   [no,'"on automatic semicolon insertion"','"the rewriter should not rely"',109]
 
 'multiline':
-  [yes, '"test"', '"test"', 113]
+  [yes, 4, 4, 113]
 
 
 if typeof window isnt 'undefined'

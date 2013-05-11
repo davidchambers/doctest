@@ -113,9 +113,8 @@ global = 'global'
   /*
     This is just explanatory text
 
-    > t
-    'test'
+    > 2 + 2
+    4
   */
-  var t = 'test';
 
 }()
