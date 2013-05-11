@@ -10,6 +10,11 @@ usage = '''
 
 {argv} = optimist.usage(usage).options
   h: alias: 'help'
+  d: alias: 'dump'
 
 if argv.help or argv._.length is 0 then optimist.showHelp()
-else require('../lib/doctest').apply(null, argv._)
+else
+  doctest = require('../lib/doctest')
+  if argv.dump
+    doctest.dump = true
+  doctest.apply(null, argv._)
