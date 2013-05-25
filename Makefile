@@ -27,6 +27,6 @@ setup:
 	@npm install
 
 test:
-	@$(bin)/coffee test/cli
+	@$(bin)/coffee test/cli.coffee
 	@sleep 0.1 && test/open http://localhost:$(PORT) &
-	@$(bin)/coffee test/server
+	@$(bin)/coffee test/server.coffee
