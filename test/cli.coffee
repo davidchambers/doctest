@@ -1,6 +1,6 @@
 {isEqual} = require 'underscore'
 
-doctest   = require '../src/doctest'
+doctest   = require '../lib/doctest'
 tests     = require './tests'
 
 

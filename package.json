@@ -15,11 +15,13 @@
     "url": "git://github.com/davidchambers/doctest.git"
   },
   "dependencies": {
-    "coffee-script": "1.4.x",
-    "optimist": "0.3.x",
+    "escodegen": "~0.0.23",
+    "esprima": "1.0.x",
+    "optimist": "0.5.x",
     "underscore": "1.4.x"
   },
   "devDependencies": {
-    "express": "3.0.x"
+    "coffee-script": "1.6.x",
+    "express": "3.2.x"
   }
 }
