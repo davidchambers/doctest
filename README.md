@@ -11,24 +11,23 @@ comments to verify that one's code and inline documentation are in agreement.
 #
 # Return the product of two or more numeric values:
 #
-#     > Math.product -2, 2.5, "3"
+#     > Math.product(-2, 2.5, "3")
 #     -15
 #
 # `NaN` is returned if the values cannot all be coerced to numbers:
 #
-#     > Math.product 2, "ten"
+#     > Math.product(2, "ten")
 #     NaN
 #
-# `undefined` is returned if fewer than two values are provided:
+# `undefined` is returned if no arguments are provided:
 #
-#     > Math.product 100
+#     > Math.product()
 #     undefined
 #
-Math.product = (numbers...) ->
-  return unless numbers.length
-  product = 1
-  product *= number for number in numbers
-  product
+Math.product = (nums...) ->
+  prod = 1
+  prod *= num for num in nums
+  prod
 ```
 
 Doctests needn't be indented, though there's no harm in being
@@ -51,7 +50,7 @@ For example:
     retrieving /scripts/lib/../src/math-extensions.coffee...
     running doctests in math-extensions.coffee...
     ..x
-    expected undefined on line 17 (got 100)
+    expected undefined on line 17 (got 1)
 
 Oops. Looks like we have a disagreement.
 
@@ -182,6 +181,6 @@ This runs doctest's test suite: first headless, then in a browser.
 
 
 [1]: http://docs.python.org/library/doctest.html
-[2]: http://bit.ly/LanyLq
+[2]: http://bit.ly/129sbLQ
 [3]: http://jquery.com/
 [4]: http://underscorejs.org/
