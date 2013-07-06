@@ -40,9 +40,9 @@ Doctests can be run from the command line or from a browser console: provide
 local file system paths in the former case, URLs in the latter. Specifically,
 each URL should be one of the following:
 
-  - an absolute URL; e.g. "http://example.com/scripts/some-module.js"
-  - a root-relative URL; e.g. "/scripts/some-module.js"
-  - a path relative to doctest.js; e.g. "./some-module.js"
+  - an absolute URL; e.g. `"http://example.com/scripts/some-module.js"`
+  - a root-relative URL; e.g. `"/scripts/some-module.js"`
+  - a path relative to doctest.js; e.g. `"./some-module.js"`
 
 For example:
 
