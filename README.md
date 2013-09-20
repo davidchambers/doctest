@@ -35,7 +35,7 @@ Doctests needn't be indented, though there's no harm in being
 
 ### Running doctests
 
-To run doctests, pass `doctest` paths to one or more "modules" to be tested.
+To run doctests, pass `doctest` the path to the "module" to be tested.
 Doctests can be run from the command line or from a browser console: provide
 local file system paths in the former case, URLs in the latter. Specifically,
 each URL should be one of the following:
@@ -53,6 +53,12 @@ For example:
     expected undefined on line 17 (got 1)
 
 Oops. Looks like we have a disagreement.
+
+### AMD modules
+
+doctest detects AMD modules and defines `define` to allow them to be tested,
+provided they have no dependencies. See [test/module.js][3] for an example of
+such a module.
 
 ### Errors
 
@@ -169,8 +175,8 @@ MyApp.utils.bar = function() {
 
 The following libraries are required to run doctests from a browser console:
 
-  - [jQuery][3]
-  - [Underscore][4]
+  - [jQuery][4]
+  - [Underscore][5]
 
 ### Running the test suite
 
@@ -182,5 +188,6 @@ This runs doctest's test suite: first headless, then in a browser.
 
 [1]: http://docs.python.org/library/doctest.html
 [2]: http://bit.ly/129sbLQ
-[3]: http://jquery.com/
-[4]: http://underscorejs.org/
+[3]: https://github.com/davidchambers/doctest/blob/master/test/module.js
+[4]: http://jquery.com/
+[5]: http://underscorejs.org/

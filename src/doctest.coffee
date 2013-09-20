@@ -10,7 +10,26 @@
 
 ###
 
-doctest = (urls...) -> _.each urls, fetch
+doctest = (path, callback = noop) ->
+  fetch path, (text, type) ->
+    source = rewrite[type] text
+    source += ";\n#{defineFunctionString}" if isModule source
+    # Functions created via `Function` are always run in the `window`
+    # context, which ensures that doctests can't access variables in
+    # _this_ context. A doctest which assigns to or references `text`
+    # sets/gets `window.text`, not this function's `text` parameter.
+    # The `evaluate` function takes one argument, named `__doctest`.
+    evaluate = Function '__doctest', source
+    queue = []
+    evaluate
+      input: (fn) -> queue.push [fn]
+      output: (num, fn) -> queue.push [fn, num]
+    results = run queue
+    log results
+    callback results
+
+doctest.version = '0.4.1'
+
 
 if typeof window isnt 'undefined'
   {_, CoffeeScript, escodegen, esprima} = window
@@ -22,45 +41,8 @@ else
   esprima = require 'esprima'
   module.exports = doctest
 
-doctest.version = '0.4.1'
 
-doctest.queue = []
-
-doctest.input = (fn) ->
-  @queue.push fn
-
-doctest.output = (num, fn) ->
-  fn.line = num
-  @queue.push fn
-
-doctest.run = ->
-  results = []; input = null
-
-  while fn = @queue.shift()
-    unless num = fn.line
-      input?()
-      input = fn
-      continue
-
-    actual = try input() catch error then error.constructor
-    expected = fn()
-    results.push [
-      _.isEqual actual, expected
-      repr expected
-      repr actual
-      num
-    ]
-    input = null
-
-  @complete results
-
-doctest.complete = (results) ->
-  console.log ((if pass then '.' else 'x') for [pass] in results).join ''
-  for [pass, expected, actual, num] in (r for r in results when not r[0])
-    console.warn "expected #{expected} on line #{num} (got #{actual})"
-
-
-fetch = (path) ->
+fetch = (path, callback) ->
   console.log "retrieving #{path}..."
   if typeof window isnt 'undefined'
     # Support relative paths; e.g. `doctest("./foo.js")`.
@@ -69,27 +51,13 @@ fetch = (path) ->
     jQuery.ajax path, dataType: 'text', success: (text) ->
       [name, type] = /[^/]+[.](coffee|js)$/.exec path
       console.log "running doctests in #{name}..."
-      source = rewrite text, type
-      source = CoffeeScript.compile source if type is 'coffee'
-      # Functions created via `Function` are always run in the `window`
-      # context, which ensures that doctests can't access variables in
-      # _this_ context. A doctest which assigns to or references `text`
-      # sets/gets `window.text`, not this function's `text` parameter.
-      do Function source
-      doctest.run()
+      callback text, type
   else
     fs = require 'fs'
     fs.readFile path, 'utf8', (err, text) ->
       [name, type] = /[^/]+[.](coffee|js)$/.exec path
       console.log "running doctests in #{name}..."
-      source = rewrite text, type
-      source = CoffeeScript.compile source if type is 'coffee'
-      name += "-#{+new Date}"
-      file = "#{__dirname}/#{name}.js"
-      fs.writeFileSync file, source, 'utf8'
-      require "./#{name}"
-      fs.unlink file
-      doctest.run()
+      callback text, type
 
 
 rewrite = (input, type) ->
@@ -131,23 +99,13 @@ rewrite.js = (input) ->
                             processComment(comment, loc.start) +
                             line.substr(start.column)
     input = lines.join('\n')
-
-  if typeof window isnt 'undefined'
-    "window.__doctest = doctest;\n#{input}"
-  else
-    "var __doctest = require('../lib/doctest');\n#{input}"
+  input
 
 
 rewrite.coffee = (input) ->
   f = (indent, expr) -> "->\n#{indent}  #{expr}\n#{indent}"
 
-  lines = []
-  lines.push if typeof window isnt 'undefined'
-    'window.__doctest = doctest'
-  else
-    "__doctest = require '../lib/doctest'"
-
-  expr = ''
+  lines = []; expr = ''
   for line, idx in input.split('\n')
     if match = /^([ \t]*)#[ \t]*(.+)/.exec line
       [match, indent, comment] = match
@@ -162,8 +120,59 @@ rewrite.coffee = (input) ->
         expr = ''
     else
       lines.push line
+  CoffeeScript.compile lines.join('\n')
 
-  lines.join('\n')
+
+defineFunctionString = '''
+  function define() {
+    var arg, idx;
+    for (idx = 0; idx < arguments.length; idx += 1) {
+      arg = arguments[idx];
+      if (typeof arg === 'function') {
+        arg();
+        break;
+      }
+    }
+  }
+'''
+
+
+isModule = (source) ->
+  _.some esprima.parse(source).body, (node) ->
+    node.type is 'ExpressionStatement' and
+    node.expression.type is 'CallExpression' and
+    node.expression.callee.type is 'Identifier' and
+    node.expression.callee.name is 'define'
+
+
+run = (queue) ->
+  results = []; input = noop
+  for arr in queue
+    switch arr.length
+      when 1
+        input()
+        input = arr[0]
+      when 2
+        actual = try input() catch error then error.constructor
+        expected = arr[0]()
+        results.push [
+          _.isEqual actual, expected
+          repr expected
+          repr actual
+          arr[1]
+        ]
+        input = noop
+  results
+
+
+log = (results) ->
+  console.log ((if pass then '.' else 'x') for [pass] in results).join('')
+  for [pass, expected, actual, num] in results when not pass
+    console.warn "expected #{expected} on line #{num} (got #{actual})"
+  return
+
+
+noop = ->
 
 
 # > repr 'foo \\ bar \\ baz'

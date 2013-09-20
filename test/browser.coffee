@@ -1,12 +1,12 @@
 jQuery ($) ->
 
-  doctest.complete = (results) ->
+  callback = (results) ->
     for message, expected of tests
       deepEqual results.shift(), expected, message
     start()
 
   asyncTest 'JavaScript doctests', ->
-    doctest './test.js'
+    doctest './test.js', callback
 
   asyncTest 'CoffeeScript doctests', ->
-    doctest './test.coffee'
+    doctest './test.coffee', callback

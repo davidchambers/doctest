@@ -11,10 +11,7 @@ unless process.env.NODE_DISABLE_COLORS or process.platform is 'win32'
   red   = '\x1B[0;31m'
   reset = '\x1B[0m'
 
-queue = ['test/test.js', 'test/test.coffee']
-next = -> doctest queue.shift() if queue.length
-
-doctest.complete = (results) ->
+callback = (results) ->
   for message, expected of tests
     actual = results.shift()
     if isEqual actual, expected
@@ -23,5 +20,8 @@ doctest.complete = (results) ->
       console.warn  "#{red} \u2718 #{gray} #{message}#{reset}"
       console.log  "#{gray}      expected: #{green}#{expected}#{reset}"
       console.log  "#{gray}      received: #{red}#{actual}#{reset}"
-  next()
-next()
+
+doctest path, callback for path in [
+  'test/test.js'
+  'test/test.coffee'
+]
