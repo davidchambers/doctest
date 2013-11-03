@@ -44,7 +44,12 @@ doctest.run = ->
 
     actual = try input() catch error then error.constructor
     expected = fn()
-    results.push [_.isEqual(actual, expected), q(expected), q(actual), num]
+    results.push [
+      _.isEqual actual, expected
+      repr expected
+      repr actual
+      num
+    ]
     input = null
 
   @complete results
@@ -161,10 +166,18 @@ rewrite.coffee = (input) ->
   lines.join('\n')
 
 
-q = (object) ->
-  switch typeof object
-    when 'string' then return "\"#{object}\""
-    when 'function'
-      try throw object()
-      catch error then return object.name if error instanceof Error
-  object
+# > repr 'foo \\ bar \\ baz'
+# '"foo \\\\ bar \\\\ baz"'
+# > repr 'foo "bar" baz'
+# '"foo \\"bar\\" baz"'
+# > repr TypeError
+# 'TypeError'
+# > repr 42
+# 42
+repr = (val) -> switch Object::toString.call val
+  when '[object String]'
+    '"' + val.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
+  when '[object Function]'
+    val.name
+  else
+    val
