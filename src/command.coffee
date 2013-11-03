@@ -1,15 +1,11 @@
-optimist = require 'optimist'
+program = require 'commander'
 
-usage = '''
+doctest = require '../lib/doctest'
 
-  Usage: doctest file [file ...]
 
-  `file` must be a JavaScript or CoffeeScript file with the appropriate
-  extension.
-'''
+program
+  .version(doctest.version)
+  .usage('file [file ...]\n\n  `file` must be a .js or .coffee file.')
+  .parse(process.argv)
 
-{argv} = optimist.usage(usage).options
-  h: alias: 'help'
-
-if argv.help or argv._.length is 0 then optimist.showHelp()
-else require('../lib/doctest').apply(null, argv._)
+doctest program.args...

@@ -15,9 +15,9 @@
     "url": "git://github.com/davidchambers/doctest.git"
   },
   "dependencies": {
+    "commander": "2.0.x",
     "escodegen": "0.0.28",
     "esprima": "1.0.x",
-    "optimist": "0.5.x",
     "underscore": "1.4.x"
   },
   "devDependencies": {
