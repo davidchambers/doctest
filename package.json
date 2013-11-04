@@ -2,7 +2,10 @@
   "name": "doctest",
   "version": "0.4.1",
   "description": "Quick and dirty doctests for JavaScript and CoffeeScript",
-  "author": "David Chambers <dc@hashify.me>",
+  "contributors": [
+    "David Chambers <dc@davidchambers.me>",
+    "Francesco Occhipinti <f.occhipinti@gmail.com>"
+  ],
   "keywords": ["doctests", "test", "browser"],
   "main": "./lib/doctest",
   "bin": "./bin/doctest",
