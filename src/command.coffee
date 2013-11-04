@@ -5,7 +5,7 @@ doctest = require '../lib/doctest'
 
 program
   .version(doctest.version)
-  .usage('file [file ...]\n\n  `file` must be a .js or .coffee file.')
+  .usage('path/to/js/or/coffee/module')
   .parse(process.argv)
 
-doctest program.args...
+doctest path for path in program.args
