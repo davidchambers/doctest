@@ -1,7 +1,7 @@
 {
   "name": "doctest",
   "version": "0.4.1",
-  "description": "Quick and dirty doctests for JavaScript and CoffeeScript",
+  "description": "Doctests for JavaScript and CoffeeScript",
   "contributors": [
     "David Chambers <dc@davidchambers.me>",
     "Francesco Occhipinti <f.occhipinti@gmail.com>"
