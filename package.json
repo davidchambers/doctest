@@ -18,13 +18,13 @@
     "url": "git://github.com/davidchambers/doctest.git"
   },
   "dependencies": {
+    "coffee-script": "1.6.x",
     "commander": "2.0.x",
     "escodegen": "0.0.28",
     "esprima": "1.0.x",
     "underscore": "1.4.x"
   },
   "devDependencies": {
-    "coffee-script": "1.6.x",
     "express": "3.2.x"
   }
 }
