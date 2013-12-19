@@ -28,7 +28,7 @@ doctest = (path, callback = noop) ->
     log results
     callback results
 
-doctest.version = '0.5.0'
+doctest.version = '0.5.1'
 
 
 if typeof window isnt 'undefined'
