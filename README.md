@@ -54,11 +54,24 @@ For example:
 
 Oops. Looks like we have a disagreement.
 
-### AMD modules
+### AMD and CommonJS modules
 
-doctest detects AMD modules and defines `define` to allow them to be tested,
-provided they have no dependencies. See [test/amd/index.js][3] for an example
-of such a module.
+doctest partially supports AMD and CommonJS modules:
+
+| Module system               | Node.js | Browser |
+| --------------------------- |:-------:|:-------:|
+| AMD                         |    ✔︎    |    ✔︎    |
+| AMD w/ dependencies         |    ✘    |    ✘    |
+| CommonJS                    |    ✔︎    |    ✘    |
+| CommonJS w/ dependencies    |    ✔︎    |    ✘    |
+
+Specify module system via JavaScript API:
+
+    > doctest("path/to/amd/module.js", {module: "amd"})
+
+Specify module system via command-line interface:
+
+    $ doctest --module commonjs path/to/commonjs/module.js
 
 ### Errors
 
@@ -188,4 +201,3 @@ Then point a browser at the correct port on localhost to view the results.
 
 [1]: http://docs.python.org/library/doctest.html
 [2]: http://bit.ly/129sbLQ
-[3]: https://github.com/davidchambers/doctest/blob/master/test/amd/index.js
