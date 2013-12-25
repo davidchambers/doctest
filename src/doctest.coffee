@@ -22,6 +22,7 @@ doctest = (path, options = {}, callback = noop) ->
         functionEval source
     log results
     callback results
+    results
 
 doctest.version = '0.5.1'
 
@@ -50,10 +51,10 @@ fetch = (path, callback) ->
       console.log "running doctests in #{name}..."
       callback text, type
   else
-    fs.readFile path, 'utf8', (err, text) ->
-      [name, type] = /[^/]+[.](coffee|js)$/.exec path
-      console.log "running doctests in #{name}..."
-      callback text, type
+    text = fs.readFileSync path, 'utf8'
+    [name, type] = /[^/]+[.](coffee|js)$/.exec path
+    console.log "running doctests in #{name}..."
+    callback text, type
 
 
 rewrite = (input, type) ->

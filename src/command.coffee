@@ -12,4 +12,7 @@ program
 
 options = _.pick program, ['module']
 
-doctest path, options for path in program.args
+process.exit _.reduce program.args, (failures, path) ->
+  results = doctest path, options
+  failures + _.reject(_.map(results, _.first), _.identity).length
+, 0
