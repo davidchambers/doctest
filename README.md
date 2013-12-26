@@ -57,8 +57,8 @@ Oops. Looks like we have a disagreement.
 ### AMD modules
 
 doctest detects AMD modules and defines `define` to allow them to be tested,
-provided they have no dependencies. See [test/module.js][3] for an example of
-such a module.
+provided they have no dependencies. See [test/amd/index.js][3] for an example
+of such a module.
 
 ### Errors
 
@@ -171,23 +171,21 @@ MyApp.utils.bar = function() {
 }
 ```
 
-### Dependencies
-
-The following libraries are required to run doctests from a browser console:
-
-  - [jQuery][4]
-  - [Underscore][5]
-
 ### Running the test suite
 
-    make setup
-    make test
+    $ make setup
+    $ make test
 
-This runs doctest's test suite: first headless, then in a browser.
+This runs doctest's test suite in Node. To run the suite in a browser, first
+start an HTTP server with __test/public__ as the root. For example:
+
+    $ cd test/public
+    $ python -m SimpleHTTPServer
+    Serving HTTP on 0.0.0.0 port 8000 ...
+
+Then point a browser at the correct port on localhost to view the results.
 
 
 [1]: http://docs.python.org/library/doctest.html
 [2]: http://bit.ly/129sbLQ
-[3]: https://github.com/davidchambers/doctest/blob/master/test/module.js
-[4]: http://jquery.com/
-[5]: http://underscorejs.org/
+[3]: https://github.com/davidchambers/doctest/blob/master/test/amd/index.js

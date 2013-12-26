@@ -1,0 +1,14 @@
+{
+  "name": "doctest",
+  "version": "0.5.1",
+  "dependencies": {
+    "coffee-script": "1.6.x",
+    "escodegen": "1.0.x",
+    "esprima": "1.0.x",
+    "jquery": "2.0.x",
+    "underscore": "1.5.x"
+  },
+  "devDependencies": {
+    "qunit": "1.12.x"
+  }
+}

@@ -19,12 +19,12 @@
   },
   "dependencies": {
     "coffee-script": "1.6.x",
-    "commander": "2.0.x",
-    "escodegen": "0.0.28",
+    "commander": "2.1.x",
+    "escodegen": "1.0.x",
     "esprima": "1.0.x",
-    "underscore": "1.4.x"
+    "underscore": "1.5.x"
   },
   "devDependencies": {
-    "express": "3.2.x"
+    "bower": "1.2.x"
   }
 }
