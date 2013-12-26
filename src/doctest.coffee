@@ -10,21 +10,16 @@
 
 ###
 
-doctest = (path, callback = noop) ->
+doctest = (path, options = {}, callback = noop) ->
   fetch path, (text, type) ->
     source = rewrite[type] text
-    source += ";\n#{defineFunctionString}" if isModule source
-    # Functions created via `Function` are always run in the `window`
-    # context, which ensures that doctests can't access variables in
-    # _this_ context. A doctest which assigns to or references `text`
-    # sets/gets `window.text`, not this function's `text` parameter.
-    # The `evaluate` function takes one argument, named `__doctest`.
-    evaluate = Function '__doctest', source
-    queue = []
-    evaluate
-      input: (fn) -> queue.push [fn]
-      output: (num, fn) -> queue.push [fn, num]
-    results = run queue
+    results = switch options.module
+      when 'amd'
+        functionEval "#{source};\n#{defineFunctionString}"
+      when 'commonjs'
+        commonjsEval source, path
+      else
+        functionEval source
     log results
     callback results
 
@@ -35,6 +30,8 @@ if typeof window isnt 'undefined'
   {_, CoffeeScript, escodegen, esprima} = window
   window.doctest = doctest
 else
+  fs = require 'fs'
+  pathlib = require 'path'
   _ = require 'underscore'
   CoffeeScript = require 'coffee-script'
   escodegen = require 'escodegen'
@@ -53,7 +50,6 @@ fetch = (path, callback) ->
       console.log "running doctests in #{name}..."
       callback text, type
   else
-    fs = require 'fs'
     fs.readFile path, 'utf8', (err, text) ->
       [name, type] = /[^/]+[.](coffee|js)$/.exec path
       console.log "running doctests in #{name}..."
@@ -137,12 +133,40 @@ defineFunctionString = '''
 '''
 
 
-isModule = (source) ->
-  _.some esprima.parse(source).body, (node) ->
-    node.type is 'ExpressionStatement' and
-    node.expression.type is 'CallExpression' and
-    node.expression.callee.type is 'Identifier' and
-    node.expression.callee.name is 'define'
+functionEval = (source) ->
+  # Functions created via the Function function are always run in the
+  # global context, which ensures that doctests can't access variables
+  # in _this_ context.
+  #
+  # The `evaluate` function takes one argument, named `__doctest`.
+  evaluate = Function '__doctest', source
+  queue = []
+  evaluate
+    input: (fn) -> queue.push [fn]
+    output: (num, fn) -> queue.push [fn, num]
+  run queue
+
+
+commonjsEval = (source, path) ->
+  abspath = pathlib.resolve(path).replace(/[.][^.]+$/, "-#{+new Date}.js")
+  fs.writeFileSync abspath, """
+    var __doctest = {
+      queue: [],
+      input: function(fn) {
+        __doctest.queue.push([fn]);
+      },
+      output: function(num, fn) {
+        __doctest.queue.push([fn, num]);
+      }
+    };
+    #{source}
+    (module.exports || exports).__doctest = __doctest;
+  """
+  try
+    {queue} = require(abspath).__doctest
+  finally
+    fs.unlinkSync abspath
+  run queue
 
 
 run = (queue) ->

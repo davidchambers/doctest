@@ -15,10 +15,10 @@
   <script>
     (function() {
       asyncTest('JavaScript doctests', function() {
-        doctest('shared/index.js', callback);
+        doctest('shared/index.js', {}, callback);
       });
       asyncTest('CoffeeScript doctests', function() {
-        doctest('shared/index.coffee', callback);
+        doctest('shared/index.coffee', {}, callback);
       });
       function callback(results) {
         _.each(window.results, function(expected, idx) {

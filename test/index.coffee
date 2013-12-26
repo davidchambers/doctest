@@ -1,3 +1,4 @@
+{exec}  = require 'child_process'
 pathlib = require 'path'
 
 _       = require 'underscore'
@@ -13,8 +14,8 @@ unless process.env.NODE_DISABLE_COLORS or process.platform is 'win32'
   reset = '\x1B[0m'
 
 
-testModule = (path) ->
-  doctest path, (results) ->
+testModule = (path, options) ->
+  doctest path, options, (results) ->
     for [message, expected], idx in require pathlib.resolve path, '../results'
       actual = results[idx]
       if _.isEqual actual, expected
@@ -27,4 +28,7 @@ testModule = (path) ->
 
 testModule 'test/shared/index.js'
 testModule 'test/shared/index.coffee'
-testModule 'test/amd/index.js'
+testModule 'test/amd/index.js', module: 'amd'
+testModule 'test/commonjs/require/index.js', module: 'commonjs'
+testModule 'test/commonjs/exports/index.js', module: 'commonjs'
+testModule 'test/commonjs/module.exports/index.js', module: 'commonjs'
