@@ -41,17 +41,16 @@ else
 
 
 fetch = (path, callback) ->
-  console.log "retrieving #{path}..."
-  if typeof window isnt 'undefined'
-    jQuery.ajax path, dataType: 'text', success: (text) ->
-      [name, type] = /[^/]+[.](coffee|js)$/.exec path
-      console.log "running doctests in #{name}..."
-      callback text, type
-  else
-    text = fs.readFileSync path, 'utf8'
+  wrapper = (text) ->
     [name, type] = /[^/]+[.](coffee|js)$/.exec path
     console.log "running doctests in #{name}..."
     callback text, type
+
+  console.log "retrieving #{path}..."
+  if typeof window isnt 'undefined'
+    jQuery.ajax path, dataType: 'text', success: wrapper
+  else
+    wrapper fs.readFileSync path, 'utf8'
 
 
 rewrite = (input, type) ->
