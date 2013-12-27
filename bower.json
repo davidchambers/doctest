@@ -1,6 +1,6 @@
 {
   "name": "doctest",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "dependencies": {
     "coffee-script": "1.6.x",
     "escodegen": "1.0.x",

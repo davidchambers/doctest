@@ -39,7 +39,7 @@ doctest = (path, options = {}, callback = noop) ->
     callback results
     results
 
-doctest.version = '0.5.1'
+doctest.version = '0.6.0'
 
 
 if typeof window isnt 'undefined'
