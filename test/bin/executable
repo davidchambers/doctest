@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+
+// > identity(42)
+// 42
+var identity = function(x) {
+  return x;
+};

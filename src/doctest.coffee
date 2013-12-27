@@ -12,7 +12,7 @@
 
 doctest = (path, options = {}, callback = noop) ->
   fetch path, options, (text, type) ->
-    source = rewrite[type] text
+    source = rewrite[type] text.replace(/^#!.*/, '')
     results = switch options.module
       when 'amd'
         functionEval "#{source};\n#{defineFunctionString}"
@@ -42,9 +42,9 @@ else
 
 fetch = (path, options, callback) ->
   wrapper = (text) ->
-    [name, type] = /[^/]+[.](coffee|js)$/.exec path
+    name = _.last path.split('/')
     console.log "running doctests in #{name}..." unless options.silent
-    callback text, type
+    callback text, options.type ? /[.](coffee|js)$/.exec(name)[1]
 
   console.log "retrieving #{path}..." unless options.silent
   if typeof window isnt 'undefined'

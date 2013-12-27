@@ -9,9 +9,10 @@ program
   .usage('[options] path/to/js/or/coffee/module')
   .option('-m, --module [type]', 'specify module system ("amd" or "commonjs")')
   .option('-s, --silent', 'suppress output')
+  .option('-t, --type [type]', 'specify file type ("coffee" or "js")')
   .parse(process.argv)
 
-options = _.pick program, ['module', 'silent']
+options = _.pick program, ['module', 'silent', 'type']
 
 process.exit _.reduce program.args, (failures, path) ->
   results = doctest path, options

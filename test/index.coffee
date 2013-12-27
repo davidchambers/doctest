@@ -44,6 +44,7 @@ testModule 'test/amd/index.js', module: 'amd'
 testModule 'test/commonjs/require/index.js', module: 'commonjs'
 testModule 'test/commonjs/exports/index.js', module: 'commonjs'
 testModule 'test/commonjs/module.exports/index.js', module: 'commonjs'
+testModule 'test/bin/executable', type: 'js'
 
 testCommand 'bin/doctest test/shared/index.js',
   code: 4
@@ -90,6 +91,14 @@ testCommand 'bin/doctest test/shared/index.js test/shared/index.coffee',
   '''
 testCommand 'bin/doctest --silent test/shared/index.js',
   code: 4
+  output: ''
+
+testCommand 'bin/doctest --silent test/bin/executable',
+  code: 1
+  output: ''
+
+testCommand 'bin/doctest --type js --silent test/bin/executable',
+  code: 0
   output: ''
 
 testCommand 'bin/doctest --module commonjs --silent src/doctest.coffee',
