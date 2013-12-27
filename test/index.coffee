@@ -30,12 +30,17 @@ testModule = (path, options) ->
 
 
 testCommand = (command, expected) ->
-  child = exec command, (err, stdout) ->
+  child = exec command, (err, stdout, stderr) ->
     code = if err? then err.code else 0
-    if code isnt expected.code
-      printResult code, expected.code, command
-    else
-      printResult stdout, expected.output, command
+    switch
+      when code isnt expected.code
+        printResult code, expected.code, command
+      when stdout isnt expected.stdout
+        printResult stdout, expected.stdout, command
+      when stderr isnt expected.stderr
+        printResult stderr, expected.stderr, command
+      else
+        printResult 0, 0, command
 
 
 testModule 'test/shared/index.js'
@@ -46,9 +51,19 @@ testModule 'test/commonjs/exports/index.js', module: 'commonjs'
 testModule 'test/commonjs/module.exports/index.js', module: 'commonjs'
 testModule 'test/bin/executable', type: 'js'
 
+testCommand 'bin/doctest --xxx',
+  code: 1
+  stdout: ''
+  stderr: "\n  error: unknown option `--xxx'\n\n"
+
+testCommand 'bin/doctest --type xxx',
+  code: 1
+  stdout: ''
+  stderr: "\n  error: invalid type `xxx'\n\n"
+
 testCommand 'bin/doctest test/shared/index.js',
   code: 4
-  output: '''
+  stdout: '''
     retrieving test/shared/index.js...
     running doctests in index.js...
     ......x.x...........x.x
@@ -58,9 +73,11 @@ testCommand 'bin/doctest test/shared/index.js',
     FAIL: expected "on automatic semicolon insertion" on line 109 (got "the rewriter should not rely")
 
   '''
+  stderr: ''
+
 testCommand 'bin/doctest test/shared/index.coffee',
   code: 4
-  output: '''
+  stdout: '''
     retrieving test/shared/index.coffee...
     running doctests in index.coffee...
     ......x.x...........x.x
@@ -70,9 +87,11 @@ testCommand 'bin/doctest test/shared/index.coffee',
     FAIL: expected "on automatic semicolon insertion" on line 109 (got "the rewriter should not rely")
 
   '''
+  stderr: ''
+
 testCommand 'bin/doctest test/shared/index.js test/shared/index.coffee',
   code: 8
-  output: '''
+  stdout: '''
     retrieving test/shared/index.js...
     running doctests in index.js...
     ......x.x...........x.x
@@ -89,18 +108,24 @@ testCommand 'bin/doctest test/shared/index.js test/shared/index.coffee',
     FAIL: expected "on automatic semicolon insertion" on line 109 (got "the rewriter should not rely")
 
   '''
+  stderr: ''
+
 testCommand 'bin/doctest --silent test/shared/index.js',
   code: 4
-  output: ''
+  stdout: ''
+  stderr: ''
 
 testCommand 'bin/doctest --silent test/bin/executable',
   code: 1
-  output: ''
+  stdout: ''
+  stderr: '\n  error: cannot infer type from extension\n\n'
 
 testCommand 'bin/doctest --type js --silent test/bin/executable',
   code: 0
-  output: ''
+  stdout: ''
+  stderr: ''
 
 testCommand 'bin/doctest --module commonjs --silent src/doctest.coffee',
   code: 0
-  output: ''
+  stdout: ''
+  stderr: ''

@@ -10,8 +10,23 @@
 
 ###
 
+validators =
+  module: (module) -> module in [undefined, 'amd', 'commonjs']
+  silent: -> yes
+  type: (type) -> type in [undefined, 'coffee', 'js']
+
 doctest = (path, options = {}, callback = noop) ->
-  fetch path, options, (text, type) ->
+  _.each _.keys(validators).sort(), (key) ->
+    unless validators[key] options[key]
+      throw new Error "Invalid #{key} `#{options[key]}'"
+
+  type = options.type or do ->
+    match = /[.](coffee|js)$/.exec path
+    if match is null
+      throw new Error 'Cannot infer type from extension'
+    match[1]
+
+  fetch path, options, (text) ->
     source = rewrite[type] text.replace(/^#!.*/, '')
     results = switch options.module
       when 'amd'
@@ -44,7 +59,7 @@ fetch = (path, options, callback) ->
   wrapper = (text) ->
     name = _.last path.split('/')
     console.log "running doctests in #{name}..." unless options.silent
-    callback text, options.type ? /[.](coffee|js)$/.exec(name)[1]
+    callback text
 
   console.log "retrieving #{path}..." unless options.silent
   if typeof window isnt 'undefined'

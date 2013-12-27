@@ -27,6 +27,12 @@ _.each keys, (key) ->
 
 
 process.exit _.reduce program.args, (failures, path) ->
-  results = doctest path, options
+  try
+    results = doctest path, options
+  catch err
+    process.stderr.write \
+      # Format output to match commander.
+      "\n  error: #{err.message[0].toLowerCase()}#{err.message[1..]}\n\n"
+    process.exit 1
   failures + _.reject(_.map(results, _.first), _.identity).length
 , 0
