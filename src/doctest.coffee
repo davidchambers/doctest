@@ -100,7 +100,7 @@ rewrite.coffee = (input) ->
 
   lines = []; expr = ''
   for line, idx in input.split('\n')
-    if match = /^([ \t]*)#[ \t]*(.+)/.exec line
+    if match = /^([ \t]*)#(?!##)[ \t]*(.+)/.exec line
       [match, indent, comment] = match
       if match = /^>(.*)/.exec comment
         lines.push "#{indent}__doctest.input #{f indent, expr}" if expr

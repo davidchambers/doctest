@@ -91,3 +91,7 @@ testCommand 'bin/doctest test/shared/index.js test/shared/index.coffee',
 testCommand 'bin/doctest --silent test/shared/index.js',
   code: 4
   output: ''
+
+testCommand 'bin/doctest --module commonjs --silent src/doctest.coffee',
+  code: 0
+  output: ''
