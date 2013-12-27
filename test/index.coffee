@@ -56,6 +56,11 @@ testCommand 'bin/doctest --xxx',
   stdout: ''
   stderr: "\n  error: unknown option `--xxx'\n\n"
 
+testCommand 'bin/doctest --type',
+  code: 1
+  stdout: ''
+  stderr: "\n  error: option `-t, --type <type>' argument missing\n\n"
+
 testCommand 'bin/doctest --type xxx',
   code: 1
   stdout: ''

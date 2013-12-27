@@ -7,9 +7,9 @@ doctest = require '../lib/doctest'
 program
   .version(doctest.version)
   .usage('[options] path/to/js/or/coffee/module')
-  .option('-m, --module [type]', 'specify module system ("amd" or "commonjs")')
+  .option('-m, --module <type>', 'specify module system ("amd" or "commonjs")')
   .option('-s, --silent', 'suppress output')
-  .option('-t, --type [type]', 'specify file type ("coffee" or "js")')
+  .option('-t, --type <type>', 'specify file type ("coffee" or "js")')
   .parse(process.argv)
 
 
