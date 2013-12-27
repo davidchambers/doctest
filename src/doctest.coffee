@@ -189,7 +189,7 @@ run = (queue) ->
 log = (results) ->
   console.log ((if pass then '.' else 'x') for [pass] in results).join('')
   for [pass, expected, actual, num] in results when not pass
-    console.warn "expected #{expected} on line #{num} (got #{actual})"
+    console.log "FAIL: expected #{expected} on line #{num} (got #{actual})"
   return
 
 
