@@ -24,7 +24,7 @@ printResult = (actual, expected, message) ->
 
 
 testModule = (path, options) ->
-  doctest path, options, (results) ->
+  doctest path, _.extend(silent: yes, options), (results) ->
     for [message, expected], idx in require pathlib.resolve path, '../results'
       printResult results[idx], expected, message
 
@@ -72,3 +72,6 @@ testCommand 'bin/doctest test/shared/index.js test/shared/index.coffee',
     ......x.x...........x.x
 
   '''
+testCommand 'bin/doctest --silent test/shared/index.js',
+  code: 4
+  output: ''

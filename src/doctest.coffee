@@ -11,7 +11,7 @@
 ###
 
 doctest = (path, options = {}, callback = noop) ->
-  fetch path, (text, type) ->
+  fetch path, options, (text, type) ->
     source = rewrite[type] text
     results = switch options.module
       when 'amd'
@@ -20,7 +20,7 @@ doctest = (path, options = {}, callback = noop) ->
         commonjsEval source, path
       else
         functionEval source
-    log results
+    log results unless options.silent
     callback results
     results
 
@@ -40,13 +40,13 @@ else
   module.exports = doctest
 
 
-fetch = (path, callback) ->
+fetch = (path, options, callback) ->
   wrapper = (text) ->
     [name, type] = /[^/]+[.](coffee|js)$/.exec path
-    console.log "running doctests in #{name}..."
+    console.log "running doctests in #{name}..." unless options.silent
     callback text, type
 
-  console.log "retrieving #{path}..."
+  console.log "retrieving #{path}..." unless options.silent
   if typeof window isnt 'undefined'
     jQuery.ajax path, dataType: 'text', success: wrapper
   else
