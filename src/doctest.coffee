@@ -43,9 +43,6 @@ else
 fetch = (path, callback) ->
   console.log "retrieving #{path}..."
   if typeof window isnt 'undefined'
-    # Support relative paths; e.g. `doctest("./foo.js")`.
-    if path[0] is '.' and (script = jQuery 'script[src$="doctest.js"]').length
-      path = script.attr('src').replace(/doctest[.]js$/, path)
     jQuery.ajax path, dataType: 'text', success: (text) ->
       [name, type] = /[^/]+[.](coffee|js)$/.exec path
       console.log "running doctests in #{name}..."

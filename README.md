@@ -37,17 +37,10 @@ Doctests needn't be indented, though there's no harm in being
 
 To run doctests, pass `doctest` the path to the "module" to be tested.
 Doctests can be run from the command line or from a browser console: provide
-local file system paths in the former case, URLs in the latter. Specifically,
-each URL should be one of the following:
+local file system paths in the former case, URLs in the latter. For example:
 
-  - an absolute URL; e.g. `"http://example.com/scripts/some-module.js"`
-  - a root-relative URL; e.g. `"/scripts/some-module.js"`
-  - a path relative to doctest.js; e.g. `"./some-module.js"`
-
-For example:
-
-    > doctest("../src/math-extensions.coffee")
-    retrieving /scripts/lib/../src/math-extensions.coffee...
+    $ doctest src/math-extensions.coffee
+    retrieving src/math-extensions.coffee...
     running doctests in math-extensions.coffee...
     ..x
     expected undefined on line 17 (got 1)
