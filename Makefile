@@ -32,6 +32,7 @@ setup:
 
 .PHONY: test
 test: \
+		all \
 		test/public/bundle.js \
 		test/public/index.html \
 		test/public/shared/index.coffee \
