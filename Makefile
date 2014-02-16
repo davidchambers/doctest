@@ -1,9 +1,11 @@
 BOWER = node_modules/.bin/bower
 COFFEE = node_modules/.bin/coffee
 
+JS_FILES = $(patsubst src/%.coffee,lib/%.js,$(shell find src -type f))
+
 
 .PHONY: all
-all: lib/command.js lib/doctest.js
+all: $(JS_FILES)
 
 lib/%.js: src/%.coffee
 	mkdir -p $(@D)
