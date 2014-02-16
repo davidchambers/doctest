@@ -25,6 +25,7 @@
     "underscore": "1.5.x"
   },
   "devDependencies": {
-    "bower": "1.2.x"
+    "bower": "1.2.x",
+    "semver": "2.2.x"
   }
 }

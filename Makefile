@@ -17,17 +17,23 @@ clean:
 	rm -f $(JS_FILES)
 
 
+.PHONY: release-patch release-minor release-major
+VERSION = $(shell node -p 'require("./package.json").version')
+release-patch: NEXT_VERSION = $(shell node -p 'require("semver").inc("$(VERSION)", "patch")')
+release-minor: NEXT_VERSION = $(shell node -p 'require("semver").inc("$(VERSION)", "minor")')
+release-major: NEXT_VERSION = $(shell node -p 'require("semver").inc("$(VERSION)", "major")')
+release-patch: release
+release-minor: release
+release-major: release
+
 .PHONY: release
 release:
-ifndef VERSION
-	$(error VERSION is undefined)
-endif
-	sed -i '' 's!\("version": "\)[0-9.]*\("\)!\1$(VERSION)\2!' bower.json package.json
-	sed -i '' "s!\(.version = '\)[0-9.]*\('\)!\1$(VERSION)\2!" src/doctest.coffee
+	sed -i '' 's!\("version": "\)[0-9.]*\("\)!\1$(NEXT_VERSION)\2!' bower.json package.json
+	sed -i '' "s!\(.version = '\)[0-9.]*\('\)!\1$(NEXT_VERSION)\2!" src/doctest.coffee
 	make
 	git add bower.json package.json src/doctest.coffee lib/doctest.js
-	git commit --message $(VERSION)
-	git tag $(VERSION)
+	git commit --message $(NEXT_VERSION)
+	git tag $(NEXT_VERSION)
 	@echo 'remember to run `npm publish`'
 
 
