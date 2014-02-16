@@ -62,11 +62,11 @@ test/public/bundle.js: \
 		lib/doctest.js \
 		test/shared/results.js
 	mkdir -p $(@D)
-	cat $^ > $@
+	cat $^ >$@
 
 test/public/style.css: bower_components/qunit/qunit/qunit.css
 	mkdir -p $(@D)
-	cat $^ > $@
+	cat $^ >$@
 
 test/public/%: test/%
 	mkdir -p $(@D)
