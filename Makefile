@@ -28,8 +28,8 @@ release-major: release
 
 .PHONY: release
 release:
-	sed -i '' 's!\("version": "\)[0-9.]*\("\)!\1$(NEXT_VERSION)\2!' bower.json package.json
-	sed -i '' "s!\(.version = '\)[0-9.]*\('\)!\1$(NEXT_VERSION)\2!" src/doctest.coffee
+	sed -i '' 's/"version": "[^"]*"/"version": "$(NEXT_VERSION)"/' bower.json package.json
+	sed -i '' "s/.version = '[^']*'/.version = '$(NEXT_VERSION)'/" src/doctest.coffee
 	make
 	git add bower.json package.json src/doctest.coffee lib/doctest.js
 	git commit --message $(NEXT_VERSION)
