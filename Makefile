@@ -12,6 +12,11 @@ lib/%.js: src/%.coffee
 	cat $< | $(COFFEE) --compile --stdio > $@
 
 
+.PHONY: clean
+clean:
+	rm -f $(JS_FILES)
+
+
 .PHONY: release
 release:
 ifndef VERSION
