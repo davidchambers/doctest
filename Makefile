@@ -9,12 +9,12 @@ JS_FILES = $(patsubst src/%.coffee,lib/%.js,$(shell find src -type f))
 all: $(JS_FILES)
 
 lib/%.js: src/%.coffee
-	$(COFFEE) --compile --output $(@D) $<
+	$(COFFEE) --compile --output $(@D) -- $<
 
 
 .PHONY: clean
 clean:
-	rm -f $(JS_FILES)
+	rm -f -- $(JS_FILES)
 
 
 .PHONY: release-patch release-minor release-major
