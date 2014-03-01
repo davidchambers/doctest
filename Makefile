@@ -29,7 +29,7 @@ release-patch release-minor release-major:
 	make
 	git add bower.json package.json src/doctest.coffee lib/doctest.js
 	git commit --message $(NEXT_VERSION)
-	git tag $(NEXT_VERSION)
+	git tag --annotate $(NEXT_VERSION) --message $(NEXT_VERSION)
 	@echo 'remember to run `npm publish`'
 
 
