@@ -78,7 +78,7 @@ rewrite.js = (input) ->
   processComment = do (expr = '') -> ({value}, start) ->
     lines = []
     for line in value.split('\n')
-      [match, indent, comment] = /^([ \t]*)(.*)/.exec line
+      [..., indent, comment] = /^([ \t]*)(.*)/.exec line
       if match = /^>(.*)/.exec comment
         lines.push "__doctest.input(#{f expr})" if expr
         expr = match[1]
@@ -116,7 +116,7 @@ rewrite.coffee = (input) ->
   lines = []; expr = ''
   for line, idx in input.split('\n')
     if match = /^([ \t]*)#(?!##)[ \t]*(.+)/.exec line
-      [match, indent, comment] = match
+      [..., indent, comment] = match
       if match = /^>(.*)/.exec comment
         lines.push "#{indent}__doctest.input #{f indent, expr}" if expr
         expr = match[1]
