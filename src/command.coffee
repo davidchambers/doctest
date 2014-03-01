@@ -15,8 +15,8 @@ program
 
 validators =
   module: _.partial _.contains, [undefined, 'amd', 'commonjs']
-  silent: -> yes
-  type: _.partial _.contains, [undefined, 'coffee', 'js']
+  silent: _.constant yes
+  type:   _.partial _.contains, [undefined, 'coffee', 'js']
 
 keys = _.keys(validators).sort()
 options = _.pick program, keys

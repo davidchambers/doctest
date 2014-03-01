@@ -22,7 +22,7 @@
     "commander": "2.1.x",
     "escodegen": "1.2.x",
     "esprima": "1.0.x",
-    "underscore": "1.5.x"
+    "underscore": "1.6.x"
   },
   "devDependencies": {
     "bower": "1.2.x",

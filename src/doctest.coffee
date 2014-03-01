@@ -10,11 +10,6 @@
 
 ###
 
-validators =
-  module: (module) -> module in [undefined, 'amd', 'commonjs']
-  silent: -> yes
-  type: (type) -> type in [undefined, 'coffee', 'js']
-
 doctest = (path, options = {}, callback = noop) ->
   _.each _.keys(validators).sort(), (key) ->
     unless validators[key] options[key]
@@ -53,6 +48,12 @@ else
   escodegen = require 'escodegen'
   esprima = require 'esprima'
   module.exports = doctest
+
+
+validators =
+  module: _.partial _.contains, [undefined, 'amd', 'commonjs']
+  silent: _.constant yes
+  type:   _.partial _.contains, [undefined, 'coffee', 'js']
 
 
 fetch = (path, options, callback) ->
@@ -160,7 +161,7 @@ functionEval = (source) ->
 
 
 commonjsEval = (source, path) ->
-  abspath = pathlib.resolve(path).replace(/[.][^.]+$/, "-#{+new Date}.js")
+  abspath = pathlib.resolve(path).replace(/[.][^.]+$/, "-#{_.now()}.js")
   fs.writeFileSync abspath, """
     var __doctest = {
       queue: [],
