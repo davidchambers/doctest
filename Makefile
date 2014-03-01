@@ -22,12 +22,8 @@ VERSION = $(shell node -p 'require("./package.json").version')
 release-patch: NEXT_VERSION = $(shell $(SEMVER) -i patch $(VERSION))
 release-minor: NEXT_VERSION = $(shell $(SEMVER) -i minor $(VERSION))
 release-major: NEXT_VERSION = $(shell $(SEMVER) -i major $(VERSION))
-release-patch: release
-release-minor: release
-release-major: release
 
-.PHONY: release
-release:
+release-patch release-minor release-major:
 	sed -i '' 's/"version": "[^"]*"/"version": "$(NEXT_VERSION)"/' bower.json package.json
 	sed -i '' "s/.version = '[^']*'/.version = '$(NEXT_VERSION)'/" src/doctest.coffee
 	make
