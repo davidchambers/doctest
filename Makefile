@@ -53,7 +53,7 @@ test/public/bundle.js: \
 		bower_components/coffee-script/extras/coffee-script.js \
 		bower_components/escodegen/escodegen.browser.js \
 		bower_components/esprima/esprima.js \
-		bower_components/jquery/jquery.js \
+		bower_components/jquery/dist/jquery.js \
 		bower_components/qunit/qunit/qunit.js \
 		bower_components/underscore/underscore.js \
 		lib/doctest.js \

@@ -2,13 +2,13 @@
   "name": "doctest",
   "version": "0.6.0",
   "dependencies": {
-    "coffee-script": "1.6.x",
-    "escodegen": "1.0.x",
+    "coffee-script": "1.7.x",
+    "escodegen": "1.2.x",
     "esprima": "1.0.x",
-    "jquery": "2.0.x",
-    "underscore": "1.5.x"
+    "jquery": "2.1.x",
+    "underscore": "1.6.x"
   },
   "devDependencies": {
-    "qunit": "1.12.x"
+    "qunit": "1.14.x"
   }
 }
