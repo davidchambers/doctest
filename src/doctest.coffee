@@ -73,63 +73,134 @@ rewrite = (input, type) ->
   rewrite[type] input.replace /\r\n?/g, '\n'
 
 
+# transformComments :: [Object] -> [Object]
+#
+# Returns a list of {input,output} pairs representing the doctests
+# present in the given list of esprima comment objects.
+#
+# > transformComments [
+# .   type: 'Line'
+# .   value: ' > 6 * 7'
+# .   loc: start: {line: 1, column: 0}, end: {line: 1, column: 10}
+# . ,
+# .   type: 'Line'
+# .   value: ' 42'
+# .   loc: start: {line: 2, column: 0}, end: {line: 2, column: 5}
+# . ]
+# [{input: {value: ' 6 * 7', loc: {start: {line: 1, column: 0}, end: {line: 1, column: 10}}}, output: {value: '42', loc: {start: {line: 2, column: 0}, end: {line: 2, column: 5}}}}]
+transformComments = (comments) ->
+  _.last _.reduce comments, ([state, accum], {loc, value}) ->
+    _.reduce _.initial(value.match /(?!\s).*/g), ([state, accum], line) ->
+      [..., prefix, value] = /^(>|[.]*)(.*)$/.exec line
+      if prefix is '>'
+        [1, accum.concat input: {loc, value}]
+      else if state is 0
+        [0, accum]
+      else if prefix
+        [1, _.initial(accum).concat {
+          input:
+            loc: start: _.last(accum).input.loc.start, end: loc.end
+            value: "#{_.last(accum).input.value}\n#{value}"
+        }]
+      else
+        [0, _.initial(accum).concat {
+          input: _.last(accum).input
+          output: {loc, value: line}
+        }]
+    , [state, accum]
+  , [0, []]
+
+
+# substring :: String,{line,column},{line,column} -> String
+#
+# Returns the substring between the start and end positions.
+# Positions are specified in terms of line and column rather than index.
+# {line: 1, column: 0} represents the first character of the first line.
+#
+# > substring "hello\nworld", {line: 1, column: 3}, {line: 2, column: 2}
+# "lo\nwo"
+substring = (input, start, end) ->
+  combine = (a, b) -> ["#{a[0]}#{b[0]}", b[1]]
+  _.first _.reduce input.split(/^/m), (accum, line, idx) ->
+    isStartLine = idx + 1 is start.line
+    isEndLine   = idx + 1 is end.line
+    combine accum, _.reduce line, ([chrs, inComment], chr, column) ->
+      if (isStartLine and column is start.column) or
+         inComment and not (isEndLine and column is end.column)
+        ["#{chrs}#{chr}", yes]
+      else
+        ["#{chrs}", no]
+    , ['', _.last accum]
+  , ['', no]
+
+
 rewrite.js = (input) ->
-  f = (expr) -> "function() {\n  return #{expr}\n}"
+  # Locate all the comments within the input text, then use their
+  # positions to create a list containing all the code chunks. Note
+  # that if there are N comment chunks there are N + 1 code chunks.
+  # An empty comment at {line: Infinity, column: Infinity} enables
+  # the final code chunk to be captured.
+  {comments} = esprima.parse input, comment: yes, loc: yes
+  tests = transformComments comments
+  .concat input: value: '', loc: start: line: Infinity, column: Infinity
 
-  processComment = do (expr = '') -> ({value}, start) ->
-    lines = []
-    for line in value.split('\n')
-      [..., indent, comment] = /^([ \t]*)(.*)/.exec line
-      if match = /^>(.*)/.exec comment
-        lines.push "__doctest.input(#{f expr})" if expr
-        expr = match[1]
-      else if match = /^[.]+(.*)/.exec comment
-        expr += "\n#{match[1]}"
-      else if expr
-        lines.push "__doctest.input(#{f expr})"
-        lines.push "__doctest.output(#{start.line}, #{f line})"
-        expr = ''
-    escodegen.generate esprima.parse(lines.join('\n')), indent: '  '
+  wrap =
+    input: (test) -> """
+      __doctest.input(function() {
+        return #{test.input.value};
+      });
+    """
+    output: (test) -> """
+      __doctest.output(#{test.output.loc.start.line}, function() {
+        return #{test.output.value};
+      });
+    """
 
-  for {loc} in esprima.parse(input, comment: yes, loc: yes).comments
-    [comment] = esprima.parse(input, comment: yes, loc: yes).comments
-    {start, end} = comment.loc
-    lines = input.split('\n')
-    idx = start.line - 1
-    line = lines[idx]
-    if end.line is start.line
-      lines[idx] = line.substr(0, start.column) + line.substr(end.column)
-    else
-      lines[idx] = line.substr(0, start.column)
-      lines[idx] = '' until ++idx is end.line - 1
-      lines[idx] = lines[idx].substr(end.column)
-    line = lines[start.line - 1]
-    lines[start.line - 1] = line.substr(0, start.column) +
-                            processComment(comment, loc.start) +
-                            line.substr(start.column)
-    input = lines.join('\n')
-  input
+  _.chain tests
+  .reduce ([chunks, start], test) ->
+    [chunks.concat substring input, start, test.input.loc.start
+     (test.output ? test.input).loc.end]
+  , [[], {line: 1, column: 0}]
+  .first()
+  .zip _.map tests, _.compose escodegen.generate, esprima.parse, (test) ->
+    (wrap[p] test for p in ['input', 'output'] when p of test).join('\n')
+  .flatten()
+  .value()
+  .join ''
 
 
 rewrite.coffee = (input) ->
-  f = (indent, expr) -> "->\n#{indent}  #{expr}\n#{indent}"
+  wrap =
+    input: (test) ->
+      "__doctest.input -> #{test.input.value}"
+    output: (test) ->
+      "__doctest.output #{test.output.loc.start.line}, -> #{test.output.value}"
 
-  lines = []; expr = ''
-  for line, idx in input.split('\n')
-    if match = /^([ \t]*)#(?!##)[ \t]*(.+)/.exec line
-      [..., indent, comment] = match
-      if match = /^>(.*)/.exec comment
-        lines.push "#{indent}__doctest.input #{f indent, expr}" if expr
-        expr = match[1]
-      else if match = /^[.]+(.*)/.exec comment
-        expr += "\n#{indent}  #{match[1]}"
+  source = _.chain input.split '\n'
+  .reduce ([expr, lines], line, idx) ->
+    if match = /^([ \t]*)#(?!##)[ \t]*(>|[.]*)(.*)$/.exec line
+      [..., indent, prefix, value] = match
+      if prefix is '>' and expr
+        [value, lines.concat "#{indent}#{wrap.input input: value: expr}"]
+      else if prefix is '>'
+        [value, lines]
+      else if prefix
+        ["#{expr}\n#{indent}  #{value}", lines]
       else if expr
-        lines.push "#{indent}__doctest.input #{f indent, expr}"
-        lines.push "#{indent}__doctest.output #{idx + 1}, #{f indent, comment}"
-        expr = ''
+        ['', lines.concat [
+          "#{indent}#{wrap.input input: value: expr}"
+          "#{indent}#{wrap.output output: {value, loc: start: line: idx + 1}}"
+        ]]
+      else
+        [expr, lines]
     else
-      lines.push line
-  CoffeeScript.compile lines.join('\n')
+      [expr, lines.concat line]
+  , ['', []]
+  .last()
+  .value()
+  .join '\n'
+
+  CoffeeScript.compile source
 
 
 defineFunctionString = '''
