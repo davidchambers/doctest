@@ -19,6 +19,26 @@ function toFahrenheit(degreesCelsius) {
 }
 ```
 
+### Installation
+
+#### Node
+
+    $ npm install -g doctest
+
+#### Browser
+
+1.  Install doctest and its dependencies:
+
+        $ bower install doctest
+
+2.  Add script tags:
+
+        <script src="path/to/bower_components/escodegen/escodegen.browser.js"></script>
+        <script src="path/to/bower_components/esprima/esprima.js"></script>
+        <script src="path/to/bower_components/jquery/dist/jquery.js"></script>
+        <script src="path/to/bower_components/underscore/underscore.js"></script>
+        <script src="path/to/bower_components/doctest/lib/doctest.js"></script>
+
 ### Running doctests
 
 Test a module via JavaScript API:
