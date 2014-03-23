@@ -1,6 +1,14 @@
 {
   "name": "doctest",
   "version": "0.6.0",
+  "main": "./lib/doctest",
+  "ignore": [
+    "/Makefile",
+    "/bin/",
+    "/lib/command.js",
+    "/package.json",
+    "/src/"
+  ],
   "dependencies": {
     "coffee-script": "1.7.x",
     "escodegen": "1.2.x",
