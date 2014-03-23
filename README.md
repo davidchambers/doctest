@@ -22,7 +22,7 @@ function toFahrenheit(degreesCelsius) {
 
 Doctest will execute `toFahrenheit(0)` and verify that its output is `32`.
 
-### Installing doctest
+### Installation
 
 Doctest is a node package and is installed via [npm][2]:
 
