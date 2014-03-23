@@ -1,6 +1,6 @@
 {
   "name": "doctest",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Doctests for JavaScript and CoffeeScript",
   "contributors": [
     "David Chambers <dc@davidchambers.me>",
