@@ -1,9 +1,10 @@
 # doctest
 
-[Doctests][1] are executable usage examples sometimes found in "docstrings".
-JavaScript doesn't have docstrings, but inline documentation can be included
-in code comments. doctest tests the accuracy of usage examples in JavaScript
-and CoffeeScript modules.
+[Doctests][1] are executable usage examples simply written inside a code comment.
+Doctest verifies usage examples in JavaScript
+and CoffeeScript modules to ensure that your code is doing what it is supposed to do.
+
+### Example
 
 ```javascript
 // toFahrenheit :: Number -> Number
@@ -18,6 +19,14 @@ function toFahrenheit(degreesCelsius) {
   return degreesCelsius * 9 / 5 + 32;
 }
 ```
+
+Doctest will execute `toFahrenheit(0)` and verify that its output is `32`.
+
+### Installation
+
+Doctest is a node package and is installed via [npm][2]:
+
+    npm install doctest
 
 ### Running doctests
 
@@ -53,7 +62,7 @@ Specify module system via command-line interface:
 
     $ doctest --module commonjs path/to/commonjs/module.js
 
-### Errors
+### Testing errors
 
 It's easy to indicate that an error (of a particular kind) is expected:
 
@@ -80,3 +89,4 @@ Then point a browser at the correct port on localhost to view the results.
 
 
 [1]: http://docs.python.org/library/doctest.html
+[2]: https://www.npmjs.org/
