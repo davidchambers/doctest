@@ -1,8 +1,10 @@
 # doctest
 
-[Doctests][1] are executable usage examples simply written inside a code comment.
-Doctest verifies usage examples in JavaScript
-and CoffeeScript modules to ensure that your code is doing what it is supposed to do.
+[Doctests][1] are executable usage examples sometimes found in "docstrings".
+JavaScript doesn't have docstrings, but inline documentation can be included
+in code comments. doctest finds and evaluates usage examples in code comments
+and reports any inaccuracies. doctest works with JavaScript and CoffeeScript
+modules.
 
 ### Example
 
