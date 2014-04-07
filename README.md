@@ -33,7 +33,6 @@ function toFahrenheit(degreesCelsius) {
 
 2.  Add script tags:
 
-        <script src="path/to/bower_components/escodegen/escodegen.browser.js"></script>
         <script src="path/to/bower_components/esprima/esprima.js"></script>
         <script src="path/to/bower_components/jquery/dist/jquery.js"></script>
         <script src="path/to/bower_components/underscore/underscore.js"></script>

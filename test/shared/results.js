@@ -66,6 +66,21 @@
   ], [
     'wrapped lines may begin with more than one "."',
     [true, 1234.5, 1234.5, 105]
+  ], [
+    'multiline comment',
+    [true, 23, 23, 110]
+  ], [
+    'multiline comment with wrapped input',
+    [true, '"FOO BAR"', '"FOO BAR"', 119]
+  ], [
+    'multiline comment with leading asterisks',
+    [true, 25, 25, 125]
+  ], [
+    'multiline comment with leading asterisks',
+    [true, 25, 25, 127]
+  ], [
+    'multiline comment with leading asterisks and wrapped input',
+    [true, 55, 55, 135]
   ]];
 
   if (typeof window === 'undefined') {
