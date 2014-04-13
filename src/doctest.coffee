@@ -119,7 +119,10 @@ transformComments = (comments) ->
 #
 # > substring "hello\nworld", {line: 1, column: 3}, {line: 2, column: 2}
 # "lo\nwo"
+# > substring "hello\nworld", {line: 1, column: 0}, {line: 1, column: 0}
+# ""
 substring = (input, start, end) ->
+  return '' if start.line is end.line and start.column is end.column
   combine = (a, b) -> ["#{a[0]}#{b[0]}", b[1]]
   _.first _.reduce input.split(/^/m), (accum, line, idx) ->
     isStartLine = idx + 1 is start.line
