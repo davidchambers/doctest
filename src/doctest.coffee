@@ -145,8 +145,9 @@ substring = (input, start, end) ->
     , ['', _.last accum]
   , ['', no]
 
-
 rewrite.js = (input) ->
+  # > wrap {input:'2+2',output:'4'}
+  # 'raise a big error'
   wrap = (test) ->
     _.chain ['input', 'output']
     .filter _.partial _.has, test
