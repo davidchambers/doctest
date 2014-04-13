@@ -38,14 +38,13 @@ doctest.version = '0.6.1'
 
 
 if typeof window isnt 'undefined'
-  {_, CoffeeScript, escodegen, esprima} = window
+  {_, CoffeeScript, esprima} = window
   window.doctest = doctest
 else
   fs = require 'fs'
   pathlib = require 'path'
   _ = require 'underscore'
   CoffeeScript = require 'coffee-script'
-  escodegen = require 'escodegen'
   esprima = require 'esprima'
   module.exports = doctest
 
@@ -87,25 +86,38 @@ rewrite = (input, type) ->
 # .   value: ' 42'
 # .   loc: start: {line: 2, column: 0}, end: {line: 2, column: 5}
 # . ]
-# [{input: {value: ' 6 * 7', loc: {start: {line: 1, column: 0}, end: {line: 1, column: 10}}}, output: {value: '42', loc: {start: {line: 2, column: 0}, end: {line: 2, column: 5}}}}]
+# [{commentIndex: 1, input: {value: ' 6 * 7', loc: {start: {line: 1, column: 0}, end: {line: 1, column: 10}}}, output: {value: '42', loc: {start: {line: 2, column: 0}, end: {line: 2, column: 5}}}}]
 transformComments = (comments) ->
-  _.last _.reduce comments, ([state, accum], {loc, value}) ->
-    _.reduce _.initial(value.match /(?!\s).*/g), ([state, accum], line) ->
-      [..., prefix, value] = /^(>|[.]*)(.*)$/.exec line
+  _.last _.reduce comments, ([state, accum], comment, commentIndex) ->
+    _.reduce comment.value.split('\n'), ([state, accum], line, idx) ->
+      switch comment.type
+        when 'Block'
+          normalizedLine = line.replace /^\s*[*]?\s*/, ''
+          start = end = line: comment.loc.start.line + idx
+        when 'Line'
+          normalizedLine = line.replace /^\s*/, ''
+          {start, end} = comment.loc
+
+      [..., prefix, value] = /^(>|[.]*)(.*)$/.exec normalizedLine
       if prefix is '>'
-        [1, accum.concat input: {loc, value}]
+        [1, accum.concat {
+          commentIndex
+          input: {loc: {start, end}, value}
+        }]
       else if state is 0
         [0, accum]
       else if prefix
         [1, _.initial(accum).concat {
+          commentIndex
           input:
-            loc: start: _.last(accum).input.loc.start, end: loc.end
+            loc: {start: _.last(accum).input.loc.start, end}
             value: "#{_.last(accum).input.value}\n#{value}"
         }]
       else
         [0, _.initial(accum).concat {
+          commentIndex
           input: _.last(accum).input
-          output: {loc, value: line}
+          output: {loc: {start, end}, value}
         }]
     , [state, accum]
   , [0, []]
@@ -138,36 +150,79 @@ substring = (input, start, end) ->
 
 
 rewrite.js = (input) ->
-  # Locate all the comments within the input text, then use their
-  # positions to create a list containing all the code chunks. Note
-  # that if there are N comment chunks there are N + 1 code chunks.
-  # An empty comment at {line: Infinity, column: Infinity} enables
-  # the final code chunk to be captured.
-  {comments} = esprima.parse input, comment: yes, loc: yes
-  tests = transformComments comments
-  .concat input: value: '', loc: start: line: Infinity, column: Infinity
+  wrap = (test) ->
+    _.chain ['input', 'output']
+    .filter _.partial _.has, test
+    .map (type) -> wrap[type] test
+    .value()
+    .join '\n'
 
-  wrap =
-    input: (test) -> """
-      __doctest.input(function() {
-        return #{test.input.value};
-      });
-    """
-    output: (test) -> """
-      __doctest.output(#{test.output.loc.start.line}, function() {
-        return #{test.output.value};
-      });
-    """
+  wrap.input = (test) -> """
+    __doctest.input(function() {
+      return #{test.input.value};
+    });
+  """
+  wrap.output = (test) -> """
+    __doctest.output(#{test.output.loc.start.line}, function() {
+      return #{test.output.value};
+    });
+  """
 
-  _.chain tests
+  #  1. Locate block comments and line comments within the input text.
+  #
+  #  2. Create a list of comment chunks from the list of line comments
+  #     located in step 1 by grouping related comments.
+  #
+  #  3. Create a list of code chunks from the remaining input text.
+  #     Note that if there are N comment chunks there are N + 1 code
+  #     chunks. A trailing empty comment enables the final code chunk
+  #     to be captured:
+
+  bookend = value: '', loc: start: line: Infinity, column: Infinity
+
+  #  4. Map each comment chunk in the list produced by step 2 to a
+  #     string of JavaScript code derived from the chunk's doctests.
+  #
+  #  5. Zip the lists produced by steps 3 and 4; flatten; and join.
+  #
+  #  6. Find block comments in the source code produced by step 5.
+  #     (The locations of block comments located in step 1 are not
+  #     applicable to the rewritten source.)
+  #
+  #  7. Repeat steps 3 through 5 for the list of block comments
+  #     produced by step 6 (substituting "step 6" for "step 2").
+
+  getComments = (s) -> esprima.parse(s, comment: yes, loc: yes).comments
+  [blockTests, lineTests] = _.chain getComments input
+  .partition (c) -> c.type is 'Block'
+  .map transformComments
+  .value()
+
+  source = _.chain lineTests
+  .concat input: bookend
   .reduce ([chunks, start], test) ->
-    [chunks.concat substring input, start, test.input.loc.start
+    [[chunks..., substring input, start, test.input.loc.start]
      (test.output ? test.input).loc.end]
   , [[], {line: 1, column: 0}]
   .first()
-  .zip _.map tests, _.compose escodegen.generate, esprima.parse, (test) ->
-    (wrap[p] test for p in ['input', 'output'] when p of test).join('\n')
+  .zip _.map lineTests, wrap
   .flatten()
+  .value()
+  .join ''
+
+  _.chain getComments source
+  .filter (c) -> c.type is 'Block'
+  .concat bookend
+  .reduce ([chunks, start], comment, idx) ->
+    s = _.chain blockTests
+    .filter (t) -> t.commentIndex is idx
+    .map wrap
+    .value()
+    .join '\n'
+    [[chunks..., substring(source, start, comment.loc.start), s],
+     comment.loc.end]
+  , [[], {line: 1, column: 0}]
+  .first()
   .value()
   .join ''
 

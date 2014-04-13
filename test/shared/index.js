@@ -104,7 +104,38 @@ global = 'global'
   // ..... .5
   // 1234.5
 
-  23, 'the rewriter should not rely on automatic semicolon insertion'
+  23, 'multiline comment'
+  /*
+     > Math.pow(3, 3) - Math.pow(2, 2)
+     23
+  */
+
+  24, 'multiline comment with wrapped input'
+  /*
+     > ["foo", "bar", "baz"]
+     . .slice(0, -1)
+     . .join(" ")
+     . .toUpperCase()
+     "FOO BAR"
+  */
+
+  25, 'multiline comment with leading asterisks'
+  /*
+   * > 1 + 2 * 3 * 4
+   * 25
+   * > 1 * 2 + 3 + 4 * 5
+   * 25
+   */
+
+  26, 'multiline comment with leading asterisks and wrapped input'
+  /*
+   * > (function fib(n) {
+   * .    return n == 0 || n == 1 ? n : fib(n - 2) + fib(n - 1);
+   * .  })(10)
+   * 55
+   */
+
+  27, 'the rewriter should not rely on automatic semicolon insertion'
   // > "the rewriter should not rely"
   // "on automatic semicolon insertion"
   (4 + 4)
