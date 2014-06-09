@@ -83,6 +83,11 @@ It's easy to indicate that an error (of a particular kind) is expected:
 
 Each doctest has access to variables in its scope chain.
 
+### Integrations
+
+  - [Grunt](http://gruntjs.com/):
+      [paolodm/grunt-doctest](https://github.com/paolodm/grunt-doctest)
+
 ### Running the test suite
 
     $ make setup
