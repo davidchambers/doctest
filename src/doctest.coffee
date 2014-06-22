@@ -22,7 +22,7 @@ doctest = (path, options = {}, callback = noop) ->
     match[1]
 
   fetch path, options, (text) ->
-    source = rewrite[type] text.replace(/^#!.*/, '')
+    source = rewrite text.replace(/^#!.*/, ''), type
     results = switch options.module
       when 'amd'
         functionEval "#{source};\n#{defineFunctionString}"
