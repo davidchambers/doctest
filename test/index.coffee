@@ -45,6 +45,12 @@ testCommand = (command, expected) ->
 
 testModule 'test/shared/index.js'
 testModule 'test/shared/index.coffee'
+testModule 'test/line-endings/CR.js'
+testModule 'test/line-endings/CR.coffee'
+testModule 'test/line-endings/CR+LF.js'
+testModule 'test/line-endings/CR+LF.coffee'
+testModule 'test/line-endings/LF.js'
+testModule 'test/line-endings/LF.coffee'
 testModule 'test/amd/index.js', module: 'amd'
 testModule 'test/commonjs/require/index.js', module: 'commonjs'
 testModule 'test/commonjs/exports/index.js', module: 'commonjs'
