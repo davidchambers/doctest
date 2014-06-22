@@ -140,3 +140,77 @@ testCommand 'bin/doctest --module commonjs --silent src/doctest.coffee',
   code: 0
   stdout: ''
   stderr: ''
+
+testCommand 'bin/doctest --print test/commonjs/exports/index.js',
+  code: 0
+  stdout: '''
+    __doctest.input(function() {
+      return exports.identity(42);
+    });
+    __doctest.output(2, function() {
+      return 42;
+    });
+    exports.identity = function(x) {
+      return x;
+    };
+
+  '''
+  stderr: ''
+
+testCommand 'bin/doctest --print --module amd test/amd/index.js',
+  code: 0
+  stdout: '''
+    define(function() {
+      // Convert degrees Celsius to degrees Fahrenheit.
+      //
+      __doctest.input(function() {
+      return toFahrenheit(0);
+    });
+    __doctest.output(5, function() {
+      return 32;
+    });
+      function toFahrenheit(degreesCelsius) {
+        return degreesCelsius * 9 / 5 + 32;
+      }
+      return toFahrenheit;
+    });
+
+    function define() {
+      for (var idx = 0; idx < arguments.length; idx += 1) {
+        if (typeof arguments[idx] == 'function') {
+          arguments[idx]();
+          break;
+        }
+      }
+    }
+
+  '''
+  stderr: ''
+
+testCommand 'bin/doctest --print --module commonjs test/commonjs/exports/index.js',
+  code: 0
+  stdout: '''
+    var __doctest = {
+      queue: [],
+      input: function(fn) {
+        __doctest.queue.push([fn]);
+      },
+      output: function(num, fn) {
+        __doctest.queue.push([fn, num]);
+      }
+    };
+
+    __doctest.input(function() {
+      return exports.identity(42);
+    });
+    __doctest.output(2, function() {
+      return 42;
+    });
+    exports.identity = function(x) {
+      return x;
+    };
+
+    (module.exports || exports).__doctest = __doctest;
+
+  '''
+  stderr: ''
