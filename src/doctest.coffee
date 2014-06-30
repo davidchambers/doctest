@@ -22,17 +22,20 @@ doctest = (path, options = {}, callback = noop) ->
     match[1]
 
   fetch path, options, (text) ->
-    source = rewrite text.replace(/^#!.*/, ''), type
-    results = switch options.module
-      when 'amd'
-        functionEval "#{source};\n#{defineFunctionString}"
-      when 'commonjs'
+    source = toModule rewrite(text, type), options.module
+
+    if options.print
+      console.log source.replace(/\n$/, '') unless options.silent
+      callback source
+      source
+    else
+      results = if options.module is 'commonjs'
         commonjsEval source, path
       else
         functionEval source
-    log results unless options.silent
-    callback results
-    results
+      log results unless options.silent
+      callback results
+      results
 
 doctest.version = '0.6.1'
 
@@ -56,12 +59,14 @@ validators =
 
 
 fetch = (path, options, callback) ->
+  silent = options.silent or options.print
+
   wrapper = (text) ->
     name = _.last path.split('/')
-    console.log "running doctests in #{name}..." unless options.silent
+    console.log "running doctests in #{name}..." unless silent
     callback text
 
-  console.log "retrieving #{path}..." unless options.silent
+  console.log "retrieving #{path}..." unless silent
   if typeof window isnt 'undefined'
     jQuery.ajax path, dataType: 'text', success: wrapper
   else
@@ -69,7 +74,40 @@ fetch = (path, options, callback) ->
 
 
 rewrite = (input, type) ->
-  rewrite[type] input.replace /\r\n?/g, '\n'
+  rewrite[type] input.replace(/\r\n?/g, '\n').replace(/^#!.*/, '')
+
+
+# toModule :: String,String? -> String
+toModule = (source, moduleType) -> switch moduleType
+  when 'amd'
+    """
+    #{source}
+    function define() {
+      for (var idx = 0; idx < arguments.length; idx += 1) {
+        if (typeof arguments[idx] == 'function') {
+          arguments[idx]();
+          break;
+        }
+      }
+    }
+    """
+  when 'commonjs'
+    """
+    var __doctest = {
+      queue: [],
+      input: function(fn) {
+        __doctest.queue.push([fn]);
+      },
+      output: function(num, fn) {
+        __doctest.queue.push([fn, num]);
+      }
+    };
+
+    #{source}
+    (module.exports || exports).__doctest = __doctest;
+    """
+  else
+    source
 
 
 # transformComments :: [Object] -> [Object]
@@ -86,7 +124,7 @@ rewrite = (input, type) ->
 # .   value: ' 42'
 # .   loc: start: {line: 2, column: 0}, end: {line: 2, column: 5}
 # . ]
-# [{commentIndex: 1, input: {value: ' 6 * 7', loc: {start: {line: 1, column: 0}, end: {line: 1, column: 10}}}, output: {value: '42', loc: {start: {line: 2, column: 0}, end: {line: 2, column: 5}}}}]
+# [{commentIndex: 1, input: {value: '6 * 7', loc: {start: {line: 1, column: 0}, end: {line: 1, column: 10}}}, output: {value: '42', loc: {start: {line: 2, column: 0}, end: {line: 2, column: 5}}}}]
 transformComments = (comments) ->
   _.last _.reduce comments, ([state, accum], comment, commentIndex) ->
     _.reduce comment.value.split('\n'), ([state, accum], line, idx) ->
@@ -98,7 +136,7 @@ transformComments = (comments) ->
           normalizedLine = line.replace /^\s*/, ''
           {start, end} = comment.loc
 
-      [..., prefix, value] = /^(>|[.]*)(.*)$/.exec normalizedLine
+      [..., prefix, value] = /^(>|[.]*)[ ]?(.*)$/.exec normalizedLine
       if prefix is '>'
         [1, accum.concat {
           commentIndex
@@ -259,20 +297,6 @@ rewrite.coffee = (input) ->
   .join '\n'
 
   CoffeeScript.compile source
-
-
-defineFunctionString = '''
-  function define() {
-    var arg, idx;
-    for (idx = 0; idx < arguments.length; idx += 1) {
-      arg = arguments[idx];
-      if (typeof arg === 'function') {
-        arg();
-        break;
-      }
-    }
-  }
-'''
 
 
 functionEval = (source) ->

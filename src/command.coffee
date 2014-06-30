@@ -8,6 +8,7 @@ program
 .version doctest.version
 .usage '[options] path/to/js/or/coffee/module'
 .option '-m, --module <type>', 'specify module system ("amd" or "commonjs")'
+.option '-p, --print', 'output the rewritten source without running tests'
 .option '-s, --silent', 'suppress output'
 .option '-t, --type <type>', 'specify file type ("coffee" or "js")'
 .parse process.argv
@@ -15,6 +16,7 @@ program
 
 validators =
   module: _.partial _.contains, [undefined, 'amd', 'commonjs']
+  print:  _.constant yes
   silent: _.constant yes
   type:   _.partial _.contains, [undefined, 'coffee', 'js']
 
