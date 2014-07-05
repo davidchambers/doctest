@@ -1,12 +1,13 @@
 BOWER = node_modules/.bin/bower
 COFFEE = node_modules/.bin/coffee
-SEMVER = node_modules/.bin/semver
+XYZ = node_modules/.bin/xyz --message X.Y.Z --tag X.Y.Z --repo git@github.com:davidchambers/doctest.git --script scripts/prepublish
 
-JS_FILES = $(patsubst src/%.coffee,lib/%.js,$(shell find src -type f))
+SRC = $(shell find src -name '*.coffee')
+LIB = $(patsubst src/%.coffee,lib/%.js,$(SRC))
 
 
 .PHONY: all
-all: $(JS_FILES)
+all: $(LIB)
 
 lib/%.js: src/%.coffee
 	$(COFFEE) --compile --output $(@D) -- $<
@@ -14,29 +15,24 @@ lib/%.js: src/%.coffee
 
 .PHONY: clean
 clean:
-	rm -f -- $(JS_FILES)
+	rm -f -- $(LIB)
 
 
-.PHONY: release-patch release-minor release-major
-VERSION = $(shell node -p 'require("./package.json").version')
-release-patch: NEXT_VERSION = $(shell $(SEMVER) -i patch $(VERSION))
-release-minor: NEXT_VERSION = $(shell $(SEMVER) -i minor $(VERSION))
-release-major: NEXT_VERSION = $(shell $(SEMVER) -i major $(VERSION))
+.PHONY: release-major release-minor release-patch
+release-major: LEVEL = major
+release-minor: LEVEL = minor
+release-patch: LEVEL = patch
 
-release-patch release-minor release-major:
-	sed -i '' 's/"version": "[^"]*"/"version": "$(NEXT_VERSION)"/' bower.json package.json
-	sed -i '' "s/.version = '[^']*'/.version = '$(NEXT_VERSION)'/" src/doctest.coffee
-	make
-	git add bower.json package.json src/doctest.coffee lib/doctest.js
-	git commit --message $(NEXT_VERSION)
-	git tag --annotate $(NEXT_VERSION) --message $(NEXT_VERSION)
-	@echo 'remember to run `npm publish`'
+release-major release-minor release-patch:
+	@$(XYZ) --increment $(LEVEL)
 
 
 .PHONY: setup
 setup:
 	npm install
 	$(BOWER) install
+	make clean
+	git update-index --assume-unchanged -- $(LIB)
 
 
 .PHONY: test
