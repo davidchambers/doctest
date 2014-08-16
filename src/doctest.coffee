@@ -11,11 +11,14 @@
 ###
 
 doctest = (path, options = {}, callback = noop) ->
-  _.each _.keys(validators).sort(), (key) ->
-    unless validators[key] options[key]
-      throw new Error "Invalid #{key} `#{options[key]}'"
+  validateOption = (name, validValues) ->
+    if name of options and not R.contains options[name], validValues
+      throw new Error "Invalid #{name} `#{options[name]}'"
 
-  type = options.type or do ->
+  validateOption 'module', ['amd', 'commonjs']
+  validateOption 'type', ['coffee', 'js']
+
+  type = options.type ? do ->
     match = /[.](coffee|js)$/.exec path
     if match is null
       throw new Error 'Cannot infer type from extension'
@@ -41,7 +44,7 @@ doctest.version = '0.6.1'
 
 
 if typeof window isnt 'undefined'
-  {_, CoffeeScript, esprima} = window
+  {_, CoffeeScript, esprima, ramda: R} = window
   window.doctest = doctest
 else
   fs = require 'fs'
@@ -49,20 +52,15 @@ else
   _ = require 'underscore'
   CoffeeScript = require 'coffee-script'
   esprima = require 'esprima'
+  R = require 'ramda'
   module.exports = doctest
-
-
-validators =
-  module: _.partial _.contains, [undefined, 'amd', 'commonjs']
-  silent: _.constant yes
-  type:   _.partial _.contains, [undefined, 'coffee', 'js']
 
 
 fetch = (path, options, callback) ->
   silent = options.silent or options.print
 
   wrapper = (text) ->
-    name = _.last path.split('/')
+    name = R.last R.split '/', path
     console.log "running doctests in #{name}..." unless silent
     callback text
 
@@ -125,9 +123,9 @@ toModule = (source, moduleType) -> switch moduleType
 # .   loc: start: {line: 2, column: 0}, end: {line: 2, column: 5}
 # . ]
 # [{commentIndex: 1, input: {value: '6 * 7', loc: {start: {line: 1, column: 0}, end: {line: 1, column: 10}}}, output: {value: '42', loc: {start: {line: 2, column: 0}, end: {line: 2, column: 5}}}}]
-transformComments = (comments) ->
-  _.last _.reduce comments, ([state, accum], comment, commentIndex) ->
-    _.reduce comment.value.split('\n'), ([state, accum], line, idx) ->
+transformComments = R.pipe(
+  R.reduce.idx ([state, accum], comment, commentIndex) ->
+    R.reduce.idx ([state, accum], line, idx) ->
       switch comment.type
         when 'Block'
           normalizedLine = line.replace /^\s*[*]?\s*/, ''
@@ -145,20 +143,22 @@ transformComments = (comments) ->
       else if state is 0
         [0, accum]
       else if prefix
-        [1, _.initial(accum).concat {
+        [1, R.concat R.slice(0, -1, accum), [{
           commentIndex
           input:
-            loc: {start: _.last(accum).input.loc.start, end}
-            value: "#{_.last(accum).input.value}\n#{value}"
-        }]
+            loc: {start: R.last(accum).input.loc.start, end}
+            value: "#{R.last(accum).input.value}\n#{value}"
+        }]]
       else
-        [0, _.initial(accum).concat {
+        [0, R.concat R.slice(0, -1, accum), [{
           commentIndex
-          input: _.last(accum).input
+          input: R.last(accum).input
           output: {loc: {start, end}, value}
-        }]
-    , [state, accum]
+        }]]
+    , [state, accum], comment.value.split '\n'
   , [0, []]
+  R.last
+)
 
 
 # substring :: String,{line,column},{line,column} -> String
@@ -174,26 +174,30 @@ transformComments = (comments) ->
 substring = (input, start, end) ->
   return '' if start.line is end.line and start.column is end.column
   combine = (a, b) -> ["#{a[0]}#{b[0]}", b[1]]
-  _.first _.reduce input.split(/^/m), (accum, line, idx) ->
-    isStartLine = idx + 1 is start.line
-    isEndLine   = idx + 1 is end.line
-    combine accum, _.reduce line, ([chrs, inComment], chr, column) ->
-      if (isStartLine and column is start.column) or
-         inComment and not (isEndLine and column is end.column)
-        ["#{chrs}#{chr}", yes]
-      else
-        ["#{chrs}", no]
-    , ['', _.last accum]
-  , ['', no]
+  R.pipe(
+    R.split /^/m
+    R.reduce.idx (accum, line, idx) ->
+      isStartLine = idx + 1 is start.line
+      isEndLine   = idx + 1 is end.line
+      combine accum, R.reduce.idx ([chrs, inComment], chr, column) ->
+        if (isStartLine and column is start.column) or
+           inComment and not (isEndLine and column is end.column)
+          ["#{chrs}#{chr}", yes]
+        else
+          ["#{chrs}", no]
+      , ['', R.last accum], line
+    , ['', no]
+    R.first
+  ) input
 
 
 rewrite.js = (input) ->
   wrap = (test) ->
-    _.chain ['input', 'output']
-    .filter _.partial _.has, test
-    .map (type) -> wrap[type] test
-    .value()
-    .join '\n'
+    R.pipe(
+      R.filter (x) -> Object::hasOwnProperty.call test, x
+      R.map (type) -> wrap[type] test
+      R.join '\n'
+    ) ['input', 'output']
 
   wrap.input = (test) -> """
     __doctest.input(function() {
@@ -230,39 +234,44 @@ rewrite.js = (input) ->
   #  7. Repeat steps 3 through 5 for the list of block comments
   #     produced by step 6 (substituting "step 6" for "step 2").
 
-  getComments = (s) -> esprima.parse(s, comment: yes, loc: yes).comments
-  [blockTests, lineTests] = _.chain getComments input
-  .partition (c) -> c.type is 'Block'
-  .map transformComments
-  .value()
+  getComments = R.pipe(
+    R.rPartial esprima.parse, comment: yes, loc: yes
+    R.prop('comments')
+  )
+  [blockTests, lineTests] = R.pipe(
+    getComments
+    R.partition R.pipe R.prop('type'), R.eq('Block')
+    R.map transformComments
+  ) input
 
-  source = _.chain lineTests
-  .concat input: bookend
-  .reduce ([chunks, start], test) ->
-    [[chunks..., substring input, start, test.input.loc.start]
-     (test.output ? test.input).loc.end]
-  , [[], {line: 1, column: 0}]
-  .first()
-  .zip _.map lineTests, wrap
-  .flatten()
-  .value()
-  .join ''
+  source = R.pipe(
+    R.concat
+    R.reduce ([chunks, start], test) ->
+      [[chunks..., substring input, start, test.input.loc.start]
+       (test.output ? test.input).loc.end]
+    , [[], {line: 1, column: 0}]
+    R.first
+    R.rPartial R.zip, R.concat R.map(wrap, lineTests), [undefined]
+    R.flatten
+    R.join ''
+  ) lineTests, [input: bookend]
 
-  _.chain getComments source
-  .filter (c) -> c.type is 'Block'
-  .concat bookend
-  .reduce ([chunks, start], comment, idx) ->
-    s = _.chain blockTests
-    .filter (t) -> t.commentIndex is idx
-    .map wrap
-    .value()
-    .join '\n'
-    [[chunks..., substring(source, start, comment.loc.start), s],
-     comment.loc.end]
-  , [[], {line: 1, column: 0}]
-  .first()
-  .value()
-  .join ''
+  R.pipe(
+    getComments
+    R.filter R.pipe R.prop('type'), R.eq('Block')
+    R.rPartial R.concat, [bookend]
+    R.reduce.idx ([chunks, start], comment, idx) ->
+      s = R.pipe(
+        R.filter R.pipe R.prop('commentIndex'), R.eq(idx)
+        R.map wrap
+        R.join '\n'
+      ) blockTests
+      [[chunks..., substring(source, start, comment.loc.start), s],
+       comment.loc.end]
+    , [[], {line: 1, column: 0}]
+    R.first
+    R.join ''
+  ) source
 
 
 rewrite.coffee = (input) ->
@@ -272,31 +281,31 @@ rewrite.coffee = (input) ->
     output: (test) ->
       "__doctest.output #{test.output.loc.start.line}, -> #{test.output.value}"
 
-  source = _.chain input.split '\n'
-  .reduce ([expr, lines], line, idx) ->
-    if match = /^([ \t]*)#(?!##)[ \t]*(>|[.]*)(.*)$/.exec line
-      [..., indent, prefix, value] = match
-      if prefix is '>' and expr
-        [value, lines.concat "#{indent}#{wrap.input input: value: expr}"]
-      else if prefix is '>'
-        [value, lines]
-      else if prefix
-        ["#{expr}\n#{indent}  #{value}", lines]
-      else if expr
-        ['', lines.concat [
-          "#{indent}#{wrap.input input: value: expr}"
-          "#{indent}#{wrap.output output: {value, loc: start: line: idx + 1}}"
-        ]]
+  R.pipe(
+    R.split '\n'
+    R.reduce.idx ([expr, lines], line, idx) ->
+      if match = /^([ \t]*)#(?!##)[ \t]*(>|[.]*)(.*)$/.exec line
+        [..., indent, prefix, value] = match
+        if prefix is '>' and expr
+          [value, lines.concat "#{indent}#{wrap.input input: value: expr}"]
+        else if prefix is '>'
+          [value, lines]
+        else if prefix
+          ["#{expr}\n#{indent}  #{value}", lines]
+        else if expr
+          ['', lines.concat [
+            "#{indent}#{wrap.input input: value: expr}"
+            "#{indent}#{wrap.output output: {value, loc: start: line: idx + 1}}"
+          ]]
+        else
+          [expr, lines]
       else
-        [expr, lines]
-    else
-      [expr, lines.concat line]
-  , ['', []]
-  .last()
-  .value()
-  .join '\n'
-
-  CoffeeScript.compile source
+        [expr, lines.concat line]
+    , ['', []]
+    R.last
+    R.join '\n'
+    CoffeeScript.compile
+  ) input
 
 
 functionEval = (source) ->
@@ -356,7 +365,7 @@ run = (queue) ->
 
 
 log = (results) ->
-  console.log ((if pass then '.' else 'x') for [pass] in results).join('')
+  console.log R.join '', ((if pass then '.' else 'x') for [pass] in results)
   for [pass, expected, actual, num] in results when not pass
     console.log "FAIL: expected #{expected} on line #{num} (got #{actual})"
   return
