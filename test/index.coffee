@@ -77,11 +77,11 @@ testCommand 'bin/doctest test/shared/index.js',
   stdout: '''
     retrieving test/shared/index.js...
     running doctests in index.js...
-    ......x.x...........x......x
+    ......x.x...........x........x
     FAIL: expected 5 on line 31 (got 4)
     FAIL: expected TypeError on line 38 (got 0)
     FAIL: expected 9.5 on line 97 (got 5)
-    FAIL: expected "on automatic semicolon insertion" on line 140 (got "the rewriter should not rely")
+    FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
 
   '''
   stderr: ''
@@ -91,11 +91,11 @@ testCommand 'bin/doctest test/shared/index.coffee',
   stdout: '''
     retrieving test/shared/index.coffee...
     running doctests in index.coffee...
-    ......x.x...........x......x
+    ......x.x...........x........x
     FAIL: expected 5 on line 31 (got 4)
     FAIL: expected TypeError on line 38 (got 0)
     FAIL: expected 9.5 on line 97 (got 5)
-    FAIL: expected "on automatic semicolon insertion" on line 140 (got "the rewriter should not rely")
+    FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
 
   '''
   stderr: ''
@@ -105,18 +105,18 @@ testCommand 'bin/doctest test/shared/index.js test/shared/index.coffee',
   stdout: '''
     retrieving test/shared/index.js...
     running doctests in index.js...
-    ......x.x...........x......x
+    ......x.x...........x........x
     FAIL: expected 5 on line 31 (got 4)
     FAIL: expected TypeError on line 38 (got 0)
     FAIL: expected 9.5 on line 97 (got 5)
-    FAIL: expected "on automatic semicolon insertion" on line 140 (got "the rewriter should not rely")
+    FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
     retrieving test/shared/index.coffee...
     running doctests in index.coffee...
-    ......x.x...........x......x
+    ......x.x...........x........x
     FAIL: expected 5 on line 31 (got 4)
     FAIL: expected TypeError on line 38 (got 0)
     FAIL: expected 9.5 on line 97 (got 5)
-    FAIL: expected "on automatic semicolon insertion" on line 140 (got "the rewriter should not rely")
+    FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
 
   '''
   stderr: ''
