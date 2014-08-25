@@ -1,18 +1,24 @@
 {
   "name": "doctest",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Doctests for JavaScript and CoffeeScript",
   "contributors": [
     "David Chambers <dc@davidchambers.me>",
     "Francesco Occhipinti <f.occhipinti@gmail.com>"
   ],
-  "keywords": ["doctests", "test", "browser"],
+  "keywords": [
+    "doctests",
+    "test",
+    "browser"
+  ],
   "main": "./lib/doctest",
   "bin": "./bin/doctest",
-  "licenses": [{
-    "type": "WTFPL",
-    "url": "https://raw.github.com/davidchambers/doctest/master/LICENSE"
-  }],
+  "licenses": [
+    {
+      "type": "WTFPL",
+      "url": "https://raw.github.com/davidchambers/doctest/master/LICENSE"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/davidchambers/doctest.git"
