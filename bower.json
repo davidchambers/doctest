@@ -17,6 +17,6 @@
     "underscore": "1.6.x"
   },
   "devDependencies": {
-    "qunit": "1.14.x"
+    "qunit": "1.15.x"
   }
 }
