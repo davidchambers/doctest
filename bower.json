@@ -11,7 +11,7 @@
   ],
   "dependencies": {
     "coffee-script": "1.7.x",
-    "esprima": "1.0.x",
+    "esprima": "1.2.x",
     "jquery": "2.1.x",
     "ramda": "0.3.x",
     "underscore": "1.6.x"
