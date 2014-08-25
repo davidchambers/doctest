@@ -81,6 +81,12 @@
   ], [
     'multiline comment with leading asterisks and wrapped input',
     [true, 55, 55, 135]
+  ], [
+    'multiline output',
+    [true, ['foo', 'bar', 'baz'], ['foo', 'bar', 'baz'], 140]
+  ], [
+    'multiline input with multiline output',
+    [true, ['FOO', 'BAR', 'BAZ'], ['FOO', 'BAR', 'BAZ'], 149]
   ]];
 
   if (typeof window === 'undefined') {

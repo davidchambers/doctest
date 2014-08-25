@@ -135,7 +135,22 @@ do ->
   # 55
   #
 
-  27: 'the rewriter should not rely on automatic semicolon insertion'
+  27: 'multiline output'
+  # > ["foo", "bar", "baz"]
+  # [ "foo"
+  # . "bar"
+  # . "baz" ]
+
+  28: 'multiline input with multiline output'
+  # > ["foo", "bar", "baz"]
+  # . .join(",")
+  # . .toUpperCase()
+  # . .split(",")
+  # [ "FOO"
+  # . "BAR"
+  # . "BAZ" ]
+
+  29: 'the rewriter should not rely on automatic semicolon insertion'
   # > "the rewriter should not rely"
   # "on automatic semicolon insertion"
   (4 + 4)

@@ -122,7 +122,15 @@ toModule = (source, moduleType) -> switch moduleType
 # .   value: ' 42'
 # .   loc: start: {line: 2, column: 0}, end: {line: 2, column: 5}
 # . ]
-# [{commentIndex: 1, input: {value: '6 * 7', loc: {start: {line: 1, column: 0}, end: {line: 1, column: 10}}}, output: {value: '42', loc: {start: {line: 2, column: 0}, end: {line: 2, column: 5}}}}]
+# [
+# . commentIndex: 1
+# . input:
+# .   value: '6 * 7'
+# .   loc: start: {line: 1, column: 0}, end: {line: 1, column: 10}
+# . output:
+# .   value: '42'
+# .   loc: start: {line: 2, column: 0}, end: {line: 2, column: 5}
+# . ]
 transformComments = R.pipe(
   R.reduce.idx ([state, accum], comment, commentIndex) ->
     R.reduce.idx ([state, accum], line, idx) ->
@@ -136,27 +144,39 @@ transformComments = R.pipe(
 
       [..., prefix, value] = /^(>|[.]*)[ ]?(.*)$/.exec normalizedLine
       if prefix is '>'
-        [1, accum.concat {
+        ['input', accum.concat {
           commentIndex
           input: {loc: {start, end}, value}
         }]
-      else if state is 0
-        [0, accum]
-      else if prefix
-        [1, R.concat R.slice(0, -1, accum), [{
-          commentIndex
-          input:
-            loc: {start: R.last(accum).input.loc.start, end}
-            value: "#{R.last(accum).input.value}\n#{value}"
-        }]]
-      else
-        [0, R.concat R.slice(0, -1, accum), [{
-          commentIndex
-          input: R.last(accum).input
-          output: {loc: {start, end}, value}
-        }]]
+      else if state is 'default'
+        ['default', accum]
+      else if state is 'input'
+        if prefix
+          ['input', R.slice(0, -1, accum).concat {
+            commentIndex
+            input:
+              loc: {start: R.last(accum).input.loc.start, end}
+              value: "#{R.last(accum).input.value}\n#{value}"
+          }]
+        else
+          ['output', R.slice(0, -1, accum).concat {
+            commentIndex
+            input: R.last(accum).input
+            output: {loc: {start, end}, value}
+          }]
+      else if state is 'output'
+        if prefix
+          ['output', R.slice(0, -1, accum).concat {
+            commentIndex
+            input: R.last(accum).input
+            output:
+              loc: {start: R.last(accum).output.loc.start, end}
+              value: "#{R.last(accum).output.value}\n#{value}"
+          }]
+        else
+          ['default', accum]
     , [state, accum], comment.value.split '\n'
-  , [0, []]
+  , ['default', []]
   R.last
 )
 
@@ -191,25 +211,40 @@ substring = (input, start, end) ->
   ) input
 
 
+wrap = (type, test) -> R.pipe(
+  R.filter (dir) -> Object::hasOwnProperty.call test, dir
+  R.map (dir) -> wrap[type][dir] test
+  R.join '\n'
+) ['input', 'output']
+
+wrap.js = R.lPartial wrap, 'js'
+
+wrap.js.input = (test) -> """
+  __doctest.input(function() {
+    return #{test.input.value};
+  });
+"""
+
+wrap.js.output = (test) ->  """
+  __doctest.output(#{test.output.loc.start.line}, function() {
+    return #{test.output.value};
+  });
+"""
+
+wrap.coffee = R.lPartial wrap, 'coffee'
+
+wrap.coffee.input = (test) -> """
+  __doctest.input ->
+  #{test.input.value.replace /^/gm, '  '}
+"""
+
+wrap.coffee.output = (test) -> """
+  __doctest.output #{test.output.loc.start.line}, ->
+  #{test.output.value.replace /^/gm, '  '}
+"""
+
+
 rewrite.js = (input) ->
-  wrap = (test) ->
-    R.pipe(
-      R.filter (x) -> Object::hasOwnProperty.call test, x
-      R.map (type) -> wrap[type] test
-      R.join '\n'
-    ) ['input', 'output']
-
-  wrap.input = (test) -> """
-    __doctest.input(function() {
-      return #{test.input.value};
-    });
-  """
-  wrap.output = (test) -> """
-    __doctest.output(#{test.output.loc.start.line}, function() {
-      return #{test.output.value};
-    });
-  """
-
   #  1. Locate block comments and line comments within the input text.
   #
   #  2. Create a list of comment chunks from the list of line comments
@@ -251,7 +286,7 @@ rewrite.js = (input) ->
        (test.output ? test.input).loc.end]
     , [[], {line: 1, column: 0}]
     R.first
-    R.rPartial R.zip, R.concat R.map(wrap, lineTests), [undefined]
+    R.rPartial R.zip, R.concat R.map(wrap.js, lineTests), ['']
     R.flatten
     R.join ''
   ) lineTests, [input: bookend]
@@ -263,7 +298,7 @@ rewrite.js = (input) ->
     R.reduce.idx ([chunks, start], comment, idx) ->
       s = R.pipe(
         R.filter R.pipe R.prop('commentIndex'), R.eq(idx)
-        R.map wrap
+        R.map wrap.js
         R.join '\n'
       ) blockTests
       [[chunks..., substring(source, start, comment.loc.start), s],
@@ -275,37 +310,46 @@ rewrite.js = (input) ->
 
 
 rewrite.coffee = (input) ->
-  wrap =
-    input: (test) ->
-      "__doctest.input -> #{test.input.value}"
-    output: (test) ->
-      "__doctest.output #{test.output.loc.start.line}, -> #{test.output.value}"
+  [literalChunks, commentChunks] = R.pipe(
+    R.match /.*\n/gm
+    R.reduce.idx ([literalChunks, commentChunks, inCommentChunk], line, idx) ->
+      isComment = /^[ \t]*#(?!##)/.test line
+      current = if isComment then commentChunks else literalChunks
+      if isComment is inCommentChunk
+        current[current.length - 1].value += line
+      else
+        current[current.length] = value: line, loc: start: line: idx + 1
+      [literalChunks, commentChunks, isComment]
+    , [[value: '', loc: start: line: 1], [], no]
+  ) input
+
+  testChunks = R.map R.pipe(
+    (commentChunk) -> R.reduce.idx ([state, tests], line, idx) ->
+      [..., indent, prefix, value] = /^([ \t]*)#[ \t]*(>|[.]*)(.*\n)/.exec line
+      if prefix is '>'
+        tests[tests.length] = {indent, input: {value}}
+        ['input', tests]
+      else if prefix
+        tests[tests.length - 1][state].value += value
+        [state, tests]
+      else if state is 'input'
+        loc = start: line: commentChunk.loc.start.line + idx
+        tests[tests.length - 1].output = {loc, value}
+        ['output', tests]
+      else
+        ['default', tests]
+    , ['default', []], commentChunk.value.match /.*\n/gm
+    R.last
+    R.map (test) -> wrap.coffee(test).replace(/^/gm, test.indent)
+    R.join '\n'
+  ), commentChunks
 
   R.pipe(
-    R.split '\n'
-    R.reduce.idx ([expr, lines], line, idx) ->
-      if match = /^([ \t]*)#(?!##)[ \t]*(>|[.]*)(.*)$/.exec line
-        [..., indent, prefix, value] = match
-        if prefix is '>' and expr
-          [value, lines.concat "#{indent}#{wrap.input input: value: expr}"]
-        else if prefix is '>'
-          [value, lines]
-        else if prefix
-          ["#{expr}\n#{indent}  #{value}", lines]
-        else if expr
-          ['', lines.concat [
-            "#{indent}#{wrap.input input: value: expr}"
-            "#{indent}#{wrap.output output: {value, loc: start: line: idx + 1}}"
-          ]]
-        else
-          [expr, lines]
-      else
-        [expr, lines.concat line]
-    , ['', []]
-    R.last
+    R.zip
+    R.flatten
     R.join '\n'
     CoffeeScript.compile
-  ) input
+  ) R.pluck('value', literalChunks), R.concat(testChunks, [''])
 
 
 functionEval = (source) ->
