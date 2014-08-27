@@ -10,7 +10,7 @@
     "/src/"
   ],
   "dependencies": {
-    "coffee-script": "1.7.x",
+    "coffee-script": "1.8.x",
     "esprima": "1.2.x",
     "jquery": "2.1.x",
     "ramda": "0.3.x",
