@@ -18,6 +18,10 @@ clean:
 	rm -f -- $(LIB)
 
 
+.PHONY: lint
+lint:
+
+
 .PHONY: release-major release-minor release-patch
 release-major: LEVEL = major
 release-minor: LEVEL = minor
