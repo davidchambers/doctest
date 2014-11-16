@@ -368,19 +368,7 @@ functionEval = (source) ->
 
 commonjsEval = (source, path) ->
   abspath = pathlib.resolve(path).replace(/[.][^.]+$/, "-#{_.now()}.js")
-  fs.writeFileSync abspath, """
-    var __doctest = {
-      queue: [],
-      input: function(fn) {
-        __doctest.queue.push([fn]);
-      },
-      output: function(num, fn) {
-        __doctest.queue.push([fn, num]);
-      }
-    };
-    #{source}
-    (module.exports || exports).__doctest = __doctest;
-  """
+  fs.writeFileSync abspath, source
   try
     {queue} = require(abspath).__doctest
   finally
