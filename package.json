@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "coffee-script": "1.8.x",
-    "commander": "2.3.x",
+    "commander": "2.5.x",
     "esprima": "1.2.x",
     "ramda": "0.8.x",
     "underscore": "1.6.x"
