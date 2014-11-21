@@ -55,6 +55,7 @@ testModule 'test/amd/index.js', module: 'amd'
 testModule 'test/commonjs/require/index.js', module: 'commonjs'
 testModule 'test/commonjs/exports/index.js', module: 'commonjs'
 testModule 'test/commonjs/module.exports/index.js', module: 'commonjs'
+testModule 'test/commonjs/strict/index.js', module: 'commonjs'
 testModule 'test/bin/executable', type: 'js'
 
 testCommand 'bin/doctest --xxx',
@@ -190,27 +191,31 @@ testCommand 'bin/doctest --print --module amd test/amd/index.js',
 testCommand 'bin/doctest --print --module commonjs test/commonjs/exports/index.js',
   code: 0
   stdout: '''
-    var __doctest = {
-      queue: [],
-      input: function(fn) {
-        __doctest.queue.push([fn]);
-      },
-      output: function(num, fn) {
-        __doctest.queue.push([fn, num]);
-      }
-    };
+    void function() {
+      var __doctest = {
+        queue: [],
+        input: function(fn) {
+          __doctest.queue.push([fn]);
+        },
+        output: function(num, fn) {
+          __doctest.queue.push([fn, num]);
+        }
+      };
 
-    __doctest.input(function() {
-      return exports.identity(42);
-    });
-    __doctest.output(2, function() {
-      return 42;
-    });
-    exports.identity = function(x) {
-      return x;
-    };
+      void function() {
+        __doctest.input(function() {
+          return exports.identity(42);
+        });
+        __doctest.output(2, function() {
+          return 42;
+        });
+        exports.identity = function(x) {
+          return x;
+        };
+      }.call(this);
 
-    (module.exports || exports).__doctest = __doctest;
+      (module.exports || exports).__doctest = __doctest;
+    }.call(this);
 
   '''
   stderr: ''
