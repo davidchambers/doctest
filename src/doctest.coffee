@@ -56,6 +56,17 @@ else
   module.exports = doctest
 
 
+# indentN :: Number -> String -> String
+indentN = R.pipe(
+  R.times R.always ' '
+  R.join ''
+  R.replace /^(?!$)/gm
+)
+
+# indent2 :: String -> String
+indent2 = indentN 2
+
+
 # noop :: * -> ()
 noop = ->
 
@@ -104,9 +115,11 @@ toModule = (source, moduleType) -> switch moduleType
         }
       }
     }
+
     """
   when 'commonjs'
-    """
+    iifeWrap = (s) -> "void function() {\n#{indent2 s}}.call(this);"
+    iifeWrap """
     var __doctest = {
       queue: [],
       input: function(fn) {
@@ -117,8 +130,10 @@ toModule = (source, moduleType) -> switch moduleType
       }
     };
 
-    #{source}
+    #{iifeWrap source}
+
     (module.exports || exports).__doctest = __doctest;
+
     """
   else
     source
@@ -261,12 +276,12 @@ wrap.coffee = wrap 'coffee'
 
 wrap.coffee.input = (test) -> """
   __doctest.input ->
-  #{R.replace /^/gm, '  ', test.input.value}
+  #{indent2 test.input.value}
 """
 
 wrap.coffee.output = (test) -> """
   __doctest.output #{test.output.loc.start.line}, ->
-  #{R.replace /^/gm, '  ', test.output.value}
+  #{indent2 test.output.value}
 """
 
 
@@ -374,9 +389,9 @@ rewrite.coffee = (input) ->
     ) commentChunk
     R.last
     R.map R.converge(
-      R.replace /^/gm
-      R.prop 'indent'
-      wrap.coffee
+      R.apply
+      R.pipe R.prop('indent'), R.length, indentN
+      R.pipe wrap.coffee, R.of
     )
     R.join '\n'
   ), commentChunks
