@@ -71,8 +71,8 @@ indent2 = indentN 2
 noop = ->
 
 
-# reduce :: a -> (a,b -> a) -> [b] -> a
-reduce = R.flip R.reduce
+# foldl :: a -> (a,b -> a) -> [b] -> a
+foldl = R.flip R.foldl
 
 
 # toPairs :: [a] -> [(Number,a)]
@@ -164,11 +164,11 @@ toModule = (source, moduleType) -> switch moduleType
 # . ]
 transformComments = R.pipe(
   toPairs
-  reduce ['default', []], ([state, accum], [commentIndex, comment]) -> R.pipe(
+  foldl ['default', []], ([state, accum], [commentIndex, comment]) -> R.pipe(
     R.prop 'value'
     R.split '\n'
     toPairs
-    reduce [state, accum], ([state, accum], [idx, line]) ->
+    foldl [state, accum], ([state, accum], [idx, line]) ->
       switch comment.type
         when 'Block'
           normalizedLine = R.replace /^\s*[*]?\s*/, '', line
@@ -187,21 +187,21 @@ transformComments = R.pipe(
         ['default', accum]
       else if state is 'input'
         if prefix
-          ['input', R.appendTo R.slice(0, -1, accum), {
+          ['input', R.appendTo R.init(accum), {
             commentIndex
             input:
               loc: {start: R.last(accum).input.loc.start, end}
               value: "#{R.last(accum).input.value}\n#{value}"
           }]
         else
-          ['output', R.appendTo R.slice(0, -1, accum), {
+          ['output', R.appendTo R.init(accum), {
             commentIndex
             input: R.last(accum).input
             output: {loc: {start, end}, value}
           }]
       else if state is 'output'
         if prefix
-          ['output', R.appendTo R.slice(0, -1, accum), {
+          ['output', R.appendTo R.init(accum), {
             commentIndex
             input: R.last(accum).input
             output:
@@ -230,13 +230,13 @@ substring = (input, start, end) ->
   R.pipe(
     R.split /^/m
     toPairs
-    reduce ['', no], (accum, [idx, line]) ->
+    foldl ['', no], (accum, [idx, line]) ->
       isStartLine = idx + 1 is start.line
       isEndLine   = idx + 1 is end.line
       R.pipe(
         R.split ''
         toPairs
-        reduce ['', R.last accum], ([chrs, inComment], [column, chr]) ->
+        foldl ['', R.last accum], ([chrs, inComment], [column, chr]) ->
           if (isStartLine and column is start.column) or
              inComment and not (isEndLine and column is end.column)
             [R.concat(chrs, chr), yes]
@@ -322,7 +322,7 @@ rewrite.js = (input) ->
 
   source = R.pipe(
     R.append input: bookend
-    reduce [[], {line: 1, column: 0}], ([chunks, start], test) -> [
+    foldl [[], {line: 1, column: 0}], ([chunks, start], test) -> [
       R.appendTo chunks, substring input, start, test.input.loc.start
       (test.output ? test.input).loc.end
     ]
@@ -337,7 +337,7 @@ rewrite.js = (input) ->
     R.filter R.propEq 'type', 'Block'
     R.append bookend
     toPairs
-    reduce [[], {line: 1, column: 0}], ([chunks, start], [idx, comment]) ->
+    foldl [[], {line: 1, column: 0}], ([chunks, start], [idx, comment]) ->
       R.pipe(
         R.filter R.propEq 'commentIndex', idx
         R.map wrap.js
@@ -355,7 +355,7 @@ rewrite.coffee = (input) ->
   [literalChunks, commentChunks] = R.pipe(
     R.match /.*\n/g
     toPairs
-    R.reduce ([literalChunks, commentChunks, inCommentChunk], [idx, line]) ->
+    R.foldl ([literalChunks, commentChunks, inCommentChunk], [idx, line]) ->
       isComment = /^[ \t]*#(?!##)/.test line
       current = if isComment then commentChunks else literalChunks
       if isComment is inCommentChunk
@@ -372,7 +372,7 @@ rewrite.coffee = (input) ->
       R.prop 'value'
       R.match /.*\n/g
       toPairs
-      reduce ['default', []], ([state, tests], [idx, line]) ->
+      foldl ['default', []], ([state, tests], [idx, line]) ->
         [indent, prefix, value] = R.tail matchLine line
         if prefix is '>'
           tests[tests.length] = {indent, input: {value}}
