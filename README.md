@@ -48,10 +48,7 @@ Test a module via command-line interface:
 
     $ doctest lib/temperature.js
 
-The exit code indicates the number of test failures:
-
-    $ echo $?
-    0
+The exit code is 0 if all tests pass, 1 otherwise.
 
 ### AMD and CommonJS modules
 

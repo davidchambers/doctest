@@ -28,7 +28,7 @@ _.each keys, (key) ->
     process.exit 1
 
 
-process.exit _.reduce program.args, (failures, path) ->
+failures = _.reduce program.args, (failures, path) ->
   try
     results = doctest path, options
   catch err
@@ -38,3 +38,5 @@ process.exit _.reduce program.args, (failures, path) ->
     process.exit 1
   failures + _.reject(_.map(results, _.first), _.identity).length
 , 0
+
+process.exit if failures is 0 then 0 else 1
