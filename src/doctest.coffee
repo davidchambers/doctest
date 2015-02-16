@@ -71,8 +71,8 @@ indent2 = indentN 2
 noop = ->
 
 
-# foldl :: a -> (a,b -> a) -> [b] -> a
-foldl = R.flip R.foldl
+# reduce :: a -> (a,b -> a) -> [b] -> a
+reduce = R.flip R.reduce
 
 
 # toPairs :: [a] -> [(Number,a)]
@@ -164,11 +164,11 @@ toModule = (source, moduleType) -> switch moduleType
 # . ]
 transformComments = R.pipe(
   toPairs
-  foldl ['default', []], ([state, accum], [commentIndex, comment]) -> R.pipe(
+  reduce ['default', []], ([state, accum], [commentIndex, comment]) -> R.pipe(
     R.prop 'value'
     R.split '\n'
     toPairs
-    foldl [state, accum], ([state, accum], [idx, line]) ->
+    reduce [state, accum], ([state, accum], [idx, line]) ->
       switch comment.type
         when 'Block'
           normalizedLine = R.replace /^\s*[*]?\s*/, '', line
@@ -230,13 +230,13 @@ substring = (input, start, end) ->
   R.pipe(
     R.split /^/m
     toPairs
-    foldl ['', no], (accum, [idx, line]) ->
+    reduce ['', no], (accum, [idx, line]) ->
       isStartLine = idx + 1 is start.line
       isEndLine   = idx + 1 is end.line
       R.pipe(
         R.split ''
         toPairs
-        foldl ['', R.last accum], ([chrs, inComment], [column, chr]) ->
+        reduce ['', R.last accum], ([chrs, inComment], [column, chr]) ->
           if (isStartLine and column is start.column) or
              inComment and not (isEndLine and column is end.column)
             [R.concat(chrs, chr), yes]
@@ -253,7 +253,7 @@ substring = (input, start, end) ->
 
 
 wrap = R.curry (type, test) -> R.pipe(
-  R.filter R.rPartial R.has, test
+  R.filter R.partialRight R.has, test
   R.map (dir) -> wrap[type][dir] test
   R.join '\n'
 ) ['input', 'output']
@@ -311,7 +311,7 @@ rewrite.js = (input) ->
   #     produced by step 6 (substituting "step 6" for "step 2").
 
   getComments = R.pipe(
-    R.rPartial esprima.parse, comment: yes, loc: yes
+    R.partialRight esprima.parse, comment: yes, loc: yes
     R.prop 'comments'
   )
   [blockTests, lineTests] = R.pipe(
@@ -322,12 +322,12 @@ rewrite.js = (input) ->
 
   source = R.pipe(
     R.append input: bookend
-    foldl [[], {line: 1, column: 0}], ([chunks, start], test) -> [
+    reduce [[], {line: 1, column: 0}], ([chunks, start], test) -> [
       R.appendTo chunks, substring input, start, test.input.loc.start
       (test.output ? test.input).loc.end
     ]
     R.head
-    R.rPartial R.zip, R.append '', R.map wrap.js, lineTests
+    R.partialRight R.zip, R.append '', R.map wrap.js, lineTests
     R.flatten
     R.join ''
   ) lineTests
@@ -337,7 +337,7 @@ rewrite.js = (input) ->
     R.filter R.propEq 'type', 'Block'
     R.append bookend
     toPairs
-    foldl [[], {line: 1, column: 0}], ([chunks, start], [idx, comment]) ->
+    reduce [[], {line: 1, column: 0}], ([chunks, start], [idx, comment]) ->
       R.pipe(
         R.filter R.propEq 'commentIndex', idx
         R.map wrap.js
@@ -355,7 +355,7 @@ rewrite.coffee = (input) ->
   [literalChunks, commentChunks] = R.pipe(
     R.match /.*\n/g
     toPairs
-    R.foldl ([literalChunks, commentChunks, inCommentChunk], [idx, line]) ->
+    R.reduce ([literalChunks, commentChunks, inCommentChunk], [idx, line]) ->
       isComment = /^[ \t]*#(?!##)/.test line
       current = if isComment then commentChunks else literalChunks
       if isComment is inCommentChunk
@@ -372,7 +372,7 @@ rewrite.coffee = (input) ->
       R.prop 'value'
       R.match /.*\n/g
       toPairs
-      foldl ['default', []], ([state, tests], [idx, line]) ->
+      reduce ['default', []], ([state, tests], [idx, line]) ->
         [indent, prefix, value] = R.tail matchLine line
         if prefix is '>'
           tests[tests.length] = {indent, input: {value}}
