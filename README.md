@@ -35,7 +35,8 @@ function toFahrenheit(degreesCelsius) {
 
         <script src="path/to/bower_components/esprima/esprima.js"></script>
         <script src="path/to/bower_components/jquery/dist/jquery.js"></script>
-        <script src="path/to/bower_components/underscore/underscore.js"></script>
+        <script src="path/to/bower_components/qunit/qunit/qunit.js"></script>
+        <script src="path/to/bower_components/ramda/dist/ramda.js"></script>
         <script src="path/to/bower_components/doctest/lib/doctest.js"></script>
 
 ### Running doctests

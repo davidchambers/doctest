@@ -1,7 +1,7 @@
 {exec}  = require 'child_process'
 pathlib = require 'path'
 
-_       = require 'underscore'
+R       = require 'ramda'
 
 doctest = require '../lib/doctest'
 
@@ -15,7 +15,7 @@ unless process.env.NODE_DISABLE_COLORS or process.platform is 'win32'
 
 
 printResult = (actual, expected, message) ->
-  if _.isEqual actual, expected
+  if R.eqDeep actual, expected
     console.log "#{green} \u2714 #{gray} #{message}#{reset}"
   else
     console.warn  "#{red} \u2718 #{gray} #{message}#{reset}"
@@ -24,7 +24,7 @@ printResult = (actual, expected, message) ->
 
 
 testModule = (path, options) ->
-  doctest path, _.extend(silent: yes, options), (results) ->
+  doctest path, R.assoc('silent', yes, options), (results) ->
     for [message, expected], idx in require pathlib.resolve path, '../results'
       printResult results[idx], expected, message
 

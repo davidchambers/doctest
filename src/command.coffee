@@ -1,5 +1,5 @@
 program = require 'commander'
-_       = require 'underscore'
+R       = require 'ramda'
 
 doctest = require '../lib/doctest'
 
@@ -15,20 +15,20 @@ program
 
 
 validators =
-  module: _.partial _.contains, [undefined, 'amd', 'commonjs']
-  print:  _.constant yes
-  silent: _.constant yes
-  type:   _.partial _.contains, [undefined, 'coffee', 'js']
+  module: R.contains R.__, [undefined, 'amd', 'commonjs']
+  print:  R.always yes
+  silent: R.always yes
+  type:   R.contains R.__, [undefined, 'coffee', 'js']
 
-keys = _.keys(validators).sort()
-options = _.pick program, keys
-_.each keys, (key) ->
+keys = R.keys(validators).sort()
+options = R.pick keys, program
+keys.forEach (key) ->
   unless validators[key] options[key]
     process.stderr.write "\n  error: invalid #{key} `#{options[key]}'\n\n"
     process.exit 1
 
 
-failures = _.reduce program.args, (failures, path) ->
+failures = R.reduce (failures, path) ->
   try
     results = doctest path, options
   catch err
@@ -36,7 +36,7 @@ failures = _.reduce program.args, (failures, path) ->
       # Format output to match commander.
       "\n  error: #{err.message[0].toLowerCase()}#{err.message[1..]}\n\n"
     process.exit 1
-  failures + _.reject(_.map(results, _.first), _.identity).length
-, 0
+  failures + R.length R.reject R.identity, R.map R.head, results
+, 0, program.args
 
 process.exit if failures is 0 then 0 else 1
