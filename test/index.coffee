@@ -74,7 +74,7 @@ testCommand 'bin/doctest --type xxx',
   stderr: "\n  error: invalid type `xxx'\n\n"
 
 testCommand 'bin/doctest test/shared/index.js',
-  code: 4
+  code: 1
   stdout: '''
     retrieving test/shared/index.js...
     running doctests in index.js...
@@ -88,7 +88,7 @@ testCommand 'bin/doctest test/shared/index.js',
   stderr: ''
 
 testCommand 'bin/doctest test/shared/index.coffee',
-  code: 4
+  code: 1
   stdout: '''
     retrieving test/shared/index.coffee...
     running doctests in index.coffee...
@@ -102,7 +102,7 @@ testCommand 'bin/doctest test/shared/index.coffee',
   stderr: ''
 
 testCommand 'bin/doctest test/shared/index.js test/shared/index.coffee',
-  code: 8
+  code: 1
   stdout: '''
     retrieving test/shared/index.js...
     running doctests in index.js...
@@ -123,7 +123,7 @@ testCommand 'bin/doctest test/shared/index.js test/shared/index.coffee',
   stderr: ''
 
 testCommand 'bin/doctest --silent test/shared/index.js',
-  code: 4
+  code: 1
   stdout: ''
   stderr: ''
 
