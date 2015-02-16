@@ -44,12 +44,11 @@ doctest.version = '0.7.1'
 
 
 if typeof window isnt 'undefined'
-  {_, CoffeeScript, esprima, R} = window
+  {CoffeeScript, esprima, R} = window
   window.doctest = doctest
 else
   fs = require 'fs'
   pathlib = require 'path'
-  _ = require 'underscore'
   CoffeeScript = require 'coffee-script'
   esprima = require 'esprima'
   R = require 'ramda'
@@ -419,7 +418,7 @@ functionEval = (source) ->
 
 
 commonjsEval = (source, path) ->
-  abspath = pathlib.resolve(path).replace(/[.][^.]+$/, "-#{_.now()}.js")
+  abspath = pathlib.resolve(path).replace(/[.][^.]+$/, "-#{Date.now()}.js")
   fs.writeFileSync abspath, source
   try
     {queue} = require(abspath).__doctest
@@ -439,7 +438,7 @@ run = (queue) ->
         actual = try input() catch error then error.constructor
         expected = arr[0]()
         results.push [
-          _.isEqual actual, expected
+          R.eqDeep actual, expected
           repr expected
           repr actual
           arr[1]

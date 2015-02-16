@@ -21,9 +21,9 @@
         doctest('shared/index.coffee', {}, callback);
       });
       function callback(results) {
-        _.each(window.results, function(expected, idx) {
+        R.forEachIndexed(function(expected, idx) {
           deepEqual(results[idx], expected[1], expected[0]);
-        });
+        }, window.results);
         start();
       }
     }());

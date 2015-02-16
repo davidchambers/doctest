@@ -13,8 +13,7 @@
     "coffee-script": "1.8.x",
     "esprima": "1.2.x",
     "jquery": "2.1.x",
-    "ramda": "0.8.x",
-    "underscore": "1.6.x"
+    "ramda": "0.10.x"
   },
   "devDependencies": {
     "qunit": "1.15.x"
