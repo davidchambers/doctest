@@ -50,7 +50,7 @@ else
   fs = require 'fs'
   pathlib = require 'path'
   CoffeeScript = require 'coffee-script'
-  esprima = require 'esprima'
+  esprima = require 'esprima-fb'
   R = require 'ramda'
   module.exports = doctest
 

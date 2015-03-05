@@ -1,3 +1,15 @@
 #!/usr/bin/env node
 
-require('../lib/command');
+// Based on:
+// https://github.com/jashkenas/coffeescript/blob/1.9.1/src/command.coffee#L431-L441
+var args = process.argv.slice(1);
+var idx = args.indexOf('--nodejs');
+if (idx < 0 || idx === args.length - 1) {
+  require('../lib/command');
+} else {
+  require('child_process').spawn(
+    process.execPath,
+    args[idx + 1].split(/\s+/).concat(args.slice(0, idx), args.slice(idx + 2)),
+    {cwd: process.cwd(), env: process.env, stdio: [0, 1, 2]}
+  ).on('exit', process.exit);
+}

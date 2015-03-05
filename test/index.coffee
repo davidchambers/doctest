@@ -2,6 +2,7 @@
 pathlib = require 'path'
 
 R       = require 'ramda'
+semver  = require 'semver'
 
 doctest = require '../lib/doctest'
 
@@ -57,6 +58,7 @@ testModule 'test/commonjs/exports/index.js', module: 'commonjs'
 testModule 'test/commonjs/module.exports/index.js', module: 'commonjs'
 testModule 'test/commonjs/strict/index.js', module: 'commonjs'
 testModule 'test/bin/executable', type: 'js'
+testModule 'test/harmony/index.js' if semver.gte process.version, '0.12.0'
 
 testCommand 'bin/doctest --xxx',
   code: 1
