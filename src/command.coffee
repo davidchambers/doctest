@@ -8,6 +8,7 @@ program
 .version doctest.version
 .usage '[options] path/to/js/or/coffee/module'
 .option '-m, --module <type>', 'specify module system ("amd" or "commonjs")'
+.option '    --nodejs', 'pass options directly to the "node" binary'
 .option '-p, --print', 'output the rewritten source without running tests'
 .option '-s, --silent', 'suppress output'
 .option '-t, --type <type>', 'specify file type ("coffee" or "js")'

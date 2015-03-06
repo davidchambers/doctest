@@ -43,11 +43,11 @@ test: \
 		test/public/shared/index.coffee \
 		test/public/shared/index.js \
 		test/public/style.css
-	$(COFFEE) test/index.coffee
+	$(COFFEE) --nodejs --harmony -- test/index.coffee
 
 test/public/bundle.js: \
 		bower_components/coffee-script/extras/coffee-script.js \
-		bower_components/esprima/esprima.js \
+		node_modules/esprima-fb/esprima.js \
 		bower_components/jquery/dist/jquery.js \
 		bower_components/qunit/qunit/qunit.js \
 		bower_components/ramda/dist/ramda.js \
