@@ -45,6 +45,7 @@ doctest.version = '0.8.0'
 
 if typeof window isnt 'undefined'
   {CoffeeScript, esprima, R} = window
+  _ = R.__
   window.doctest = doctest
 else
   fs = require 'fs'
@@ -52,7 +53,12 @@ else
   CoffeeScript = require 'coffee-script'
   esprima = require 'esprima-fb'
   R = require 'ramda'
+  _ = R.__
   module.exports = doctest
+
+
+# appendTo :: [a] -> a -> [a]
+appendTo = R.flip R.append
 
 
 # indentN :: Number -> String -> String
@@ -178,7 +184,7 @@ transformComments = R.pipe(
 
       [prefix, value] = R.tail R.match /^(>|[.]*)[ ]?(.*)$/, normalizedLine
       if prefix is '>'
-        ['input', R.appendTo accum, {
+        ['input', appendTo accum, {
           commentIndex
           input: {loc: {start, end}, value}
         }]
@@ -186,21 +192,21 @@ transformComments = R.pipe(
         ['default', accum]
       else if state is 'input'
         if prefix
-          ['input', R.appendTo R.init(accum), {
+          ['input', appendTo R.init(accum), {
             commentIndex
             input:
               loc: {start: R.last(accum).input.loc.start, end}
               value: "#{R.last(accum).input.value}\n#{value}"
           }]
         else
-          ['output', R.appendTo R.init(accum), {
+          ['output', appendTo R.init(accum), {
             commentIndex
             input: R.last(accum).input
             output: {loc: {start, end}, value}
           }]
       else if state is 'output'
         if prefix
-          ['output', R.appendTo R.init(accum), {
+          ['output', appendTo R.init(accum), {
             commentIndex
             input: R.last(accum).input
             output:
@@ -252,7 +258,7 @@ substring = (input, start, end) ->
 
 
 wrap = R.curry (type, test) -> R.pipe(
-  R.filter R.partialRight R.has, test
+  R.filter R.has _, test
   R.map (dir) -> wrap[type][dir] test
   R.join '\n'
 ) ['input', 'output']
@@ -322,11 +328,11 @@ rewrite.js = (input) ->
   source = R.pipe(
     R.append input: bookend
     reduce [[], {line: 1, column: 0}], ([chunks, start], test) -> [
-      R.appendTo chunks, substring input, start, test.input.loc.start
+      appendTo chunks, substring input, start, test.input.loc.start
       (test.output ? test.input).loc.end
     ]
     R.head
-    R.partialRight R.zip, R.append '', R.map wrap.js, lineTests
+    R.zip _, R.append '', R.map wrap.js, lineTests
     R.flatten
     R.join ''
   ) lineTests
@@ -341,7 +347,7 @@ rewrite.js = (input) ->
         R.filter R.propEq 'commentIndex', idx
         R.map wrap.js
         R.join '\n'
-        R.appendTo R.append substring(source, start, comment.loc.start), chunks
+        appendTo R.append substring(source, start, comment.loc.start), chunks
         R.of
         R.append comment.loc.end
       ) blockTests
