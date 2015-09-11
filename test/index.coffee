@@ -1,10 +1,10 @@
-{exec}  = require 'child_process'
-pathlib = require 'path'
+{execSync}  = require 'child_process'
+pathlib     = require 'path'
 
-R       = require 'ramda'
-semver  = require 'semver'
+R           = require 'ramda'
+semver      = require 'semver'
 
-doctest = require '../lib/doctest'
+doctest     = require '../lib/doctest'
 
 
 gray = green = red = reset = ''
@@ -15,10 +15,13 @@ unless process.env.NODE_DISABLE_COLORS or process.platform is 'win32'
   reset = '\x1B[0m'
 
 
+failures = 0
+
 printResult = (actual, expected, message) ->
   if R.eqDeep actual, expected
     console.log "#{green} \u2714 #{gray} #{message}#{reset}"
   else
+    failures += 1
     console.warn  "#{red} \u2718 #{gray} #{message}#{reset}"
     console.log  "#{gray}      expected: #{green}#{expected}#{reset}"
     console.log  "#{gray}      received: #{red}#{actual}#{reset}"
@@ -31,17 +34,16 @@ testModule = (path, options) ->
 
 
 testCommand = (command, expected) ->
-  child = exec command, (err, stdout, stderr) ->
-    code = if err? then err.code else 0
-    switch
-      when code isnt expected.code
-        printResult code, expected.code, command
-      when stdout isnt expected.stdout
-        printResult stdout, expected.stdout, command
-      when stderr isnt expected.stderr
-        printResult stderr, expected.stderr, command
-      else
-        printResult 0, 0, command
+  status = 0
+  stderr = ''
+  try
+    stdout = execSync command, {encoding: 'utf8', stdio: 'pipe'}
+  catch err
+    {status, stdout, stderr} = err
+
+  printResult status, expected.status, "#{command} [status]"
+  printResult stdout, expected.stdout, "#{command} [stdout]"
+  printResult stderr, expected.stderr, "#{command} [stderr]"
 
 
 testModule 'test/shared/index.js'
@@ -61,22 +63,22 @@ testModule 'test/bin/executable', type: 'js'
 testModule 'test/harmony/index.js' if semver.gte process.version, '0.12.0'
 
 testCommand 'bin/doctest --xxx',
-  code: 1
+  status: 1
   stdout: ''
   stderr: "\n  error: unknown option `--xxx'\n\n"
 
 testCommand 'bin/doctest --type',
-  code: 1
+  status: 1
   stdout: ''
   stderr: "\n  error: option `-t, --type <type>' argument missing\n\n"
 
 testCommand 'bin/doctest --type xxx',
-  code: 1
+  status: 1
   stdout: ''
   stderr: "\n  error: invalid type `xxx'\n\n"
 
 testCommand 'bin/doctest test/shared/index.js',
-  code: 1
+  status: 1
   stdout: '''
     retrieving test/shared/index.js...
     running doctests in index.js...
@@ -90,7 +92,7 @@ testCommand 'bin/doctest test/shared/index.js',
   stderr: ''
 
 testCommand 'bin/doctest test/shared/index.coffee',
-  code: 1
+  status: 1
   stdout: '''
     retrieving test/shared/index.coffee...
     running doctests in index.coffee...
@@ -104,7 +106,7 @@ testCommand 'bin/doctest test/shared/index.coffee',
   stderr: ''
 
 testCommand 'bin/doctest test/shared/index.js test/shared/index.coffee',
-  code: 1
+  status: 1
   stdout: '''
     retrieving test/shared/index.js...
     running doctests in index.js...
@@ -125,27 +127,27 @@ testCommand 'bin/doctest test/shared/index.js test/shared/index.coffee',
   stderr: ''
 
 testCommand 'bin/doctest --silent test/shared/index.js',
-  code: 1
+  status: 1
   stdout: ''
   stderr: ''
 
 testCommand 'bin/doctest --silent test/bin/executable',
-  code: 1
+  status: 1
   stdout: ''
   stderr: '\n  error: cannot infer type from extension\n\n'
 
 testCommand 'bin/doctest --type js --silent test/bin/executable',
-  code: 0
+  status: 0
   stdout: ''
   stderr: ''
 
 testCommand 'bin/doctest --module commonjs --silent src/doctest.coffee',
-  code: 0
+  status: 0
   stdout: ''
   stderr: ''
 
 testCommand 'bin/doctest --print test/commonjs/exports/index.js',
-  code: 0
+  status: 0
   stdout: '''
     __doctest.input(function() {
       return exports.identity(42);
@@ -161,7 +163,7 @@ testCommand 'bin/doctest --print test/commonjs/exports/index.js',
   stderr: ''
 
 testCommand 'bin/doctest --print --module amd test/amd/index.js',
-  code: 0
+  status: 0
   stdout: '''
     define(function() {
       // Convert degrees Celsius to degrees Fahrenheit.
@@ -191,7 +193,7 @@ testCommand 'bin/doctest --print --module amd test/amd/index.js',
   stderr: ''
 
 testCommand 'bin/doctest --print --module commonjs test/commonjs/exports/index.js',
-  code: 0
+  status: 0
   stdout: '''
     void function() {
       var __doctest = {
@@ -221,3 +223,15 @@ testCommand 'bin/doctest --print --module commonjs test/commonjs/exports/index.j
 
   '''
   stderr: ''
+
+
+switch failures
+  when 0
+    process.stdout.write "\n  #{green}0 test failures#{reset}\n\n"
+    process.exit 0
+  when 1
+    process.stdout.write "\n  #{red}1 test failure#{reset}\n\n"
+    process.exit 1
+  else
+    process.stdout.write "\n  #{red}#{failures} test failures#{reset}\n\n"
+    process.exit 1
