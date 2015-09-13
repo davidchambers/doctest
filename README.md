@@ -70,12 +70,25 @@ Specify module system via command-line interface:
 
     $ doctest --module commonjs path/to/commonjs/module.js
 
-### Errors
+### Exceptions
 
-It's easy to indicate that an error (of a particular kind) is expected:
+An output line beginning with EXCLAMATION MARK (`!`) indicates that the
+preceding expression is expected to throw. The exclamation mark *must* be
+followed by SPACE (<code> </code>) and the name of an Error constructor.
+For example:
 
-    // > null.length
-    // TypeError
+```javascript
+// > null.length
+// ! TypeError
+```
+
+The constructor name *may* be followed by COLON (`:`), SPACE (<code> </code>),
+and the expected error message. For example:
+
+```javascript
+// > null.length
+// ! TypeError: Cannot read property 'length' of null
+```
 
 ### Scoping
 

@@ -32,10 +32,10 @@ do ->
 
   8: 'TypeError captured and reported'
   # > null.length
-  # TypeError
+  # ! TypeError
   9: 'TypeError expected but not reported'
   # > [].length
-  # TypeError
+  # ! TypeError
 
   10: 'function accessible before declaration'
   # > double(6)

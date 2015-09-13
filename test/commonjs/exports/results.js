@@ -1,4 +1,4 @@
 module.exports = [[
   'exports',
-  [true, 42, 42, 2]
+  [true, '42', '42', 2]
 ]];
