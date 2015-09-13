@@ -361,7 +361,7 @@ rewrite.coffee = (input) ->
     R.match /.*\n/g
     toPairs
     R.reduce ([literalChunks, commentChunks, inCommentChunk], [idx, line]) ->
-      isComment = /^[ \t]*#(?!##)/.test line
+      isComment = R.test /^[ \t]*#(?!##)/, line
       current = if isComment then commentChunks else literalChunks
       if isComment is inCommentChunk
         current[current.length - 1].value += line
