@@ -20,13 +20,13 @@
     [true, [1, 2, 3], [1, 2, 3], 28]
   ], [
     'arithmetic error reported',
-    [false, 5, 4, 31]
+    [false, 4, 5, 31]
   ], [
     'TypeError captured and reported',
     [true, 'TypeError', 'TypeError', 35]
   ], [
     'TypeError expected but not reported',
-    [false, 'TypeError', 0, 38]
+    [false, 0, 'TypeError', 38]
   ], [
     'function accessible before declaration',
     [true, 12, 12, 42]
@@ -62,7 +62,7 @@
     [true, '"undefined"', '"undefined"', 92]
   ], [
     '"." should not follow leading "." in multiline expressions',
-    [false, 9.5, 5, 97]
+    [false, 5, 9.5, 97]
   ], [
     'wrapped lines may begin with more than one "."',
     [true, 1234.5, 1234.5, 105]

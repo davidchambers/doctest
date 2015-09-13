@@ -445,8 +445,8 @@ run = (queue) ->
         expected = arr[0]()
         results.push [
           R.eqDeep actual, expected
-          repr expected
           repr actual
+          repr expected
           arr[1]
         ]
         input = noop
@@ -455,7 +455,7 @@ run = (queue) ->
 
 log = (results) ->
   console.log R.join '', ((if pass then '.' else 'x') for [pass] in results)
-  for [pass, expected, actual, num] in results when not pass
+  for [pass, actual, expected, num] in results when not pass
     console.log "FAIL: expected #{expected} on line #{num} (got #{actual})"
   return
 
