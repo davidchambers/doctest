@@ -18,7 +18,7 @@ unless process.env.NODE_DISABLE_COLORS or process.platform is 'win32'
 failures = 0
 
 printResult = (actual, expected, message) ->
-  if R.eqDeep actual, expected
+  if R.equals actual, expected
     console.log "#{green} \u2714 #{gray} #{message}#{reset}"
   else
     failures += 1

@@ -85,16 +85,8 @@ noop = ->
 quote = (s) -> "'#{R.replace /'/g, "\\'", s}'"
 
 
-# reduce :: a -> (a,b -> a) -> [b] -> a
-reduce = R.flip R.reduce
-
-
-# toPairs :: [a] -> [(Number,a)]
-toPairs = R.converge(
-  R.zip
-  R.pipe R.length, R.range 0
-  R.identity
-)
+# reduce :: a -> (a,b,Number,[b] -> a) -> [b] -> a
+reduce = R.flip R.addIndex R.reduce
 
 
 fetch = (path, options, callback) ->
@@ -198,12 +190,10 @@ normalizeTest = R.converge(
 # .   loc: start: {line: 2, column: 0}, end: {line: 2, column: 5}
 # . } ]
 transformComments = R.pipe(
-  toPairs
-  reduce ['default', []], ([state, accum], [commentIndex, comment]) -> R.pipe(
+  reduce ['default', []], ([state, accum], comment, commentIndex) -> R.pipe(
     R.prop 'value'
     R.split '\n'
-    toPairs
-    reduce [state, accum], ([state, accum], [idx, line]) ->
+    reduce [state, accum], ([state, accum], line, idx) ->
       switch comment.type
         when 'Block'
           normalizedLine = R.replace /^\s*[*]?\s*/, '', line
@@ -265,14 +255,12 @@ substring = (input, start, end) ->
   return '' if start.line is end.line and start.column is end.column
   R.pipe(
     R.split /^/m
-    toPairs
-    reduce ['', no], (accum, [idx, line]) ->
+    reduce ['', no], (accum, line, idx) ->
       isStartLine = idx + 1 is start.line
       isEndLine   = idx + 1 is end.line
       R.pipe(
         R.split ''
-        toPairs
-        reduce ['', R.last accum], ([chrs, inComment], [column, chr]) ->
+        reduce ['', R.last accum], ([chrs, inComment], chr, column) ->
           if (isStartLine and column is start.column) or
              inComment and not (isEndLine and column is end.column)
             [R.concat(chrs, chr), yes]
@@ -388,8 +376,7 @@ rewrite.js = (input) ->
     getComments
     R.filter R.propEq 'type', 'Block'
     R.append bookend
-    toPairs
-    reduce [[], {line: 1, column: 0}], ([chunks, start], [idx, comment]) ->
+    reduce [[], {line: 1, column: 0}], ([chunks, start], comment, idx) ->
       R.pipe(
         R.filter R.propEq 'commentIndex', idx
         R.map wrap.js
@@ -406,8 +393,8 @@ rewrite.js = (input) ->
 rewrite.coffee = (input) ->
   [literalChunks, commentChunks] = R.pipe(
     R.match /^.*(?=\n)/gm
-    toPairs
-    R.reduce ([literalChunks, commentChunks, inCommentChunk], [idx, line]) ->
+    R.addIndex(R.reduce) \
+    ([literalChunks, commentChunks, inCommentChunk], line, idx) ->
       isComment = R.test /^[ \t]*#(?!##)/, line
       current = if isComment then commentChunks else literalChunks
       if isComment is inCommentChunk
@@ -422,8 +409,7 @@ rewrite.coffee = (input) ->
   testChunks = R.map R.pipe(
     (commentChunk) -> R.pipe(
       R.prop 'lines'
-      toPairs
-      reduce ['default', []], ([state, tests], [idx, line]) ->
+      reduce ['default', []], ([state, tests], line, idx) ->
         [indent, prefix, value] = R.tail matchLine line
         if prefix is '>'
           tests[tests.length] = {indent, input: {value}}
@@ -501,7 +487,7 @@ run = (queue) ->
           (throws and not expected.message or
            actual.message is expected.message)
         else
-          R.eqDeep actual, expected
+          R.equals actual, expected
         (if throws then format else R.toString) actual
         (if io['!'] then format else R.toString) expected
         io[':']
