@@ -20,7 +20,7 @@ doctest = (path, options = {}, callback = noop) ->
 
   type = options.type ? do ->
     match = R.match /[.](coffee|js)$/, path
-    if match is null
+    if R.isEmpty match
       throw new Error 'Cannot infer type from extension'
     match[1]
 
@@ -149,7 +149,7 @@ normalizeTest = R.converge(
          R.map R.prop 'output'
          R.map R.prop 'value'
          R.map R.match /^![ ]?([^:]*)(?::[ ]?(.*))?$/
-         R.map R.ifElse(R.isNil
+         R.map R.ifElse(R.isEmpty
                         R.always R.assoc '!', no
                         R.converge(R.pipe(((t, m) -> "new #{t}(#{m})")
                                           R.assocPath ['output', 'value']
@@ -163,6 +163,26 @@ normalizeTest = R.converge(
          fromMaybe R.identity)
   R.identity
 )
+
+
+_commentIndex           = R.lensProp 'commentIndex'
+_end                    = R.lensProp 'end'
+_input                  = R.lensProp 'input'
+_loc                    = R.lensProp 'loc'
+_output                 = R.lensProp 'output'
+_value                  = R.lensProp 'value'
+_1                      = R.lensIndex 0
+_2                      = R.lensIndex 1
+_2._last                = R.compose _2, R.lens R.last, (x, xs) -> R.update xs.length - 1, x, xs
+_2._last.commentIndex   = R.compose _2._last, _commentIndex
+_2._last.output         = R.compose _2._last, _output
+_2._last.output.loc     = R.compose _2._last.output, _loc
+_2._last.output.loc.end = R.compose _2._last.output.loc, _end
+_2._last.output.value   = R.compose _2._last.output, _value
+_2._last.input          = R.compose _2._last, _input
+_2._last.input.loc      = R.compose _2._last.input, _loc
+_2._last.input.loc.end  = R.compose _2._last.input.loc, _end
+_2._last.input.value    = R.compose _2._last.input, _value
 
 
 # transformComments :: [Object] -> [Object]
@@ -190,10 +210,11 @@ normalizeTest = R.converge(
 # .   loc: start: {line: 2, column: 0}, end: {line: 2, column: 5}
 # . } ]
 transformComments = R.pipe(
-  reduce ['default', []], ([state, accum], comment, commentIndex) -> R.pipe(
+  reduce ['default', []], (accum, comment, commentIndex) -> R.pipe(
     R.prop 'value'
     R.split '\n'
-    reduce [state, accum], ([state, accum], line, idx) ->
+    reduce accum, (accum, line, idx) ->
+      [state] = accum
       switch comment.type
         when 'Block'
           normalizedLine = R.replace /^\s*[*]?\s*/, '', line
@@ -203,38 +224,22 @@ transformComments = R.pipe(
           {start, end} = comment.loc
 
       [prefix, value] = R.tail R.match /^(>|[.]*)[ ]?(.*)$/, normalizedLine
-      if prefix is '>'
-        ['input', appendTo accum, {
-          commentIndex
-          input: {loc: {start, end}, value}
-        }]
-      else if state is 'default'
-        ['default', accum]
+      fn = if prefix is '>'
+        R.pipe(R.set _1, 'input'
+               R.over _2, R.append {}
+               R.set _2._last.commentIndex, commentIndex
+               R.set _2._last.input, {loc: {start, end}, value})
+      else if prefix
+        R.pipe(R.set _2._last.commentIndex, commentIndex
+               R.set _2._last[state].loc.end, end
+               R.over _2._last[state].value, R.concat _, "\n#{value}")
       else if state is 'input'
-        if prefix
-          ['input', appendTo R.init(accum), {
-            commentIndex
-            input:
-              loc: {start: R.last(accum).input.loc.start, end}
-              value: "#{R.last(accum).input.value}\n#{value}"
-          }]
-        else
-          ['output', appendTo R.init(accum), {
-            commentIndex
-            input: R.last(accum).input
-            output: {loc: {start, end}, value}
-          }]
-      else if state is 'output'
-        if prefix
-          ['output', appendTo R.init(accum), {
-            commentIndex
-            input: R.last(accum).input
-            output:
-              loc: {start: R.last(accum).output.loc.start, end}
-              value: "#{R.last(accum).output.value}\n#{value}"
-          }]
-        else
-          ['default', accum]
+        R.pipe(R.set _1, 'output'
+               R.set _2._last.commentIndex, commentIndex
+               R.set _2._last.output, {loc: {start, end}, value})
+      else
+        R.set _1, 'default'
+      fn accum
   ) comment
   R.last
   R.map normalizeTest
