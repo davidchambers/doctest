@@ -40,8 +40,6 @@ doctest = (path, options = {}, callback = noop) ->
       callback results
       results
 
-doctest.version = '0.8.0'
-
 
 if typeof window isnt 'undefined'
   {CoffeeScript, esprima, R} = window

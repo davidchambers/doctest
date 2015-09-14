@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-sed -i '' "s/version = '[^']*'/version = '$VERSION'/"   src/doctest.coffee
-git add                                                 src/doctest.coffee
-
 rm -f                                   lib/{command,doctest}.js
 make                                    lib/{command,doctest}.js
 git update-index --no-assume-unchanged  lib/{command,doctest}.js

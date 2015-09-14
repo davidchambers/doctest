@@ -2,10 +2,11 @@ program = require 'commander'
 R       = require 'ramda'
 
 doctest = require '../lib/doctest'
+pkg     = require '../package.json'
 
 
 program
-.version doctest.version
+.version pkg.version
 .usage '[options] path/to/js/or/coffee/module'
 .option '-m, --module <type>', 'specify module system ("amd" or "commonjs")'
 .option '    --nodejs', 'pass options directly to the "node" binary'
