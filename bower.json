@@ -6,8 +6,7 @@
     "/Makefile",
     "/bin/",
     "/lib/command.js",
-    "/package.json",
-    "/src/"
+    "/package.json"
   ],
   "dependencies": {
     "coffee-script": "1.8.x",
