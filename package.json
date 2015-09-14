@@ -28,7 +28,7 @@
     "bower": "1.5.x",
     "jscs": "2.1.x",
     "jshint": "2.8.x",
-    "semver": "4.3.x",
+    "semver": "5.0.x",
     "xyz": "0.5.x"
   },
   "files": [
