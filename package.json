@@ -30,5 +30,12 @@
     "jshint": "2.8.x",
     "semver": "4.3.x",
     "xyz": "0.5.x"
-  }
+  },
+  "files": [
+    "/bin/",
+    "/lib/",
+    "/LICENSE",
+    "/README.md",
+    "/package.json"
+  ]
 }
