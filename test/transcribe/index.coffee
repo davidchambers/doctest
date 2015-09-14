@@ -1,4 +1,4 @@
-#% map :: (a -> b) -> [a] -> [b]
+#% map :: (a -> b) -> Array a -> Array b
 #.
 #. Transforms a list of elements of type `a` into a list of elements
 #. of type `b` using the provided function of type `a -> b`.
