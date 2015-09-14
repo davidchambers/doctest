@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "coffee-script": "1.10.x",
-    "commander": "2.5.x",
+    "commander": "2.8.x",
     "esprima-fb": "13001.1001.0-dev-harmony-fb",
     "ramda": "0.17.x"
   },
