@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-set -e
-
-rm -f                                   lib/{command,doctest}.js
-make                                    lib/{command,doctest}.js
-git update-index --no-assume-unchanged  lib/{command,doctest}.js
-git add                                 lib/{command,doctest}.js
-git update-index --assume-unchanged     lib/{command,doctest}.js

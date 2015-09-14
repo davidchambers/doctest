@@ -1,25 +1,19 @@
 BOWER = node_modules/.bin/bower
-COFFEE = node_modules/.bin/coffee
-XYZ = node_modules/.bin/xyz --message X.Y.Z --tag X.Y.Z --repo git@github.com:davidchambers/doctest.git --script scripts/prepublish
+JSCS = node_modules/.bin/jscs
+JSHINT = node_modules/.bin/jshint
+XYZ = node_modules/.bin/xyz --message X.Y.Z --tag X.Y.Z --repo git@github.com:davidchambers/doctest.git
 
-SRC = $(shell find src -name '*.coffee')
-LIB = $(patsubst src/%.coffee,lib/%.js,$(SRC))
+LIB = $(wildcard lib/*.js)
 
 
 .PHONY: all
-all: $(LIB)
-
-lib/%.js: src/%.coffee
-	$(COFFEE) --compile --output $(@D) -- $<
-
-
-.PHONY: clean
-clean:
-	rm -f -- $(LIB)
+all:
 
 
 .PHONY: lint
 lint:
+	$(JSHINT) -- $(LIB) test/index.js
+	$(JSCS) -- $(LIB) test/index.js
 
 
 .PHONY: release-major release-minor release-patch
@@ -31,19 +25,16 @@ release-major release-minor release-patch:
 setup:
 	npm install
 	$(BOWER) install
-	make clean
-	git update-index --assume-unchanged -- $(LIB)
 
 
 .PHONY: test
 test: \
-		all \
 		test/public/bundle.js \
 		test/public/index.html \
 		test/public/shared/index.coffee \
 		test/public/shared/index.js \
 		test/public/style.css
-	$(COFFEE) --nodejs --harmony -- test/index.coffee
+	node --harmony -- test/index.js
 
 test/public/bundle.js: \
 		bower_components/coffee-script/extras/coffee-script.js \
