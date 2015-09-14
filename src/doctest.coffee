@@ -20,7 +20,7 @@ doctest = (path, options = {}, callback = noop) ->
 
   type = options.type ? do ->
     match = R.match /[.](coffee|js)$/, path
-    if match is null
+    if R.isEmpty match
       throw new Error 'Cannot infer type from extension'
     match[1]
 
@@ -61,31 +61,32 @@ else
 appendTo = R.flip R.append
 
 
-# indentN :: Number -> String -> String
-indentN = R.pipe(
-  R.times R.always ' '
-  R.join ''
-  R.replace /^(?!$)/gm
-)
+# (b -> c) -> (a -> b) -> (a -> c)
+compose = R.curryN 2, R.compose
 
-# indent2 :: String -> String
-indent2 = indentN 2
+
+# fromMaybe :: a -> [a] -> a
+fromMaybe = R.curry (x, maybe) -> if R.isEmpty maybe then x else maybe[0]
+
+
+# indentN :: Number -> String -> String
+indentN = R.curry (n, s) -> R.replace /^(?!$)/gm, Array(n + 1).join(' '), s
+
+
+# joinLines :: [String] -> String
+joinLines = R.join '\n'
 
 
 # noop :: * -> ()
 noop = ->
 
 
-# reduce :: a -> (a,b -> a) -> [b] -> a
-reduce = R.flip R.reduce
+# quote :: String -> String
+quote = (s) -> "'#{R.replace /'/g, "\\'", s}'"
 
 
-# toPairs :: [a] -> [(Number,a)]
-toPairs = R.converge(
-  R.zip
-  R.pipe R.length, R.range 0
-  R.identity
-)
+# reduce :: a -> (a,b,Number,[b] -> a) -> [b] -> a
+reduce = R.flip R.addIndex R.reduce
 
 
 fetch = (path, options, callback) ->
@@ -123,16 +124,11 @@ toModule = (source, moduleType) -> switch moduleType
 
     """
   when 'commonjs'
-    iifeWrap = (s) -> "void function() {\n#{indent2 s}}.call(this);"
+    iifeWrap = (s) -> "void function() {\n#{indentN 2, s}}.call(this);"
     iifeWrap """
     var __doctest = {
       queue: [],
-      input: function(fn) {
-        __doctest.queue.push([fn]);
-      },
-      output: function(num, fn) {
-        __doctest.queue.push([fn, num]);
-      }
+      enqueue: function(io) { this.queue.push(io); }
     };
 
     #{iifeWrap source}
@@ -142,6 +138,51 @@ toModule = (source, moduleType) -> switch moduleType
     """
   else
     source
+
+
+# normalizeTest :: { output :: { value :: String } } ->
+#                    { ! :: Boolean, output :: { value :: String } }
+normalizeTest = R.converge(
+  R.call
+  R.pipe(R.of
+         R.filter R.has 'output'
+         R.map R.prop 'output'
+         R.map R.prop 'value'
+         R.map R.match /^![ ]?([^:]*)(?::[ ]?(.*))?$/
+         R.map R.ifElse(R.isEmpty
+                        R.always R.assoc '!', no
+                        R.converge(R.pipe(((t, m) -> "new #{t}(#{m})")
+                                          R.assocPath ['output', 'value']
+                                          compose R.assoc '!', yes)
+                                   R.nth 1
+                                   R.pipe(R.nth 2
+                                          R.of
+                                          R.reject R.isNil
+                                          R.map quote
+                                          fromMaybe '')))
+         fromMaybe R.identity)
+  R.identity
+)
+
+
+_commentIndex           = R.lensProp 'commentIndex'
+_end                    = R.lensProp 'end'
+_input                  = R.lensProp 'input'
+_loc                    = R.lensProp 'loc'
+_output                 = R.lensProp 'output'
+_value                  = R.lensProp 'value'
+_1                      = R.lensIndex 0
+_2                      = R.lensIndex 1
+_2._last                = R.compose _2, R.lens R.last, (x, xs) -> R.update xs.length - 1, x, xs
+_2._last.commentIndex   = R.compose _2._last, _commentIndex
+_2._last.output         = R.compose _2._last, _output
+_2._last.output.loc     = R.compose _2._last.output, _loc
+_2._last.output.loc.end = R.compose _2._last.output.loc, _end
+_2._last.output.value   = R.compose _2._last.output, _value
+_2._last.input          = R.compose _2._last, _input
+_2._last.input.loc      = R.compose _2._last.input, _loc
+_2._last.input.loc.end  = R.compose _2._last.input.loc, _end
+_2._last.input.value    = R.compose _2._last.input, _value
 
 
 # transformComments :: [Object] -> [Object]
@@ -158,22 +199,22 @@ toModule = (source, moduleType) -> switch moduleType
 # .   value: ' 42'
 # .   loc: start: {line: 2, column: 0}, end: {line: 2, column: 5}
 # . ]
-# [
+# [ {
 # . commentIndex: 1
+# . '!': no
 # . input:
 # .   value: '6 * 7'
 # .   loc: start: {line: 1, column: 0}, end: {line: 1, column: 10}
 # . output:
 # .   value: '42'
 # .   loc: start: {line: 2, column: 0}, end: {line: 2, column: 5}
-# . ]
+# . } ]
 transformComments = R.pipe(
-  toPairs
-  reduce ['default', []], ([state, accum], [commentIndex, comment]) -> R.pipe(
+  reduce ['default', []], (accum, comment, commentIndex) -> R.pipe(
     R.prop 'value'
     R.split '\n'
-    toPairs
-    reduce [state, accum], ([state, accum], [idx, line]) ->
+    reduce accum, (accum, line, idx) ->
+      [state] = accum
       switch comment.type
         when 'Block'
           normalizedLine = R.replace /^\s*[*]?\s*/, '', line
@@ -183,40 +224,25 @@ transformComments = R.pipe(
           {start, end} = comment.loc
 
       [prefix, value] = R.tail R.match /^(>|[.]*)[ ]?(.*)$/, normalizedLine
-      if prefix is '>'
-        ['input', appendTo accum, {
-          commentIndex
-          input: {loc: {start, end}, value}
-        }]
-      else if state is 'default'
-        ['default', accum]
+      fn = if prefix is '>'
+        R.pipe(R.set _1, 'input'
+               R.over _2, R.append {}
+               R.set _2._last.commentIndex, commentIndex
+               R.set _2._last.input, {loc: {start, end}, value})
+      else if prefix
+        R.pipe(R.set _2._last.commentIndex, commentIndex
+               R.set _2._last[state].loc.end, end
+               R.over _2._last[state].value, R.concat _, "\n#{value}")
       else if state is 'input'
-        if prefix
-          ['input', appendTo R.init(accum), {
-            commentIndex
-            input:
-              loc: {start: R.last(accum).input.loc.start, end}
-              value: "#{R.last(accum).input.value}\n#{value}"
-          }]
-        else
-          ['output', appendTo R.init(accum), {
-            commentIndex
-            input: R.last(accum).input
-            output: {loc: {start, end}, value}
-          }]
-      else if state is 'output'
-        if prefix
-          ['output', appendTo R.init(accum), {
-            commentIndex
-            input: R.last(accum).input
-            output:
-              loc: {start: R.last(accum).output.loc.start, end}
-              value: "#{R.last(accum).output.value}\n#{value}"
-          }]
-        else
-          ['default', accum]
+        R.pipe(R.set _1, 'output'
+               R.set _2._last.commentIndex, commentIndex
+               R.set _2._last.output, {loc: {start, end}, value})
+      else
+        R.set _1, 'default'
+      fn accum
   ) comment
   R.last
+  R.map normalizeTest
 )
 
 
@@ -234,14 +260,12 @@ substring = (input, start, end) ->
   return '' if start.line is end.line and start.column is end.column
   R.pipe(
     R.split /^/m
-    toPairs
-    reduce ['', no], (accum, [idx, line]) ->
+    reduce ['', no], (accum, line, idx) ->
       isStartLine = idx + 1 is start.line
       isEndLine   = idx + 1 is end.line
       R.pipe(
         R.split ''
-        toPairs
-        reduce ['', R.last accum], ([chrs, inComment], [column, chr]) ->
+        reduce ['', R.last accum], ([chrs, inComment], chr, column) ->
           if (isStartLine and column is start.column) or
              inComment and not (isEndLine and column is end.column)
             [R.concat(chrs, chr), yes]
@@ -260,33 +284,49 @@ substring = (input, start, end) ->
 wrap = R.curry (type, test) -> R.pipe(
   R.filter R.has _, test
   R.map (dir) -> wrap[type][dir] test
-  R.join '\n'
+  joinLines
 ) ['input', 'output']
 
 wrap.js = wrap 'js'
 
 wrap.js.input = (test) -> """
-  __doctest.input(function() {
-    return #{test.input.value};
+  __doctest.enqueue({
+    type: 'input',
+    thunk: function() {
+      return #{test.input.value};
+    }
   });
 """
 
-wrap.js.output = (test) ->  """
-  __doctest.output(#{test.output.loc.start.line}, function() {
-    return #{test.output.value};
+wrap.js.output = (test) -> """
+  __doctest.enqueue({
+    type: 'output',
+    ':': #{test.output.loc.start.line},
+    '!': #{test['!']},
+    thunk: function() {
+      return #{test.output.value};
+    }
   });
 """
 
 wrap.coffee = wrap 'coffee'
 
 wrap.coffee.input = (test) -> """
-  __doctest.input ->
-  #{indent2 test.input.value}
+  __doctest.enqueue {
+    type: 'input'
+    thunk: ->
+  #{indentN 4, test.input.value}
+  }
 """
 
 wrap.coffee.output = (test) -> """
-  __doctest.output #{test.output.loc.start.line}, ->
-  #{indent2 test.output.value}
+  __doctest.enqueue {
+    type: 'output'
+    ':': #{test.output.loc.start.line}
+    '!': #{test['!']}
+    thunk: ->
+  #{indentN 4, test.output.value}
+  }
 """
 
 
@@ -341,12 +381,11 @@ rewrite.js = (input) ->
     getComments
     R.filter R.propEq 'type', 'Block'
     R.append bookend
-    toPairs
-    reduce [[], {line: 1, column: 0}], ([chunks, start], [idx, comment]) ->
+    reduce [[], {line: 1, column: 0}], ([chunks, start], comment, idx) ->
       R.pipe(
         R.filter R.propEq 'commentIndex', idx
         R.map wrap.js
-        R.join '\n'
+        joinLines
         appendTo R.append substring(source, start, comment.loc.start), chunks
         R.of
         R.append comment.loc.end
@@ -358,32 +397,30 @@ rewrite.js = (input) ->
 
 rewrite.coffee = (input) ->
   [literalChunks, commentChunks] = R.pipe(
-    R.match /.*\n/g
-    toPairs
-    R.reduce ([literalChunks, commentChunks, inCommentChunk], [idx, line]) ->
-      isComment = /^[ \t]*#(?!##)/.test line
+    R.match /^.*(?=\n)/gm
+    R.addIndex(R.reduce) \
+    ([literalChunks, commentChunks, inCommentChunk], line, idx) ->
+      isComment = R.test /^[ \t]*#(?!##)/, line
       current = if isComment then commentChunks else literalChunks
       if isComment is inCommentChunk
-        current[current.length - 1].value += line
+        current[current.length - 1].lines.push line
       else
-        current[current.length] = value: line, loc: start: line: idx + 1
+        current[current.length] = lines: [line], loc: start: line: idx + 1
       [literalChunks, commentChunks, isComment]
-    , [[value: '', loc: start: line: 1], [], no]
+    , [[lines: [], loc: start: line: 1], [], no]
   ) input
 
-  matchLine = R.match /^([ \t]*)#[ \t]*(>|[.]*)(.*\n)/
+  matchLine = R.match /^([ \t]*)#[ \t]*(>|[.]*)[ ]?(.*)$/
   testChunks = R.map R.pipe(
     (commentChunk) -> R.pipe(
-      R.prop 'value'
-      R.match /.*\n/g
-      toPairs
-      reduce ['default', []], ([state, tests], [idx, line]) ->
+      R.prop 'lines'
+      reduce ['default', []], ([state, tests], line, idx) ->
         [indent, prefix, value] = R.tail matchLine line
         if prefix is '>'
           tests[tests.length] = {indent, input: {value}}
           ['input', tests]
         else if prefix
-          tests[tests.length - 1][state].value += value
+          tests[tests.length - 1][state].value += "\n#{value}"
           [state, tests]
         else if state is 'input'
           loc = start: line: commentChunk.loc.start.line + idx
@@ -393,20 +430,15 @@ rewrite.coffee = (input) ->
           ['default', tests]
     ) commentChunk
     R.last
-    R.map R.converge(
-      R.apply
-      R.pipe R.prop('indent'), R.length, indentN
-      R.pipe wrap.coffee, R.of
-    )
-    R.join '\n'
+    R.map normalizeTest
+    R.map R.converge indentN, R.path(['indent', 'length']), wrap.coffee
+    joinLines
   ), commentChunks
 
-  R.pipe(
-    R.zip
-    R.flatten
-    R.join '\n'
-    CoffeeScript.compile
-  ) R.pluck('value', literalChunks), R.append('', testChunks)
+  CoffeeScript.compile joinLines R.flatten R.zip(
+    R.map R.compose(joinLines, R.prop 'lines'), literalChunks
+    R.append '', testChunks
+  )
 
 
 functionEval = (source) ->
@@ -417,9 +449,7 @@ functionEval = (source) ->
   # The `evaluate` function takes one argument, named `__doctest`.
   evaluate = Function '__doctest', source
   queue = []
-  evaluate
-    input: (fn) -> queue.push [fn]
-    output: (num, fn) -> queue.push [fn, num]
+  evaluate enqueue: (io) -> queue.push io
   run queue
 
 
@@ -434,22 +464,40 @@ commonjsEval = (source, path) ->
 
 
 run = (queue) ->
-  results = []; input = noop
-  for arr in queue
-    switch arr.length
-      when 1
-        input()
-        input = arr[0]
-      when 2
-        actual = try input() catch error then error.constructor
-        expected = arr[0]()
-        results.push [
-          R.eqDeep actual, expected
-          repr actual
-          repr expected
-          arr[1]
-        ]
-        input = noop
+  results = []
+  thunks = []  # thunks :: Maybe (() -> *)
+  for io in queue
+    if io.type is 'input'
+      R.forEach R.call, thunks
+      thunks = [io.thunk]
+    else if io.type is 'output'
+      throws = no
+      actual = try
+        R.head R.map R.call, thunks
+      catch error
+        throws = yes
+        error
+      expected = io.thunk()
+
+      format = (err) ->
+        if expected.message and err.message
+          "! #{err.name}: #{err.message}"
+        else
+          "! #{err.name}"
+
+      results.push [
+        throws is io['!'] and
+        if R.is Error, actual
+          actual.constructor is expected.constructor and
+          (throws and not expected.message or
+           actual.message is expected.message)
+        else
+          R.equals actual, expected
+        (if throws then format else R.toString) actual
+        (if io['!'] then format else R.toString) expected
+        io[':']
+      ]
+      thunks = []
   results
 
 
@@ -458,20 +506,3 @@ log = (results) ->
   for [pass, actual, expected, num] in results when not pass
     console.log "FAIL: expected #{expected} on line #{num} (got #{actual})"
   return
-
-
-# > repr 'foo \\ bar \\ baz'
-# '"foo \\\\ bar \\\\ baz"'
-# > repr 'foo "bar" baz'
-# '"foo \\"bar\\" baz"'
-# > repr TypeError
-# 'TypeError'
-# > repr 42
-# 42
-repr = (val) -> switch Object::toString.call val
-  when '[object String]'
-    '"' + val.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
-  when '[object Function]'
-    val.name
-  else
-    val
