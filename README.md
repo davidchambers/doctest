@@ -33,7 +33,7 @@ function toFahrenheit(degreesCelsius) {
 
 2.  Add script tags:
 
-        <script src="path/to/node_modules/esprima-fb/esprima.js"></script>
+        <script src="path/to/node_modules/esprima/esprima.js"></script>
         <script src="path/to/bower_components/jquery/dist/jquery.js"></script>
         <script src="path/to/bower_components/qunit/qunit/qunit.js"></script>
         <script src="path/to/bower_components/ramda/dist/ramda.js"></script>
