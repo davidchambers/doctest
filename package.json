@@ -2,6 +2,7 @@
   "name": "doctest",
   "version": "0.8.0",
   "description": "Doctests for JavaScript and CoffeeScript",
+  "license": "WTFPL",
   "contributors": [
     "David Chambers <dc@davidchambers.me>",
     "Francesco Occhipinti <f.occhipinti@gmail.com>"
@@ -13,12 +14,6 @@
   ],
   "main": "./lib/doctest",
   "bin": "./bin/doctest",
-  "licenses": [
-    {
-      "type": "WTFPL",
-      "url": "https://raw.github.com/davidchambers/doctest/master/LICENSE"
-    }
-  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/davidchambers/doctest.git"
