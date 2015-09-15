@@ -4,6 +4,7 @@
 
 var execSync  = require('child_process').execSync;
 var pathlib   = require('path');
+var fs        = require('fs');
 
 var R         = require('ramda');
 var semver    = require('semver');
@@ -41,13 +42,24 @@ var printResult = function(actual, expected, message) {
 };
 
 
-var testModule = function(path, options) {
+var testCall = function(path, options, test) {
   var type = R.last(R.split('.', path));
-  doctest(path, R.assoc('silent', true, options), function(results) {
+  test(R.assoc('silent', true, options), function(results) {
     R.addIndex(R.forEach)(function(pair, idx) {
       printResult(results[idx], pair[1], pair[0] + ' [' + type + ']');
     }, require(pathlib.resolve(path, '../results')));
   });
+};
+
+
+var testModule = function(path, options) {
+  testCall(path, options, doctest.bind(null, path));
+};
+
+
+var testString = function(path, options) {
+  var source = fs.readFileSync(path, 'utf8');
+  testCall(path, options, doctest.string.bind(null, source));
 };
 
 
@@ -86,6 +98,9 @@ testModule('test/bin/executable', {type: 'js'});
 if (semver.gte(process.version, '0.12.0')) {
   testModule('test/harmony/index.js');
 }
+
+testString('test/string/index.js');
+testString('test/string/index.coffee', {type: 'coffee'});
 
 testCommand('bin/doctest --xxx', {
   status: 1,
