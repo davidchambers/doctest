@@ -11,7 +11,7 @@
   "dependencies": {
     "coffee-script": "1.10.x",
     "jquery": "2.1.x",
-    "ramda": "0.17.x"
+    "ramda": "0.18.x"
   },
   "devDependencies": {
     "qunit": "1.19.x"
