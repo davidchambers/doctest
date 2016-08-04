@@ -1,6 +1,5 @@
 {
   "name": "doctest",
-  "version": "0.10.0",
   "main": "./lib/doctest",
   "ignore": [
     "/Makefile",

@@ -29,7 +29,7 @@
     "jscs": "2.1.x",
     "jshint": "2.8.x",
     "semver": "5.0.x",
-    "xyz": "0.5.x"
+    "xyz": "1.0.x"
   },
   "files": [
     "/bin/",
