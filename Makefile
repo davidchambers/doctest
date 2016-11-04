@@ -1,6 +1,7 @@
 BOWER = node_modules/.bin/bower
 JSCS = node_modules/.bin/jscs
 JSHINT = node_modules/.bin/jshint
+REMEMBER_BOWER = node_modules/.bin/remember-bower
 XYZ = node_modules/.bin/xyz --message X.Y.Z --tag X.Y.Z --repo git@github.com:davidchambers/doctest.git
 
 LIB = $(wildcard lib/*.js)
@@ -14,6 +15,7 @@ all:
 lint:
 	$(JSHINT) -- $(LIB) test/index.js
 	$(JSCS) -- $(LIB) test/index.js
+	$(REMEMBER_BOWER) --exclude commander --exclude esprima --exclude jquery $(shell pwd)
 
 
 .PHONY: release-major release-minor release-patch
