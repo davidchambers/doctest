@@ -77,6 +77,7 @@ testModule('test/line-endings/CR+LF.coffee');
 testModule('test/line-endings/LF.js');
 testModule('test/line-endings/LF.coffee');
 testModule('test/exceptions/index.js');
+testModule('test/statements/index.js');
 testModule('test/transcribe/index.js', {prefix: '.'});
 testModule('test/transcribe/index.coffee', {prefix: '.'});
 testModule('test/amd/index.js', {module: 'amd'});
