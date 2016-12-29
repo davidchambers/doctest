@@ -22,7 +22,7 @@
     "coffee-script": "1.10.x",
     "commander": "2.8.x",
     "esprima": "2.6.x",
-    "ramda": "0.18.x"
+    "ramda": "0.19.x"
   },
   "devDependencies": {
     "bower": "1.5.x",
