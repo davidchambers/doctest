@@ -40,7 +40,7 @@ test: \
 
 test/public/bundle.js: \
 		bower_components/coffee-script/extras/coffee-script.js \
-		node_modules/esprima/esprima.js \
+		node_modules/esprima/dist/esprima.js \
 		bower_components/jquery/dist/jquery.js \
 		bower_components/qunit/qunit/qunit.js \
 		bower_components/ramda/dist/ramda.js \

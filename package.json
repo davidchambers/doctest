@@ -21,7 +21,7 @@
   "dependencies": {
     "coffee-script": "1.10.x",
     "commander": "2.8.x",
-    "esprima": "2.6.x",
+    "esprima": "3.1.x",
     "ramda": "0.19.x"
   },
   "devDependencies": {
