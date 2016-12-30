@@ -26,9 +26,9 @@
   },
   "devDependencies": {
     "bower": "1.5.x",
-    "jscs": "2.1.x",
-    "jshint": "2.8.x",
+    "eslint": "2.9.x",
     "remember-bower": "0.1.x",
+    "sanctuary-style": "0.4.x",
     "semver": "5.0.x",
     "xyz": "1.0.x"
   },

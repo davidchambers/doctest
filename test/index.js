@@ -1,7 +1,5 @@
 'use strict';
 
-/* jshint es3: false, node: true */
-
 var execSync  = require('child_process').execSync;
 var pathlib   = require('path');
 
@@ -29,7 +27,7 @@ if (!process.env.NODE_DISABLE_COLORS && process.platform !== 'win32') {
 
 var failures = 0;
 
-var printResult = function(actual, expected, message) {
+function printResult(actual, expected, message) {
   if (R.equals(actual, expected)) {
     return console.log(green + ' \u2714 ' + gray + ' ' + message + reset);
   } else {
@@ -38,20 +36,20 @@ var printResult = function(actual, expected, message) {
     console.log(gray + '      expected: ' + green + expected + reset);
     return console.log(gray + '      received: ' + red + actual + reset);
   }
-};
+}
 
 
-var testModule = function(path, options) {
+function testModule(path, options) {
   var type = R.last(R.split('.', path));
   doctest(path, R.assoc('silent', true, options), function(results) {
     R.addIndex(R.forEach)(function(pair, idx) {
       printResult(results[idx], pair[1], pair[0] + ' [' + type + ']');
     }, require(pathlib.resolve(path, '../results')));
   });
-};
+}
 
 
-var testCommand = function(command, expected) {
+function testCommand(command, expected) {
   var status = 0;
   var stdout;
   var stderr = '';
@@ -65,7 +63,7 @@ var testCommand = function(command, expected) {
   printResult(status, expected.status, command + ' [status]');
   printResult(stdout, expected.stdout, command + ' [stdout]');
   printResult(stderr, expected.stderr, command + ' [stderr]');
-};
+}
 
 
 testModule('test/shared/index.js');
