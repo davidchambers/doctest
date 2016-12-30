@@ -1,10 +1,7 @@
 BOWER = node_modules/.bin/bower
-JSCS = node_modules/.bin/jscs
-JSHINT = node_modules/.bin/jshint
+ESLINT = node_modules/.bin/eslint --config node_modules/sanctuary-style/eslint-es3.json --env es3
 REMEMBER_BOWER = node_modules/.bin/remember-bower
 XYZ = node_modules/.bin/xyz --message X.Y.Z --tag X.Y.Z --repo git@github.com:davidchambers/doctest.git
-
-LIB = $(wildcard lib/*.js)
 
 
 .PHONY: all
@@ -13,8 +10,22 @@ all:
 
 .PHONY: lint
 lint:
-	$(JSHINT) -- $(LIB) test/index.js
-	$(JSCS) -- $(LIB) test/index.js
+	$(ESLINT) \
+	  --env node \
+	  --rule 'key-spacing: [off]' \
+	  -- lib/command.js
+	$(ESLINT) \
+	  --global console \
+	  --global module \
+	  --global require \
+	  --rule 'no-multiple-empty-lines: [error, {max: 2, maxEOF: 0}]' \
+	  --rule 'no-negated-condition: [off]' \
+	  --rule 'spaced-comment: [error, always, {markers: ["/"]}]' \
+	  -- lib/doctest.js
+	$(ESLINT) \
+	  --env node \
+	  --rule 'indent: [off]' \
+	  -- test/index.js
 	$(REMEMBER_BOWER) --exclude commander --exclude esprima --exclude jquery $(shell pwd)
 
 
