@@ -55,6 +55,8 @@ test/public/bundle.js: \
 		bower_components/jquery/dist/jquery.js \
 		bower_components/qunit/qunit/qunit.js \
 		bower_components/ramda/dist/ramda.js \
+		bower_components/sanctuary-type-identifiers/index.js \
+		bower_components/sanctuary-type-classes/index.js \
 		lib/doctest.js \
 		test/shared/results.js
 	mkdir -p $(@D)
