@@ -1,6 +1,6 @@
 {
   "name": "doctest",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Doctests for JavaScript and CoffeeScript",
   "license": "WTFPL",
   "contributors": [
