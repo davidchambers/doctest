@@ -31,7 +31,7 @@
     "eslint": "3.19.x",
     "remember-bower": "0.1.x",
     "sanctuary-style": "0.5.x",
-    "xyz": "1.0.x"
+    "xyz": "2.1.x"
   },
   "files": [
     "/bin/",
