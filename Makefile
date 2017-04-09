@@ -47,7 +47,7 @@ test: \
 		test/public/shared/index.coffee \
 		test/public/shared/index.js \
 		test/public/style.css
-	node --harmony -- test/index.js
+	node -- test/index.js
 
 test/public/bundle.js: \
 		bower_components/coffee-script/extras/coffee-script.js \

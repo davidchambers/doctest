@@ -26,10 +26,9 @@
   },
   "devDependencies": {
     "bower": "1.5.x",
-    "eslint": "2.9.x",
+    "eslint": "3.19.x",
     "remember-bower": "0.1.x",
-    "sanctuary-style": "0.4.x",
-    "semver": "5.0.x",
+    "sanctuary-style": "0.5.x",
     "xyz": "1.0.x"
   },
   "files": [

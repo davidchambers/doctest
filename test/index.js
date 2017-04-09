@@ -4,7 +4,6 @@ var execSync  = require('child_process').execSync;
 var pathlib   = require('path');
 
 var R         = require('ramda');
-var semver    = require('semver');
 
 var doctest   = require('../lib/doctest');
 
@@ -84,9 +83,7 @@ testModule('test/commonjs/exports/index.js', {module: 'commonjs'});
 testModule('test/commonjs/module.exports/index.js', {module: 'commonjs'});
 testModule('test/commonjs/strict/index.js', {module: 'commonjs'});
 testModule('test/bin/executable', {type: 'js'});
-if (semver.gte(process.version, '0.12.0')) {
-  testModule('test/harmony/index.js');
-}
+testModule('test/harmony/index.js');
 
 testCommand('bin/doctest --xxx', {
   status: 1,
