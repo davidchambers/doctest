@@ -249,6 +249,7 @@ testCommand(
   stdout: unlines([
     'void function() {',
     '  var __doctest = {',
+    '    require: require,',
     '    queue: [],',
     '    enqueue: function(io) { this.queue.push(io); }',
     '  };',
