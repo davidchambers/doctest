@@ -2,13 +2,15 @@
 
 var execSync = require('child_process').execSync;
 
-var R = require('ramda');
+var Z = require('sanctuary-type-classes');
 
 var doctest = require('..');
 
 
 //  unlines :: Array String -> String
-var unlines = R.compose(R.join(''), R.map(R.concat(R.__, '\n')));
+function unlines(lines) {
+  return lines.reduce(function(s, line) { return s + line + '\n'; }, '');
+}
 
 
 var gray  = '';
@@ -26,7 +28,7 @@ if (!process.env.NODE_DISABLE_COLORS && process.platform !== 'win32') {
 var failures = 0;
 
 function printResult(actual, expected, message) {
-  if (R.equals(actual, expected)) {
+  if (Z.equals(actual, expected)) {
     return console.log(green + ' \u2714 ' + gray + ' ' + message + reset);
   } else {
     failures += 1;

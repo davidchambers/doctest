@@ -9,7 +9,6 @@ all:
 .PHONY: lint
 lint:
 	$(ESLINT) \
-	  --rule 'key-spacing: [off]' \
 	  -- lib/command.js
 	$(ESLINT) \
 	  --rule 'no-multiple-empty-lines: [error, {max: 2, maxEOF: 0}]' \
