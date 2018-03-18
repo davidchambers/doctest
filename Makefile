@@ -19,7 +19,6 @@ lint:
 	  --global module \
 	  --global require \
 	  --rule 'no-multiple-empty-lines: [error, {max: 2, maxEOF: 0}]' \
-	  --rule 'no-negated-condition: [off]' \
 	  --rule 'spaced-comment: [error, always, {markers: ["/"]}]' \
 	  -- lib/doctest.js
 	$(ESLINT) \
