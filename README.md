@@ -28,31 +28,41 @@ Doctest will execute `toFahrenheit(0)` and verify that its output is `32`.
 
 #### Node
 
-    $ npm install -g doctest
+```console
+$ npm install -g doctest
+```
 
 #### Browser
 
 1.  Install doctest and its dependencies:
 
-        $ bower install doctest
+    ```console
+    $ bower install doctest
+    ```
 
 2.  Add script tags:
 
-        <script src="path/to/node_modules/esprima/dist/esprima.js"></script>
-        <script src="path/to/bower_components/jquery/dist/jquery.js"></script>
-        <script src="path/to/bower_components/qunit/qunit/qunit.js"></script>
-        <script src="path/to/bower_components/ramda/dist/ramda.js"></script>
-        <script src="path/to/bower_components/doctest/lib/doctest.js"></script>
+    ```html
+    <script src="path/to/node_modules/esprima/dist/esprima.js"></script>
+    <script src="path/to/bower_components/jquery/dist/jquery.js"></script>
+    <script src="path/to/bower_components/qunit/qunit/qunit.js"></script>
+    <script src="path/to/bower_components/ramda/dist/ramda.js"></script>
+    <script src="path/to/bower_components/doctest/lib/doctest.js"></script>
+    ```
 
 ### Running doctests
 
 Test a module via JavaScript API:
 
-    > doctest("lib/temperature.js")
+```javascript
+> doctest("lib/temperature.js")
+```
 
 Test a module via command-line interface:
 
-    $ doctest lib/temperature.js
+```console
+$ doctest lib/temperature.js
+```
 
 The exit code is 0 if all tests pass, 1 otherwise.
 
@@ -69,11 +79,15 @@ doctest partially supports AMD and CommonJS modules:
 
 Specify module system via JavaScript API:
 
-    > doctest("path/to/amd/module.js", {module: "amd"})
+```javascript
+> doctest("path/to/amd/module.js", {module: "amd"})
+```
 
 Specify module system via command-line interface:
 
-    $ doctest --module commonjs path/to/commonjs/module.js
+```console
+$ doctest --module commonjs path/to/commonjs/module.js
+```
 
 ### Exceptions
 
@@ -106,15 +120,19 @@ Each doctest has access to variables in its scope chain.
 
 ### Running the test suite
 
-    $ make setup
-    $ make test
+```console
+$ make setup
+$ make test
+```
 
 This runs doctest's test suite in Node. To run the suite in a browser, first
 start an HTTP server with __test/public__ as the root. For example:
 
-    $ cd test/public
-    $ python -m SimpleHTTPServer
-    Serving HTTP on 0.0.0.0 port 8000 ...
+```console
+$ cd test/public
+$ python -m SimpleHTTPServer
+Serving HTTP on 0.0.0.0 port 8000 ...
+```
 
 Then point a browser at the correct port on localhost to view the results.
 
