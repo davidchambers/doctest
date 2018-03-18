@@ -26,36 +26,16 @@ Doctest will execute `toFahrenheit(0)` and verify that its output is `32`.
 
 ### Installation
 
-#### Node
-
 ```console
-$ npm install -g doctest
+$ npm install doctest
 ```
-
-#### Browser
-
-1.  Install doctest and its dependencies:
-
-    ```console
-    $ bower install doctest
-    ```
-
-2.  Add script tags:
-
-    ```html
-    <script src="path/to/node_modules/esprima/dist/esprima.js"></script>
-    <script src="path/to/bower_components/jquery/dist/jquery.js"></script>
-    <script src="path/to/bower_components/qunit/qunit/qunit.js"></script>
-    <script src="path/to/bower_components/ramda/dist/ramda.js"></script>
-    <script src="path/to/bower_components/doctest/lib/doctest.js"></script>
-    ```
 
 ### Running doctests
 
 Test a module via JavaScript API:
 
 ```javascript
-> doctest("lib/temperature.js")
+> doctest('lib/temperature.js', {})
 ```
 
 Test a module via command-line interface:
@@ -68,19 +48,19 @@ The exit code is 0 if all tests pass, 1 otherwise.
 
 ### AMD and CommonJS modules
 
-doctest partially supports AMD and CommonJS modules:
+doctest supports CommonJS modules and partially supports AMD modules:
 
-| Module system               | Node.js | Browser |
-| --------------------------- |:-------:|:-------:|
-| AMD                         |    ✔︎    |    ✔︎    |
-| AMD w/ dependencies         |    ✘    |    ✘    |
-| CommonJS                    |    ✔︎    |    ✘    |
-| CommonJS w/ dependencies    |    ✔︎    |    ✘    |
+| Module system               | Node.js |
+| --------------------------- |:-------:|
+| AMD                         |    ✔︎    |
+| AMD w/ dependencies         |    ✘    |
+| CommonJS                    |    ✔︎    |
+| CommonJS w/ dependencies    |    ✔︎    |
 
 Specify module system via JavaScript API:
 
 ```javascript
-> doctest("path/to/amd/module.js", {module: "amd"})
+> doctest('path/to/amd/module.js', {module: 'amd'})
 ```
 
 Specify module system via command-line interface:
@@ -124,17 +104,6 @@ Each doctest has access to variables in its scope chain.
 $ make setup
 $ make test
 ```
-
-This runs doctest's test suite in Node. To run the suite in a browser, first
-start an HTTP server with __test/public__ as the root. For example:
-
-```console
-$ cd test/public
-$ python -m SimpleHTTPServer
-Serving HTTP on 0.0.0.0 port 8000 ...
-```
-
-Then point a browser at the correct port on localhost to view the results.
 
 
 [1]: http://docs.python.org/library/doctest.html

@@ -1,14 +1,13 @@
 'use strict';
 
-var execSync  = require('child_process').execSync;
-var pathlib   = require('path');
+var execSync = require('child_process').execSync;
 
-var R         = require('ramda');
+var R = require('ramda');
 
-var doctest   = require('../lib/doctest');
+var doctest = require('..');
 
 
-//  unlines :: [String] -> String
+//  unlines :: Array String -> String
 var unlines = R.compose(R.join(''), R.map(R.concat(R.__, '\n')));
 
 
@@ -38,16 +37,6 @@ function printResult(actual, expected, message) {
 }
 
 
-function testModule(path, options) {
-  var type = R.last(R.split('.', path));
-  doctest(path, R.assoc('silent', true, options), function(results) {
-    R.addIndex(R.forEach)(function(pair, idx) {
-      printResult(results[idx], pair[1], pair[0] + ' [' + type + ']');
-    }, require(pathlib.resolve(path, '../results')));
-  });
-}
-
-
 function testCommand(command, expected) {
   var status = 0;
   var stdout;
@@ -65,50 +54,61 @@ function testCommand(command, expected) {
 }
 
 
-testModule('test/shared/index.js');
-testModule('test/shared/index.coffee');
-testModule('test/line-endings/CR.js');
-testModule('test/line-endings/CR.coffee');
-testModule('test/line-endings/CR+LF.js');
-testModule('test/line-endings/CR+LF.coffee');
-testModule('test/line-endings/LF.js');
-testModule('test/line-endings/LF.coffee');
-testModule('test/exceptions/index.js');
-testModule('test/statements/index.js');
-testModule('test/fantasy-land/index.js');
-testModule('test/transcribe/index.js', {prefix: '.'});
-testModule('test/transcribe/index.coffee', {prefix: '.'});
-testModule('test/amd/index.js', {module: 'amd'});
-testModule('test/commonjs/require/index.js', {module: 'commonjs'});
-testModule('test/commonjs/exports/index.js', {module: 'commonjs'});
-testModule('test/commonjs/module.exports/index.js', {module: 'commonjs'});
-testModule('test/commonjs/strict/index.js', {module: 'commonjs'});
-testModule('test/bin/executable', {type: 'js'});
-testModule('test/harmony/index.js');
+doctest('test/shared/index.js', {silent: true});
+doctest('test/shared/index.coffee', {silent: true});
+doctest('test/line-endings/CR.js', {silent: true});
+doctest('test/line-endings/CR.coffee', {silent: true});
+doctest('test/line-endings/CR+LF.js', {silent: true});
+doctest('test/line-endings/CR+LF.coffee', {silent: true});
+doctest('test/line-endings/LF.js', {silent: true});
+doctest('test/line-endings/LF.coffee', {silent: true});
+doctest('test/exceptions/index.js', {silent: true});
+doctest('test/statements/index.js', {silent: true});
+doctest('test/fantasy-land/index.js', {silent: true});
+doctest('test/transcribe/index.js', {prefix: '.', silent: true});
+doctest('test/transcribe/index.coffee', {prefix: '.', silent: true});
+doctest('test/amd/index.js', {module: 'amd', silent: true});
+doctest('test/commonjs/require/index.js', {module: 'commonjs', silent: true});
+doctest('test/commonjs/exports/index.js', {module: 'commonjs', silent: true});
+doctest('test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true});
+doctest('test/commonjs/strict/index.js', {module: 'commonjs', silent: true});
+doctest('test/bin/executable', {type: 'js', silent: true});
+doctest('test/harmony/index.js', {silent: true});
 
 testCommand('bin/doctest --xxx', {
   status: 1,
   stdout: '',
-  stderr: "\n  error: unknown option `--xxx'\n\n"
+  stderr: unlines([
+    '',
+    "  error: unknown option `--xxx'",
+    ''
+  ])
 });
 
 testCommand('bin/doctest --type', {
   status: 1,
   stdout: '',
-  stderr: "\n  error: option `-t, --type <type>' argument missing\n\n"
+  stderr: unlines([
+    '',
+    "  error: option `-t, --type <type>' argument missing",
+    ''
+  ])
 });
 
 testCommand('bin/doctest --type xxx', {
   status: 1,
   stdout: '',
-  stderr: "\n  error: invalid type `xxx'\n\n"
+  stderr: unlines([
+    '',
+    "  error: invalid type `xxx'",
+    ''
+  ])
 });
 
 testCommand('bin/doctest test/shared/index.js', {
   status: 1,
   stdout: unlines([
-    'retrieving test/shared/index.js...',
-    'running doctests in index.js...',
+    'running doctests in test/shared/index.js...',
     '......x.x...........x........x',
     'FAIL: expected 5 on line 31 (got 4)',
     'FAIL: expected ! TypeError on line 38 (got 0)',
@@ -122,8 +122,7 @@ testCommand('bin/doctest test/shared/index.js', {
 testCommand('bin/doctest test/shared/index.coffee', {
   status: 1,
   stdout: unlines([
-    'retrieving test/shared/index.coffee...',
-    'running doctests in index.coffee...',
+    'running doctests in test/shared/index.coffee...',
     '......x.x...........x........x',
     'FAIL: expected 5 on line 31 (got 4)',
     'FAIL: expected ! TypeError on line 38 (got 0)',
@@ -137,16 +136,14 @@ testCommand('bin/doctest test/shared/index.coffee', {
 testCommand('bin/doctest test/shared/index.js test/shared/index.coffee', {
   status: 1,
   stdout: unlines([
-    'retrieving test/shared/index.js...',
-    'running doctests in index.js...',
+    'running doctests in test/shared/index.js...',
     '......x.x...........x........x',
     'FAIL: expected 5 on line 31 (got 4)',
     'FAIL: expected ! TypeError on line 38 (got 0)',
     'FAIL: expected 9.5 on line 97 (got 5)',
     'FAIL: expected "on automatic semicolon insertion" on line 155 ' +
       '(got "the rewriter should not rely")',
-    'retrieving test/shared/index.coffee...',
-    'running doctests in index.coffee...',
+    'running doctests in test/shared/index.coffee...',
     '......x.x...........x........x',
     'FAIL: expected 5 on line 31 (got 4)',
     'FAIL: expected ! TypeError on line 38 (got 0)',
@@ -163,21 +160,31 @@ testCommand('bin/doctest --silent test/shared/index.js', {
   stderr: ''
 });
 
-testCommand('bin/doctest --silent test/bin/executable', {
+testCommand('bin/doctest test/bin/executable', {
   status: 1,
   stdout: '',
-  stderr: '\n  error: cannot infer type from extension\n\n'
+  stderr: unlines([
+    '',
+    '  error: cannot infer type from extension',
+    ''
+  ])
 });
 
-testCommand('bin/doctest --type js --silent test/bin/executable', {
+testCommand('bin/doctest --type js test/bin/executable', {
   status: 0,
-  stdout: '',
+  stdout: unlines([
+    'running doctests in test/bin/executable...',
+    '.'
+  ]),
   stderr: ''
 });
 
-testCommand('bin/doctest --module commonjs --silent lib/doctest.js', {
+testCommand('bin/doctest --module commonjs lib/doctest.js', {
   status: 0,
-  stdout: '',
+  stdout: unlines([
+    'running doctests in lib/doctest.js...',
+    '...'
+  ]),
   stderr: ''
 });
 
@@ -243,8 +250,7 @@ testCommand('bin/doctest --print --module amd test/amd/index.js', {
   stderr: ''
 });
 
-testCommand(
-  'bin/doctest --print --module commonjs test/commonjs/exports/index.js', {
+testCommand('bin/doctest --print --module commonjs test/commonjs/exports/index.js', {
   status: 0,
   stdout: unlines([
     'void function() {',
