@@ -43,7 +43,7 @@ function printResult(actual, expected, message) {
 function testModule(path, options) {
   var type = path.split('.').pop();
   var actuals = doctest(path, options);
-  var expecteds = require(pathlib.resolve(path, '..', 'results'));
+  var expecteds = require(pathlib.resolve(path, '..', 'results.json'));
   for (var idx = 0; idx < expecteds.length; idx += 1) {
     printResult(actuals[idx],
                 expecteds[idx][1],

@@ -127,8 +127,8 @@ Each doctest has access to variables in its scope chain.
 ### Running the test suite
 
 ```console
-$ make setup
-$ make test
+$ npm install
+$ npm test
 ```
 
 

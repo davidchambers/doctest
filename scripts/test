@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euf -o pipefail
+
+node -- test/index.js

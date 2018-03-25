@@ -1,0 +1,14 @@
+{
+  "root": true,
+  "extends": ["./node_modules/sanctuary-style/eslint-es3.json"],
+  "env": {"node": true},
+  "overrides": [
+    {
+      "files": ["lib/doctest.js"],
+      "rules": {
+        "no-multiple-empty-lines": ["error", {"max": 2, "maxEOF": 0}],
+        "spaced-comment": ["error", "always", {"markers": ["/"]}]
+      }
+    }
+  ]
+}
