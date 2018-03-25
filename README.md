@@ -69,6 +69,32 @@ Specify module system via command-line interface:
 $ doctest --module commonjs path/to/commonjs/module.js
 ```
 
+### Line wrapping
+
+Input lines may be wrapped by beginning each continuation with FULL STOP (`.`):
+
+```javascript
+// > reverse([
+// .   'foo',
+// .   'bar',
+// .   'baz',
+// . ])
+// ['baz', 'bar', 'foo']
+```
+
+Output lines may be wrapped in the same way:
+
+```javascript
+// > reverse([
+// .   'foo',
+// .   'bar',
+// .   'baz',
+// . ])
+// [ 'baz',
+// . 'bar',
+// . 'foo' ]
+```
+
 ### Exceptions
 
 An output line beginning with EXCLAMATION MARK (`!`) indicates that the
