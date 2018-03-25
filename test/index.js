@@ -102,7 +102,7 @@ testCommand('bin/doctest --type xxx', {
   stdout: '',
   stderr: unlines([
     '',
-    "  error: invalid type `xxx'",
+    "  error: Invalid type `xxx'",
     ''
   ])
 });
@@ -167,7 +167,7 @@ testCommand('bin/doctest test/bin/executable', {
   stdout: '',
   stderr: unlines([
     '',
-    '  error: cannot infer type from extension',
+    '  error: Cannot infer type from extension',
     ''
   ])
 });
