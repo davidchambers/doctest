@@ -24,9 +24,13 @@
     "sanctuary-type-classes": "8.1.x"
   },
   "devDependencies": {
-    "eslint": "4.9.x",
-    "sanctuary-style": "1.1.x",
-    "xyz": "2.1.x"
+    "sanctuary-scripts": "1.1.x"
+  },
+  "scripts": {
+    "doctest": "sanctuary-doctest",
+    "lint": "sanctuary-lint",
+    "release": "sanctuary-release",
+    "test": "npm run lint && sanctuary-test && npm run doctest"
   },
   "files": [
     "/bin/",
