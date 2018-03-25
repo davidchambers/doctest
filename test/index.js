@@ -1,6 +1,7 @@
 'use strict';
 
 var execSync = require('child_process').execSync;
+var pathlib = require('path');
 
 var Z = require('sanctuary-type-classes');
 
@@ -39,6 +40,18 @@ function printResult(actual, expected, message) {
 }
 
 
+function testModule(path, options) {
+  var type = path.split('.').pop();
+  var actuals = doctest(path, options);
+  var expecteds = require(pathlib.resolve(path, '..', 'results'));
+  for (var idx = 0; idx < expecteds.length; idx += 1) {
+    printResult(actuals[idx],
+                expecteds[idx][1],
+                expecteds[idx][0] + ' [' + type + ']');
+  }
+}
+
+
 function testCommand(command, expected) {
   var status = 0;
   var stdout;
@@ -56,26 +69,26 @@ function testCommand(command, expected) {
 }
 
 
-doctest('test/shared/index.js', {silent: true});
-doctest('test/shared/index.coffee', {silent: true});
-doctest('test/line-endings/CR.js', {silent: true});
-doctest('test/line-endings/CR.coffee', {silent: true});
-doctest('test/line-endings/CR+LF.js', {silent: true});
-doctest('test/line-endings/CR+LF.coffee', {silent: true});
-doctest('test/line-endings/LF.js', {silent: true});
-doctest('test/line-endings/LF.coffee', {silent: true});
-doctest('test/exceptions/index.js', {silent: true});
-doctest('test/statements/index.js', {silent: true});
-doctest('test/fantasy-land/index.js', {silent: true});
-doctest('test/transcribe/index.js', {prefix: '.', silent: true});
-doctest('test/transcribe/index.coffee', {prefix: '.', silent: true});
-doctest('test/amd/index.js', {module: 'amd', silent: true});
-doctest('test/commonjs/require/index.js', {module: 'commonjs', silent: true});
-doctest('test/commonjs/exports/index.js', {module: 'commonjs', silent: true});
-doctest('test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true});
-doctest('test/commonjs/strict/index.js', {module: 'commonjs', silent: true});
-doctest('test/bin/executable', {type: 'js', silent: true});
-doctest('test/harmony/index.js', {silent: true});
+testModule('test/shared/index.js', {silent: true});
+testModule('test/shared/index.coffee', {silent: true});
+testModule('test/line-endings/CR.js', {silent: true});
+testModule('test/line-endings/CR.coffee', {silent: true});
+testModule('test/line-endings/CR+LF.js', {silent: true});
+testModule('test/line-endings/CR+LF.coffee', {silent: true});
+testModule('test/line-endings/LF.js', {silent: true});
+testModule('test/line-endings/LF.coffee', {silent: true});
+testModule('test/exceptions/index.js', {silent: true});
+testModule('test/statements/index.js', {silent: true});
+testModule('test/fantasy-land/index.js', {silent: true});
+testModule('test/transcribe/index.js', {prefix: '.', silent: true});
+testModule('test/transcribe/index.coffee', {prefix: '.', silent: true});
+testModule('test/amd/index.js', {module: 'amd', silent: true});
+testModule('test/commonjs/require/index.js', {module: 'commonjs', silent: true});
+testModule('test/commonjs/exports/index.js', {module: 'commonjs', silent: true});
+testModule('test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true});
+testModule('test/commonjs/strict/index.js', {module: 'commonjs', silent: true});
+testModule('test/bin/executable', {type: 'js', silent: true});
+testModule('test/harmony/index.js', {silent: true});
 
 testCommand('bin/doctest --xxx', {
   status: 1,
