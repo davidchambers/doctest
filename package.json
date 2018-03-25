@@ -18,7 +18,7 @@
     "url": "git://github.com/davidchambers/doctest.git"
   },
   "dependencies": {
-    "coffee-script": "1.10.x",
+    "coffeescript": "1.10.x",
     "commander": "2.8.x",
     "esprima": "3.1.x",
     "sanctuary-type-classes": "8.1.x"
