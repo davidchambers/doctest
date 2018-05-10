@@ -7,8 +7,8 @@ function Absolute(n) {
 
 Absolute['@@type'] = 'doctest/Absolute';
 
-Absolute.prototype.toString = function() {
-  return 'Absolute(' + this.value + ')';
+Absolute.prototype['@@show'] = function() {
+  return 'Absolute (' + this.value + ')';
 };
 
 Absolute.prototype['fantasy-land/equals'] = function(other) {
