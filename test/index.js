@@ -94,9 +94,7 @@ testCommand('bin/doctest --xxx', {
   status: 1,
   stdout: '',
   stderr: unlines([
-    '',
-    "  error: unknown option `--xxx'",
-    ''
+    "error: unknown option `--xxx'"
   ])
 });
 
@@ -104,9 +102,7 @@ testCommand('bin/doctest --type', {
   status: 1,
   stdout: '',
   stderr: unlines([
-    '',
-    "  error: option `-t, --type <type>' argument missing",
-    ''
+    "error: option `-t, --type <type>' argument missing"
   ])
 });
 
@@ -114,9 +110,7 @@ testCommand('bin/doctest --type xxx', {
   status: 1,
   stdout: '',
   stderr: unlines([
-    '',
-    "  error: Invalid type `xxx'",
-    ''
+    "error: Invalid type `xxx'"
   ])
 });
 
@@ -179,9 +173,7 @@ testCommand('bin/doctest test/bin/executable', {
   status: 1,
   stdout: '',
   stderr: unlines([
-    '',
-    '  error: Cannot infer type from extension',
-    ''
+    'error: Cannot infer type from extension'
   ])
 });
 
