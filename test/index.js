@@ -80,8 +80,8 @@ testModule ('test/line-endings/LF.coffee', {silent: true});
 testModule ('test/exceptions/index.js', {silent: true});
 testModule ('test/statements/index.js', {silent: true});
 testModule ('test/fantasy-land/index.js', {silent: true});
-testModule ('test/transcribe/index.js', {prefix: '.', silent: true});
-testModule ('test/transcribe/index.coffee', {prefix: '.', silent: true});
+testModule ('test/transcribe/index.js', {prefix: '.', openingDelimiter: '```javascript', closingDelimiter: '```', silent: true});
+testModule ('test/transcribe/index.coffee', {prefix: '.', openingDelimiter: '```coffee', closingDelimiter: '```', silent: true});
 testModule ('test/amd/index.js', {module: 'amd', silent: true});
 testModule ('test/commonjs/require/index.js', {module: 'commonjs', silent: true});
 testModule ('test/commonjs/exports/index.js', {module: 'commonjs', silent: true});
@@ -190,7 +190,7 @@ testCommand ('bin/doctest --module commonjs lib/doctest.js', {
   status: 0,
   stdout: unlines ([
     'running doctests in lib/doctest.js...',
-    '...'
+    '......'
   ]),
   stderr: ''
 });
