@@ -25,7 +25,7 @@
     "sanctuary-type-classes": "10.0.x"
   },
   "devDependencies": {
-    "sanctuary-scripts": "1.6.x"
+    "sanctuary-scripts": "2.0.x"
   },
   "scripts": {
     "doctest": "sanctuary-doctest",
