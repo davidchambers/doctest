@@ -22,7 +22,7 @@
     "commander": "2.19.x",
     "esprima": "4.0.x",
     "sanctuary-show": "1.0.x",
-    "sanctuary-type-classes": "9.0.x"
+    "sanctuary-type-classes": "10.0.x"
   },
   "devDependencies": {
     "sanctuary-scripts": "1.4.x"
