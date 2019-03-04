@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euf -o pipefail
+
+node_modules/.bin/remark \
+  --frail \
+  --no-stdout \
+  --use remark-lint-no-undefined-references \
+  --use remark-lint-no-unused-definitions \
+  -- README.md
