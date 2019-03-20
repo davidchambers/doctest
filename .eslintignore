@@ -1,2 +1,3 @@
+!/.eslint.js
 /test/**/*.js
 !/test/index.js
