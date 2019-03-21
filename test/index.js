@@ -8,6 +8,9 @@ var Z = require ('sanctuary-type-classes');
 var doctest = require ('..');
 
 
+var esmSupported = Number ((process.versions.node.split ('.'))[0]) >= 9;
+
+
 //  unlines :: Array String -> String
 function unlines(lines) {
   return lines.reduce (function(s, line) { return s + line + '\n'; }, '');
@@ -42,13 +45,14 @@ function printResult(actual, expected, message) {
 
 function testModule(path, options) {
   var type = (path.split ('.')).pop ();
-  var actuals = doctest (path, options);
   var expecteds = require (pathlib.resolve (path, '..', 'results.json'));
-  for (var idx = 0; idx < expecteds.length; idx += 1) {
-    printResult (actuals[idx],
-                 expecteds[idx][1],
-                 expecteds[idx][0] + ' [' + type + ']');
-  }
+  return (doctest (path, options)).then (function(actuals) {
+    for (var idx = 0; idx < expecteds.length; idx += 1) {
+      printResult (actuals[idx],
+                   expecteds[idx][1],
+                   expecteds[idx][0] + ' [' + type + ']');
+    }
+  });
 }
 
 
@@ -57,7 +61,10 @@ function testCommand(command, expected) {
   var stdout;
   var stderr = '';
   try {
-    stdout = execSync (command, {encoding: 'utf8', stdio: 'pipe'});
+    stdout = execSync (
+      command + (esmSupported ? ' --nodejs --no-warnings' : ''),
+      {encoding: 'utf8', stdio: 'pipe'}
+    );
   } catch (err) {
     status = err.status;
     stdout = err.stdout;
@@ -68,27 +75,36 @@ function testCommand(command, expected) {
   printResult (stderr, expected.stderr, command + ' [stderr]');
 }
 
+const moduleTests = Promise.all ([
+  testModule ('test/shared/index.js', {silent: true}),
+  testModule ('test/shared/index.coffee', {silent: true}),
+  testModule ('test/line-endings/CR.js', {silent: true}),
+  testModule ('test/line-endings/CR.coffee', {silent: true}),
+  testModule ('test/line-endings/CR+LF.js', {silent: true}),
+  testModule ('test/line-endings/CR+LF.coffee', {silent: true}),
+  testModule ('test/line-endings/LF.js', {silent: true}),
+  testModule ('test/line-endings/LF.coffee', {silent: true}),
+  testModule ('test/exceptions/index.js', {silent: true}),
+  testModule ('test/statements/index.js', {silent: true}),
+  testModule ('test/fantasy-land/index.js', {silent: true}),
+  testModule ('test/transcribe/index.js', {prefix: '.', openingDelimiter: '```javascript', closingDelimiter: '```', silent: true}),
+  testModule ('test/transcribe/index.coffee', {prefix: '.', openingDelimiter: '```coffee', closingDelimiter: '```', silent: true}),
+  testModule ('test/amd/index.js', {module: 'amd', silent: true}),
+  testModule ('test/commonjs/require/index.js', {module: 'commonjs', silent: true}),
+  testModule ('test/commonjs/exports/index.js', {module: 'commonjs', silent: true}),
+  testModule ('test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true}),
+  testModule ('test/commonjs/strict/index.js', {module: 'commonjs', silent: true}),
+  testModule ('test/bin/executable', {type: 'js', silent: true}),
+  testModule ('test/harmony/index.js', {silent: true})
+]);
 
-testModule ('test/shared/index.js', {silent: true});
-testModule ('test/shared/index.coffee', {silent: true});
-testModule ('test/line-endings/CR.js', {silent: true});
-testModule ('test/line-endings/CR.coffee', {silent: true});
-testModule ('test/line-endings/CR+LF.js', {silent: true});
-testModule ('test/line-endings/CR+LF.coffee', {silent: true});
-testModule ('test/line-endings/LF.js', {silent: true});
-testModule ('test/line-endings/LF.coffee', {silent: true});
-testModule ('test/exceptions/index.js', {silent: true});
-testModule ('test/statements/index.js', {silent: true});
-testModule ('test/fantasy-land/index.js', {silent: true});
-testModule ('test/transcribe/index.js', {prefix: '.', openingDelimiter: '```javascript', closingDelimiter: '```', silent: true});
-testModule ('test/transcribe/index.coffee', {prefix: '.', openingDelimiter: '```coffee', closingDelimiter: '```', silent: true});
-testModule ('test/amd/index.js', {module: 'amd', silent: true});
-testModule ('test/commonjs/require/index.js', {module: 'commonjs', silent: true});
-testModule ('test/commonjs/exports/index.js', {module: 'commonjs', silent: true});
-testModule ('test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true});
-testModule ('test/commonjs/strict/index.js', {module: 'commonjs', silent: true});
-testModule ('test/bin/executable', {type: 'js', silent: true});
-testModule ('test/harmony/index.js', {silent: true});
+testCommand ('bin/doctest', {
+  status: 1,
+  stdout: '',
+  stderr: unlines ([
+    'error: No files for doctesting provided'
+  ])
+});
 
 testCommand ('bin/doctest --xxx', {
   status: 1,
@@ -98,7 +114,7 @@ testCommand ('bin/doctest --xxx', {
   ])
 });
 
-testCommand ('bin/doctest --type', {
+testCommand ('bin/doctest file.js --type', {
   status: 1,
   stdout: '',
   stderr: unlines ([
@@ -106,7 +122,7 @@ testCommand ('bin/doctest --type', {
   ])
 });
 
-testCommand ('bin/doctest --type xxx', {
+testCommand ('bin/doctest file.js --type xxx', {
   status: 1,
   stdout: '',
   stderr: unlines ([
@@ -194,6 +210,44 @@ testCommand ('bin/doctest --module commonjs lib/doctest.js', {
   ]),
   stderr: ''
 });
+
+if (esmSupported) {
+  testCommand ('bin/doctest --module esm test/esm/index.mjs', {
+    status: 0,
+    stdout: unlines ([
+      'running doctests in test/esm/index.mjs...',
+      '.'
+    ]),
+    stderr: ''
+  });
+
+  testCommand ('bin/doctest --module esm test/esm/dependencies.mjs', {
+    status: 0,
+    stdout: unlines ([
+      'running doctests in test/esm/dependencies.mjs...',
+      '.'
+    ]),
+    stderr: ''
+  });
+
+  testCommand ('bin/doctest --module esm test/esm/incorrect.mjs', {
+    status: 1,
+    stdout: unlines ([
+      'running doctests in test/esm/incorrect.mjs...',
+      'x',
+      'FAIL: expected 32 on line 4 (got "0°F")'
+    ]),
+    stderr: ''
+  });
+} else {
+  testCommand ('bin/doctest --module esm test/esm/index.mjs', {
+    status: 1,
+    stdout: '',
+    stderr: unlines ([
+      'error: Node.js v' + process.versions.node + ' does not support ECMAScript modules (supported since v9.0.0)'
+    ])
+  });
+}
 
 testCommand ('bin/doctest --print test/commonjs/exports/index.js', {
   status: 0,
@@ -293,10 +347,11 @@ testCommand ('bin/doctest --print --module commonjs test/commonjs/exports/index.
   stderr: ''
 });
 
-
-process.stdout.write (
-  failures === 0 ? '\n  ' + green + '0 test failures' + reset + '\n\n' :
-  failures === 1 ? '\n  ' + red + '1 test failure' + reset + '\n\n' :
-  /* otherwise */  '\n  ' + red + failures + ' test failures' + reset + '\n\n'
-);
-process.exit (failures === 0 ? 0 : 1);
+moduleTests.then (function() {
+  process.stdout.write (
+    failures === 0 ? '\n  ' + green + '0 test failures' + reset + '\n\n' :
+    failures === 1 ? '\n  ' + red + '1 test failure' + reset + '\n\n' :
+    /* otherwise */  '\n  ' + red + failures + ' test failures' + reset + '\n\n'
+  );
+  process.exit (failures === 0 ? 0 : 1);
+});

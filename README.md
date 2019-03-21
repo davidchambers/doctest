@@ -46,16 +46,13 @@ $ doctest lib/temperature.js
 
 The exit code is 0 if all tests pass, 1 otherwise.
 
-### AMD and CommonJS modules
+### Supported module systems
 
-doctest supports CommonJS modules and partially supports AMD modules:
-
-| Module system               | Node.js |
-| --------------------------- |:-------:|
-| AMD                         |    ✔︎    |
-| AMD w/ dependencies         |    ✘    |
-| CommonJS                    |    ✔︎    |
-| CommonJS w/ dependencies    |    ✔︎    |
+| Module system         | Option        | Node.js       | Dependencies  |
+| --------------------- | ------------- |:-------------:|:-------------:|
+| AMD                   | `amd`         |       ✔︎       |       ✘       |
+| CommonJS              | `commonjs`    |       ✔︎       |       ✔︎       |
+| ECMAScript modules    | `esm`         |       ✔︎       |       ✔︎       |
 
 Specify module system via JavaScript API:
 

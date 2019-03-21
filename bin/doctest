@@ -2,18 +2,21 @@
 
 'use strict';
 
-// Based on:
-// https://github.com/jashkenas/coffeescript/blob/1.9.1/src/command.coffee#L431-L441
-var args = process.argv.slice (1);
+var path = require ('path');
+
+var esmSupported = Number ((process.versions.node.split ('.'))[0]) >= 9;
+var args = process.argv.slice (2);
 var idx = args.indexOf ('--nodejs');
-if (idx < 0 || idx === args.length - 1) {
-  require ('../lib/command');
-} else {
-  require ('child_process')
-  .spawn (process.execPath,
-          args[idx + 1]
-            .split (/\s+/)
-            .concat (args.slice (0, idx), args.slice (idx + 2)),
-          {cwd: process.cwd (), env: process.env, stdio: [0, 1, 2]})
-  .on ('exit', process.exit);
-}
+var flags = idx >= 0 && idx < args.length - 1;
+
+require ('child_process')
+.spawn (
+  process.execPath,
+  [].concat (esmSupported ? ['--experimental-modules'] : [])
+    .concat (flags ? args[idx + 1].split (/\s+/) : [])
+    .concat (['--', path.resolve (__dirname, '..', 'lib', 'command')])
+    .concat (flags ? (args.slice (0, idx)).concat (args.slice (idx + 2))
+                   : args),
+  {cwd: process.cwd (), env: process.env, stdio: [0, 1, 2]}
+)
+.on ('exit', process.exit);

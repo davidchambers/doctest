@@ -4,6 +4,7 @@
   "description": "Doctests for JavaScript and CoffeeScript",
   "license": "WTFPL",
   "contributors": [
+    "Aldwin Vlasblom <aldwin@avaq.it>",
     "David Chambers <dc@davidchambers.me>",
     "Francesco Occhipinti <f.occhipinti@gmail.com>"
   ],
@@ -25,6 +26,7 @@
     "sanctuary-type-classes": "10.0.x"
   },
   "devDependencies": {
+    "babel-eslint": "10.0.x",
     "sanctuary-scripts": "3.1.x"
   },
   "scripts": {
