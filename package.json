@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "coffeescript": "1.12.x",
-    "commander": "2.19.x",
+    "commander": "2.20.x",
     "esprima": "4.0.x",
     "sanctuary-show": "1.0.x",
     "sanctuary-type-classes": "10.0.x"
