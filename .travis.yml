@@ -1,10 +1,10 @@
 sudo: false
 language: node_js
 node_js:
-  - "6"
   - "8"
   - "9"
   - "10"
+  - "12"
 before_install:
   - git fetch origin refs/heads/master:refs/heads/master
   - if [[ "$TRAVIS_PULL_REQUEST_BRANCH" ]] ; then git checkout -b "$TRAVIS_PULL_REQUEST_BRANCH" ; fi

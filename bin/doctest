@@ -14,7 +14,11 @@ require ('child_process')
   process.execPath,
   [].concat (esmSupported ? ['--experimental-modules'] : [])
     .concat (flags ? args[idx + 1].split (/\s+/) : [])
-    .concat (['--', path.resolve (__dirname, '..', 'lib', 'command')])
+    .concat (['--',
+              path.resolve (__dirname,
+                            '..',
+                            'lib',
+                            'command' + (esmSupported ? '.mjs' : '.js'))])
     .concat (flags ? (args.slice (0, idx)).concat (args.slice (idx + 2))
                    : args),
   {cwd: process.cwd (), env: process.env, stdio: [0, 1, 2]}
