@@ -32,10 +32,10 @@ global = 'global'
 
   8, 'RangeError captured and reported'
   // > 0..toString(1)
-  // ! RangeError
+  // throw new RangeError
   9, 'TypeError expected but not reported'
   // > [].length
-  // ! TypeError
+  // throw new TypeError
 
   10, 'function accessible before declaration'
   // > double(6)
@@ -64,7 +64,7 @@ global = 'global'
   // .  7,8,9]
   // [1,2,3,4,5,6,7,8,9]
   14, 'multiline assignment'
-  // > string = "input " +
+  // > var string = "input " +
   // . "may span many " +
   // . "lines"
   // > string

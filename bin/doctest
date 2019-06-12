@@ -12,6 +12,7 @@ const args = [
   ...process.execArgv,
   '--experimental-import-meta-resolve',
   '--experimental-vm-modules',
+  '--no-warnings',
   '--',
   path.resolve (__dirname, '..', 'lib', 'command.js'),
   ...(process.argv.slice (2)),

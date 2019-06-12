@@ -12,25 +12,28 @@
 // new Error('XXX')
 
 // > new Error('Invalid value')
-// ! Error: Invalid value
+// throw new Error('Invalid value')
 
 // > sqrt(-1)
 // new Error('Invalid value')
 
 // > 0..toString(1)
-// ! RangeError
+// throw new RangeError
 
 // > 0..toString(1)
-// ! Error
+// throw new Error
 
 // > sqrt(-1)
-// ! Error: Invalid value
+// throw new Error('Invalid value')
 
 // > sqrt(-1)
-// ! Error: XXX
+// throw new Error('XXX')
 
 // > 'foo' + 'bar'
 // foobar
+
+// > (() => { throw [1, 2, 3] })()
+// throw [1, 2, 3]
 
 var sqrt = function(n) {
   if (n >= 0) {

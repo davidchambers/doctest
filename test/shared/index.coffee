@@ -32,10 +32,10 @@ do ->
 
   8: 'RangeError captured and reported'
   # > 0.toString 1
-  # ! RangeError
+  # throw new RangeError
   9: 'TypeError expected but not reported'
   # > [].length
-  # ! TypeError
+  # throw new TypeError
 
   10: 'function accessible before declaration'
   # > double(6)
