@@ -1,10 +1,11 @@
-sudo: false
+os: linux
+dist: focal
 language: node_js
 node_js:
-  - "8"
-  - "9"
   - "10"
   - "12"
+  - "13"
+  - "14"
 before_install:
   - git fetch origin refs/heads/master:refs/heads/master
   - if [[ "$TRAVIS_PULL_REQUEST_BRANCH" ]] ; then git checkout -b "$TRAVIS_PULL_REQUEST_BRANCH" ; fi
