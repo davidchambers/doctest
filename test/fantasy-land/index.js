@@ -14,3 +14,5 @@ Absolute.prototype['@@show'] = function() {
 Absolute.prototype['fantasy-land/equals'] = function(other) {
   return Math.abs(this.value) === Math.abs(other.value);
 };
+
+export default Absolute;

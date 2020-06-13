@@ -8,27 +8,26 @@ import show from 'sanctuary-show';
 import Z from 'sanctuary-type-classes';
 
 import doctest from '../lib/doctest.js';
-import require from '../lib/require.js';
 
-
-const resultsAmd = require ('../test/amd/results.json');
-const resultsBin = require ('../test/bin/results.json');
-const resultsCommonJsDirname = require ('../test/commonjs/__dirname/results.json');
-const resultsCommonJsDoctestRequire = require ('../test/commonjs/__doctest.require/results.json');
-const resultsCommonJsFilename = require ('../test/commonjs/__filename/results.json');
-const resultsCommonJsExports = require ('../test/commonjs/exports/results.json');
-const resultsCommonJsModuleExports = require ('../test/commonjs/module.exports/results.json');
-const resultsCommonJsRequire = require ('../test/commonjs/require/results.json');
-const resultsCommonJsStrict = require ('../test/commonjs/strict/results.json');
-const resultsEs2015 = require ('../test/es2015/results.json');
-const resultsEs2018 = require ('../test/es2018/results.json');
-const resultsEsmTranscribe = require ('../test/esm/transcribe/results.json');
-const resultsExceptions = require ('../test/exceptions/results.json');
-const resultsFantasyLand = require ('../test/fantasy-land/results.json');
-const resultsLineEndings = require ('../test/line-endings/results.json');
-const resultsShared = require ('../test/shared/results.json');
-const resultsStatements = require ('../test/statements/results.json');
-const resultsTranscribe = require ('../test/transcribe/results.json');
+import resultsAmd from './amd/results.js';
+import resultsBin from './bin/results.js';
+import resultsCommonJsDirname from './commonjs/__dirname/results.js';
+import resultsCommonJsDoctestRequire from './commonjs/__doctest.require/results.js';
+import resultsCommonJsFilename from './commonjs/__filename/results.js';
+import resultsCommonJsExports from './commonjs/exports/results.js';
+import resultsCommonJsModuleExports from './commonjs/module.exports/results.js';
+import resultsCommonJsRequire from './commonjs/require/results.js';
+import resultsCommonJsStrict from './commonjs/strict/results.js';
+import resultsEs2015 from './es2015/results.js';
+import resultsEs2018 from './es2018/results.js';
+import resultsEsmTranscribe from './esm/transcribe/results.js';
+import resultsExceptions from './exceptions/results.js';
+import resultsFantasyLand from './fantasy-land/results.js';
+import resultsLineEndings from './line-endings/results.js';
+import resultsSharedCoffee from './shared/results.coffee.js';
+import resultsSharedJs from './shared/results.js';
+import resultsStatements from './statements/results.js';
+import resultsTranscribe from './transcribe/results.js';
 
 
 const eq = actual => expected => {
@@ -37,7 +36,7 @@ const eq = actual => expected => {
 };
 
 const jsi = results => path => options => {
-  results.forEach (([description, expected], idx) => {
+  results.forEach (({description, doctest: expected}, idx) => {
     test (`${relative ('test', path)} \u001B[2m›\u001B[0m ${description}`, () =>
       doctest ({silent: true, ...options}) (path)
       .then (actuals => { eq (actuals[idx]) (expected); })
@@ -56,11 +55,11 @@ const cli = command => expected => {
 const stdout = stdout => ({code: 0, stdout, stderr: ''});
 const stderr = stderr => ({code: 1, stdout: '', stderr});
 
-jsi (resultsShared)
+jsi (resultsSharedJs)
     ('test/shared/index.js')
     ({});
 
-jsi (resultsShared)
+jsi (resultsSharedCoffee)
     ('test/shared/index.coffee')
     ({});
 
@@ -98,7 +97,7 @@ jsi (resultsStatements)
 
 jsi (resultsFantasyLand)
     ('test/fantasy-land/index.js')
-    ({});
+    ({module: 'esm'});
 
 jsi (resultsTranscribe)
     ('test/transcribe/index.js')
@@ -157,7 +156,7 @@ jsi (resultsEs2018)
     ({});
 
 jsi (resultsEsmTranscribe)
-    ('test/esm/transcribe/index.mjs')
+    ('test/esm/transcribe/index.js')
     ({module: 'esm',
       prefix: '.'});
 
@@ -237,25 +236,25 @@ cli ('bin/doctest --module esm lib/doctest.js')
 ...
 `));
 
-cli ('bin/doctest --module esm test/esm/index.mjs')
-    (stdout (`running doctests in test/esm/index.mjs...
+cli ('bin/doctest --module esm test/esm/index.js')
+    (stdout (`running doctests in test/esm/index.js...
 .
 `));
 
-cli ('bin/doctest --module esm test/esm/dependencies.mjs')
-    (stdout (`running doctests in test/esm/dependencies.mjs...
+cli ('bin/doctest --module esm test/esm/dependencies.js')
+    (stdout (`running doctests in test/esm/dependencies.js...
 .
 `));
 
-cli ('bin/doctest --module esm test/esm/incorrect.mjs')
+cli ('bin/doctest --module esm test/esm/incorrect.js')
     ({code: 1,
-      stdout: `running doctests in test/esm/incorrect.mjs...
+      stdout: `running doctests in test/esm/incorrect.js...
 x
 FAIL: expected 32 on line 4 (got "0°F")
 `,
       stderr: ''});
 
-cli ('bin/doctest --module esm --print test/esm/index.mjs')
+cli ('bin/doctest --module esm --print test/esm/index.js')
     (stdout (`
 export const __doctest = {
   queue: [],
@@ -266,18 +265,25 @@ export const __doctest = {
 //
 
 __doctest.enqueue({
-  type: "input",
-  thunk: () => {
-    return toFahrenheit (0);
+  input: {
+    lines: [
+      {number: 3, text: '> toFahrenheit (0)'},
+    ],
+    thunk: () => {
+      return (
+        toFahrenheit (0)
+      );
+    },
   },
-});
-
-__doctest.enqueue({
-  type: "output",
-  ":": 4,
-  "!": false,
-  thunk: () => {
-    return 32;
+  output: {
+    lines: [
+      {number: 4, text: '32'},
+    ],
+    thunk: () => {
+      return (
+        32
+      );
+    },
   },
 });
 
@@ -287,28 +293,35 @@ export function toFahrenheit(degreesCelsius) {
 
 `));
 
-cli ('bin/doctest --module esm --silent test/esm/index.mjs')
+cli ('bin/doctest --module esm --silent test/esm/index.js')
     (stdout (''));
 
-cli ('bin/doctest --module esm --type xxx test/esm/index.mjs')
+cli ('bin/doctest --module esm --type xxx test/esm/index.js')
     (stderr (`error: Cannot use file type when module is "esm"
 `));
 
 cli ('bin/doctest --print test/commonjs/exports/index.js')
     (stdout (`
 __doctest.enqueue({
-  type: "input",
-  thunk: () => {
-    return exports.identity(42);
+  input: {
+    lines: [
+      {number: 1, text: '> exports.identity(42)'},
+    ],
+    thunk: () => {
+      return (
+        exports.identity(42)
+      );
+    },
   },
-});
-
-__doctest.enqueue({
-  type: "output",
-  ":": 2,
-  "!": false,
-  thunk: () => {
-    return 42;
+  output: {
+    lines: [
+      {number: 2, text: '42'},
+    ],
+    thunk: () => {
+      return (
+        42
+      );
+    },
   },
 });
 
@@ -324,18 +337,25 @@ define(function() {
   //
 
 __doctest.enqueue({
-  type: "input",
-  thunk: () => {
-    return toFahrenheit(0);
+  input: {
+    lines: [
+      {number: 4, text: '> toFahrenheit(0)'},
+    ],
+    thunk: () => {
+      return (
+        toFahrenheit(0)
+      );
+    },
   },
-});
-
-__doctest.enqueue({
-  type: "output",
-  ":": 5,
-  "!": false,
-  thunk: () => {
-    return 32;
+  output: {
+    lines: [
+      {number: 5, text: '32'},
+    ],
+    thunk: () => {
+      return (
+        32
+      );
+    },
   },
 });
 
@@ -362,18 +382,25 @@ cli ('bin/doctest --print --module commonjs test/commonjs/exports/index.js')
   void (() => {
 
     __doctest.enqueue({
-      type: "input",
-      thunk: () => {
-        return exports.identity(42);
+      input: {
+        lines: [
+          {number: 1, text: '> exports.identity(42)'},
+        ],
+        thunk: () => {
+          return (
+            exports.identity(42)
+          );
+        },
       },
-    });
-
-    __doctest.enqueue({
-      type: "output",
-      ":": 2,
-      "!": false,
-      thunk: () => {
-        return 42;
+      output: {
+        lines: [
+          {number: 2, text: '42'},
+        ],
+        thunk: () => {
+          return (
+            42
+          );
+        },
       },
     });
 

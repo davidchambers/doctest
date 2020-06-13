@@ -85,7 +85,7 @@ do ->
   # "foobar"
   19: 'comment on output line'
   # > 5 * 5
-  # 25
+  # 25 # comment
 
   20: 'variable in creation context is not accessible'
   # > typeof text
