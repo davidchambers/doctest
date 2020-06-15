@@ -8,9 +8,6 @@ var Z = require ('sanctuary-type-classes');
 var doctest = require ('..');
 
 
-var esmSupported = Number ((process.versions.node.split ('.'))[0]) >= 9;
-
-
 //  unlines :: Array String -> String
 function unlines(lines) {
   return lines.reduce (function(s, line) { return s + line + '\n'; }, '');
@@ -62,7 +59,7 @@ function testCommand(command, expected) {
   var stderr = '';
   try {
     stdout = execSync (
-      command + (esmSupported ? ' --nodejs --no-warnings' : ''),
+      command + ' --nodejs --no-warnings',
       {encoding: 'utf8', stdio: 'pipe'}
     );
   } catch (err) {
@@ -211,43 +208,33 @@ testCommand ('bin/doctest --module commonjs lib/doctest.js', {
   stderr: ''
 });
 
-if (esmSupported) {
-  testCommand ('bin/doctest --module esm test/esm/index.mjs', {
-    status: 0,
-    stdout: unlines ([
-      'running doctests in test/esm/index.mjs...',
-      '.'
-    ]),
-    stderr: ''
-  });
+testCommand ('bin/doctest --module esm test/esm/index.mjs', {
+  status: 0,
+  stdout: unlines ([
+    'running doctests in test/esm/index.mjs...',
+    '.'
+  ]),
+  stderr: ''
+});
 
-  testCommand ('bin/doctest --module esm test/esm/dependencies.mjs', {
-    status: 0,
-    stdout: unlines ([
-      'running doctests in test/esm/dependencies.mjs...',
-      '.'
-    ]),
-    stderr: ''
-  });
+testCommand ('bin/doctest --module esm test/esm/dependencies.mjs', {
+  status: 0,
+  stdout: unlines ([
+    'running doctests in test/esm/dependencies.mjs...',
+    '.'
+  ]),
+  stderr: ''
+});
 
-  testCommand ('bin/doctest --module esm test/esm/incorrect.mjs', {
-    status: 1,
-    stdout: unlines ([
-      'running doctests in test/esm/incorrect.mjs...',
-      'x',
-      'FAIL: expected 32 on line 4 (got "0°F")'
-    ]),
-    stderr: ''
-  });
-} else {
-  testCommand ('bin/doctest --module esm test/esm/index.mjs', {
-    status: 1,
-    stdout: '',
-    stderr: unlines ([
-      'error: Node.js v' + process.versions.node + ' does not support ECMAScript modules (supported since v9.0.0)'
-    ])
-  });
-}
+testCommand ('bin/doctest --module esm test/esm/incorrect.mjs', {
+  status: 1,
+  stdout: unlines ([
+    'running doctests in test/esm/incorrect.mjs...',
+    'x',
+    'FAIL: expected 32 on line 4 (got "0°F")'
+  ]),
+  stderr: ''
+});
 
 testCommand ('bin/doctest --print test/commonjs/exports/index.js', {
   status: 0,

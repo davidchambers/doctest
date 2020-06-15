@@ -4,7 +4,6 @@
 
 var path = require ('path');
 
-var esmSupported = Number ((process.versions.node.split ('.'))[0]) >= 9;
 var args = process.argv.slice (2);
 var idx = args.indexOf ('--nodejs');
 var flags = idx >= 0 && idx < args.length - 1;
@@ -12,13 +11,9 @@ var flags = idx >= 0 && idx < args.length - 1;
 require ('child_process')
 .spawn (
   process.execPath,
-  [].concat (esmSupported ? ['--experimental-modules'] : [])
+  [].concat (['--experimental-modules'])
     .concat (flags ? args[idx + 1].split (/\s+/) : [])
-    .concat (['--',
-              path.resolve (__dirname,
-                            '..',
-                            'lib',
-                            'command' + (esmSupported ? '.mjs' : '.js'))])
+    .concat (['--', path.resolve (__dirname, '..', 'lib', 'command.mjs')])
     .concat (flags ? (args.slice (0, idx)).concat (args.slice (idx + 2))
                    : args),
   {cwd: process.cwd (), env: process.env, stdio: [0, 1, 2]}
