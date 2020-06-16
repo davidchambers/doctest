@@ -3,5 +3,5 @@
 // > toFahrenheit (0)
 // 32
 export function toFahrenheit(degreesCelsius) {
-  return String (degreesCelsius) + '°F';
+  return `${degreesCelsius}°F`;
 }

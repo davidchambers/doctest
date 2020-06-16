@@ -1,23 +1,20 @@
 'use strict';
 
-var execSync = (require ('child_process')).execSync;
-var pathlib = require ('path');
+const {execSync} = require ('child_process');
+const {resolve} = require ('path');
 
-var Z = require ('sanctuary-type-classes');
+const Z = require ('sanctuary-type-classes');
 
-var doctest = require ('..');
-
-
-//  unlines :: Array String -> String
-function unlines(lines) {
-  return lines.reduce (function(s, line) { return s + line + '\n'; }, '');
-}
+const doctest = require ('..');
 
 
-var gray  = '';
-var green = '';
-var red   = '';
-var reset = '';
+//    unlines :: Array String -> String
+const unlines = lines => lines.reduce ((s, line) => `${s}${line}\n`, '');
+
+let gray  = '';
+let green = '';
+let red   = '';
+let reset = '';
 if (!process.env.NODE_DISABLE_COLORS && process.platform !== 'win32') {
   gray  = '\u001B[0;37m';
   green = '\u001B[0;32m';
@@ -25,52 +22,47 @@ if (!process.env.NODE_DISABLE_COLORS && process.platform !== 'win32') {
   reset = '\u001B[0m';
 }
 
+let failures = 0;
 
-var failures = 0;
-
-function printResult(actual, expected, message) {
+const printResult = (actual, expected, message) => {
   if (Z.equals (actual, expected)) {
-    return console.log (green + ' \u2714 ' + gray + ' ' + message + reset);
+    console.log (`${green} \u2714 ${gray} ${message}${reset}`);
   } else {
     failures += 1;
-    console.warn (red + ' \u2718 ' + gray + ' ' + message + reset);
-    console.log (gray + '      expected: ' + green + expected + reset);
-    return console.log (gray + '      received: ' + red + actual + reset);
+    console.warn (`${red} \u2718 ${gray} ${message}${reset}`);
+    console.log (`${gray}      expected: ${green}${expected}${reset}`);
+    console.log (`${gray}      received: ${red}${actual}${reset}`);
   }
-}
+};
 
-
-function testModule(path, options) {
-  var type = (path.split ('.')).pop ();
-  var expecteds = require (pathlib.resolve (path, '..', 'results.json'));
-  return (doctest (path, options)).then (function(actuals) {
-    for (var idx = 0; idx < expecteds.length; idx += 1) {
-      printResult (actuals[idx],
-                   expecteds[idx][1],
-                   expecteds[idx][0] + ' [' + type + ']');
-    }
+const testModule = (path, options) => {
+  const type = (path.split ('.')).pop ();
+  return doctest (options) (path)
+  .then (actuals => {
+    require (resolve (path, '..', 'results.json'))
+    .forEach (([description, expected], idx) => {
+      printResult (actuals[idx], expected, `${description} [${type}]`);
+    });
   });
-}
+};
 
-
-function testCommand(command, expected) {
-  var status = 0;
-  var stdout;
-  var stderr = '';
-  try {
-    stdout = execSync (
-      command + ' --nodejs --no-warnings',
-      {encoding: 'utf8', stdio: 'pipe'}
-    );
-  } catch (err) {
-    status = err.status;
-    stdout = err.stdout;
-    stderr = err.stderr;
-  }
-  printResult (status, expected.status, command + ' [status]');
-  printResult (stdout, expected.stdout, command + ' [stdout]');
-  printResult (stderr, expected.stderr, command + ' [stderr]');
-}
+const testCommand = (command, expected) => {
+  const actual = (() => {
+    const options = {encoding: 'utf8', stdio: 'pipe'};
+    try {
+      return {
+        status: 0,
+        stdout: execSync (`${command} --nodejs --no-warnings`, options),
+        stderr: '',
+      };
+    } catch (err) {
+      return err;
+    }
+  }) ();
+  printResult (actual.status, expected.status, `${command} [status]`);
+  printResult (actual.stdout, expected.stdout, `${command} [stdout]`);
+  printResult (actual.stderr, expected.stderr, `${command} [stderr]`);
+};
 
 const moduleTests = Promise.all ([
   testModule ('test/shared/index.js', {silent: true}),
@@ -92,39 +84,39 @@ const moduleTests = Promise.all ([
   testModule ('test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true}),
   testModule ('test/commonjs/strict/index.js', {module: 'commonjs', silent: true}),
   testModule ('test/bin/executable', {type: 'js', silent: true}),
-  testModule ('test/harmony/index.js', {silent: true})
+  testModule ('test/harmony/index.js', {silent: true}),
 ]);
 
 testCommand ('bin/doctest', {
   status: 1,
   stdout: '',
   stderr: unlines ([
-    'error: No files for doctesting provided'
-  ])
+    'error: No files for doctesting provided',
+  ]),
 });
 
 testCommand ('bin/doctest --xxx', {
   status: 1,
   stdout: '',
   stderr: unlines ([
-    "error: unknown option `--xxx'"
-  ])
+    "error: unknown option `--xxx'",
+  ]),
 });
 
 testCommand ('bin/doctest file.js --type', {
   status: 1,
   stdout: '',
   stderr: unlines ([
-    "error: option `-t, --type <type>' argument missing"
-  ])
+    "error: option `-t, --type <type>' argument missing",
+  ]),
 });
 
 testCommand ('bin/doctest file.js --type xxx', {
   status: 1,
   stdout: '',
   stderr: unlines ([
-    "error: Invalid type `xxx'"
-  ])
+    "error: Invalid type `xxx'",
+  ]),
 });
 
 testCommand ('bin/doctest test/shared/index.js', {
@@ -136,9 +128,9 @@ testCommand ('bin/doctest test/shared/index.js', {
     'FAIL: expected ! TypeError on line 38 (got 0)',
     'FAIL: expected 9.5 on line 97 (got 5)',
     'FAIL: expected "on automatic semicolon insertion" on line 155 ' +
-      '(got "the rewriter should not rely")'
+      '(got "the rewriter should not rely")',
   ]),
-  stderr: ''
+  stderr: '',
 });
 
 testCommand ('bin/doctest test/shared/index.coffee', {
@@ -150,9 +142,9 @@ testCommand ('bin/doctest test/shared/index.coffee', {
     'FAIL: expected ! TypeError on line 38 (got 0)',
     'FAIL: expected 9.5 on line 97 (got 5)',
     'FAIL: expected "on automatic semicolon insertion" on line 155 ' +
-      '(got "the rewriter should not rely")'
+      '(got "the rewriter should not rely")',
   ]),
-  stderr: ''
+  stderr: '',
 });
 
 testCommand ('bin/doctest test/shared/index.js test/shared/index.coffee', {
@@ -171,59 +163,59 @@ testCommand ('bin/doctest test/shared/index.js test/shared/index.coffee', {
     'FAIL: expected ! TypeError on line 38 (got 0)',
     'FAIL: expected 9.5 on line 97 (got 5)',
     'FAIL: expected "on automatic semicolon insertion" on line 155 ' +
-      '(got "the rewriter should not rely")'
+      '(got "the rewriter should not rely")',
   ]),
-  stderr: ''
+  stderr: '',
 });
 
 testCommand ('bin/doctest --silent test/shared/index.js', {
   status: 1,
   stdout: '',
-  stderr: ''
+  stderr: '',
 });
 
 testCommand ('bin/doctest test/bin/executable', {
   status: 1,
   stdout: '',
   stderr: unlines ([
-    'error: Cannot infer type from extension'
-  ])
+    'error: Cannot infer type from extension',
+  ]),
 });
 
 testCommand ('bin/doctest --type js test/bin/executable', {
   status: 0,
   stdout: unlines ([
     'running doctests in test/bin/executable...',
-    '.'
+    '.',
   ]),
-  stderr: ''
+  stderr: '',
 });
 
 testCommand ('bin/doctest --module commonjs lib/doctest.js', {
   status: 0,
   stdout: unlines ([
     'running doctests in lib/doctest.js...',
-    '......'
+    '...',
   ]),
-  stderr: ''
+  stderr: '',
 });
 
 testCommand ('bin/doctest --module esm test/esm/index.mjs', {
   status: 0,
   stdout: unlines ([
     'running doctests in test/esm/index.mjs...',
-    '.'
+    '.',
   ]),
-  stderr: ''
+  stderr: '',
 });
 
 testCommand ('bin/doctest --module esm test/esm/dependencies.mjs', {
   status: 0,
   stdout: unlines ([
     'running doctests in test/esm/dependencies.mjs...',
-    '.'
+    '.',
   ]),
-  stderr: ''
+  stderr: '',
 });
 
 testCommand ('bin/doctest --module esm test/esm/incorrect.mjs', {
@@ -231,114 +223,120 @@ testCommand ('bin/doctest --module esm test/esm/incorrect.mjs', {
   stdout: unlines ([
     'running doctests in test/esm/incorrect.mjs...',
     'x',
-    'FAIL: expected 32 on line 4 (got "0°F")'
+    'FAIL: expected 32 on line 4 (got "0°F")',
   ]),
-  stderr: ''
+  stderr: '',
 });
 
 testCommand ('bin/doctest --print test/commonjs/exports/index.js', {
   status: 0,
   stdout: unlines ([
+    '',
     '__doctest.enqueue({',
     '  type: "input",',
-    '  thunk: function() {',
+    '  thunk: () => {',
     '    return exports.identity(42);',
-    '  }',
+    '  },',
     '});',
+    '',
     '__doctest.enqueue({',
     '  type: "output",',
     '  ":": 2,',
     '  "!": false,',
-    '  thunk: function() {',
+    '  thunk: () => {',
     '    return 42;',
-    '  }',
+    '  },',
     '});',
+    '',
     'exports.identity = function(x) {',
     '  return x;',
-    '};'
+    '};',
   ]),
-  stderr: ''
+  stderr: '',
 });
 
 testCommand ('bin/doctest --print --module amd test/amd/index.js', {
   status: 0,
   stdout: unlines ([
+    '',
     'define(function() {',
     '  // Convert degrees Celsius to degrees Fahrenheit.',
     '  //',
-    '  __doctest.enqueue({',
+    '',
+    '__doctest.enqueue({',
     '  type: "input",',
-    '  thunk: function() {',
+    '  thunk: () => {',
     '    return toFahrenheit(0);',
-    '  }',
+    '  },',
     '});',
+    '',
     '__doctest.enqueue({',
     '  type: "output",',
     '  ":": 5,',
     '  "!": false,',
-    '  thunk: function() {',
+    '  thunk: () => {',
     '    return 32;',
-    '  }',
+    '  },',
     '});',
+    '',
     '  function toFahrenheit(degreesCelsius) {',
     '    return degreesCelsius * 9 / 5 + 32;',
     '  }',
     '  return toFahrenheit;',
     '});',
     '',
-    'function define() {',
-    '  for (var idx = 0; idx < arguments.length; idx += 1) {',
-    '    if (typeof arguments[idx] == "function") {',
-    '      arguments[idx]();',
-    '      break;',
-    '    }',
-    '  }',
-    '}'
+    'function define(...args) {',
+    '  args[args.length - 1]();',
+    '}',
   ]),
-  stderr: ''
+  stderr: '',
 });
 
 testCommand ('bin/doctest --print --module commonjs test/commonjs/exports/index.js', {
   status: 0,
   stdout: unlines ([
-    'void function() {',
-    '  var __doctest = {',
-    '    require: require,',
+    'void (() => {',
+    '',
+    '  const __doctest = {',
+    '    require,',
     '    queue: [],',
-    '    enqueue: function(io) { this.queue.push(io); }',
+    '    enqueue: function(io) { this.queue.push(io); },',
     '  };',
     '',
-    '  void function() {',
+    '  void (() => {',
+    '',
     '    __doctest.enqueue({',
     '      type: "input",',
-    '      thunk: function() {',
+    '      thunk: () => {',
     '        return exports.identity(42);',
-    '      }',
+    '      },',
     '    });',
+    '',
     '    __doctest.enqueue({',
     '      type: "output",',
     '      ":": 2,',
     '      "!": false,',
-    '      thunk: function() {',
+    '      thunk: () => {',
     '        return 42;',
-    '      }',
+    '      },',
     '    });',
+    '',
     '    exports.identity = function(x) {',
     '      return x;',
     '    };',
-    '  }.call(this);',
+    '  })();',
     '',
     '  (module.exports || exports).__doctest = __doctest;',
-    '}.call(this);'
+    '})();',
   ]),
-  stderr: ''
+  stderr: '',
 });
 
-moduleTests.then (function() {
+moduleTests.then (() => {
   process.stdout.write (
-    failures === 0 ? '\n  ' + green + '0 test failures' + reset + '\n\n' :
-    failures === 1 ? '\n  ' + red + '1 test failure' + reset + '\n\n' :
-    /* otherwise */  '\n  ' + red + failures + ' test failures' + reset + '\n\n'
+    failures === 0 ? `\n  ${green}0 test failures${reset}\n\n` :
+    failures === 1 ? `\n  ${red}1 test failure${reset}\n\n` :
+    /* otherwise */  `\n  ${red}${failures} test failures${reset}\n\n`
   );
   process.exit (failures === 0 ? 0 : 1);
 });
