@@ -18,6 +18,9 @@
     "type": "git",
     "url": "git://github.com/davidchambers/doctest.git"
   },
+  "engines": {
+    "node": ">=10.0.0"
+  },
   "dependencies": {
     "coffeescript": "1.12.x",
     "commander": "2.20.x",
