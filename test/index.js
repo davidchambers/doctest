@@ -174,8 +174,7 @@ jsi (resultsContiguity)
     ({});
 
 cli ('bin/doctest')
-    (stderr (`error: No files for doctesting provided
-`));
+    (stdout (''));
 
 cli ('bin/doctest --xxx')
     (stderr (`error: unknown option \`--xxx'
@@ -186,7 +185,7 @@ cli ('bin/doctest file.js --type')
 `));
 
 cli ('bin/doctest file.js --type xxx')
-    (stderr (`error: Invalid type \`xxx'
+    (stderr (`Error: Invalid type "xxx"
 `));
 
 cli ('bin/doctest test/shared/index.js')
@@ -424,7 +423,7 @@ cli ('bin/doctest --silent test/shared/index.js')
     (stderr (''));
 
 cli ('bin/doctest test/bin/executable')
-    (stderr (`error: Cannot infer type from extension
+    (stderr (`Error: Cannot infer type from extension
 `));
 
 cli ('bin/doctest --type js test/bin/executable')
@@ -434,7 +433,7 @@ cli ('bin/doctest --type js test/bin/executable')
 `));
 
 cli ('bin/doctest --module xxx file.js')
-    (stderr (`error: Invalid module \`xxx'
+    (stderr (`Error: Invalid module "xxx"
 `));
 
 cli ('bin/doctest --module esm lib/doctest.js')
@@ -511,7 +510,7 @@ cli ('bin/doctest --module esm --silent test/esm/index.js')
     (stdout (''));
 
 cli ('bin/doctest --module esm --type xxx test/esm/index.js')
-    (stderr (`error: Cannot use file type when module is "esm"
+    (stderr (`Error: Cannot use file type when module is "esm"
 `));
 
 cli ('bin/doctest --print test/commonjs/exports/index.js')
