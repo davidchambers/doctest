@@ -33,7 +33,7 @@
     "babel-eslint": "10.0.x",
     "c8": "7.2.x",
     "oletus": "3.0.x",
-    "sanctuary-scripts": "3.2.x"
+    "sanctuary-scripts": "4.0.x"
   },
   "scripts": {
     "doctest": "sanctuary-doctest",
