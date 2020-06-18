@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "babel-eslint": "10.0.x",
-    "sanctuary-scripts": "3.2.x"
+    "sanctuary-scripts": "4.0.x"
   },
   "scripts": {
     "doctest": "sanctuary-doctest",
