@@ -576,7 +576,7 @@ export default [
   {
     description: 'multiline input with multiline output',
     doctest: {
-      correct: true,
+      correct: false,
       input: {
         lines: [
           {number: 145, text: '> ["foo", "bar", "baz"]'},
@@ -591,10 +591,11 @@ export default [
         lines: [
           {number: 149, text: '[ "FOO",'},
           {number: 150, text: '. "BAR",'},
-          {number: 151, text: '. "BAZ" ]'},
+          {number: 151, text: '. "BAZ",'},
+          {number: 152, text: '. "XXX" ]'},
         ],
         throws: false,
-        result: ['FOO', 'BAR', 'BAZ'],
+        result: ['FOO', 'BAR', 'BAZ', 'XXX'],
       },
     },
   },

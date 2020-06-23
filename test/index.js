@@ -179,39 +179,231 @@ cli ('bin/doctest file.js --type xxx')
 cli ('bin/doctest test/shared/index.js')
     ({code: 1,
       stdout: `running doctests in test/shared/index.js...
-......x.x...........x........x
-FAIL: expected 5 on line 31 (got 4)
-FAIL: expected ! TypeError on line 38 (got 0)
-FAIL: expected 9.5 on line 97 (got 5)
-FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
+......x.x...........x.......xx
+
+Unexpected result on line 31:
+
+> two + two
+\u001B[0;32m5\u001B[0m
+\u001B[0;31m4\u001B[0m
+
+Unexpected result on line 38:
+
+> [].length
+\u001B[0;32m! TypeError\u001B[0m
+\u001B[0;31m0\u001B[0m
+
+Unexpected result on line 97:
+
+>10 -
+..5
+\u001B[0;32m9.5\u001B[0m
+\u001B[0;31m5\u001B[0m
+
+Unexpected result on lines 149-152:
+
+> ["foo", "bar", "baz"]
+. .join(",")
+. .toUpperCase()
+. .split(",")
+\u001B[0;32m[ "FOO",
+. "BAR",
+. "BAZ",
+. "XXX" ]\u001B[0m
+\u001B[0;31m["FOO", "BAR", "BAZ"]\u001B[0m
+
+Unexpected result on line 156:
+
+> "the rewriter should not rely"
+\u001B[0;32m"on automatic semicolon insertion"\u001B[0m
+\u001B[0;31m"the rewriter should not rely"\u001B[0m
+
 `,
       stderr: ''});
 
 cli ('bin/doctest test/shared/index.coffee')
     ({code: 1,
       stdout: `running doctests in test/shared/index.coffee...
-......x.x...........x........x
-FAIL: expected 5 on line 31 (got 4)
-FAIL: expected ! TypeError on line 38 (got 0)
-FAIL: expected 9.5 on line 97 (got 5)
-FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
+......x.x...........x.......xx
+
+Unexpected result on line 31:
+
+> two + two
+\u001B[0;32m5\u001B[0m
+\u001B[0;31m4\u001B[0m
+
+Unexpected result on line 38:
+
+> [].length
+\u001B[0;32m! TypeError\u001B[0m
+\u001B[0;31m0\u001B[0m
+
+Unexpected result on line 97:
+
+>10 -
+..5
+\u001B[0;32m9.5\u001B[0m
+\u001B[0;31m5\u001B[0m
+
+Unexpected result on lines 149-152:
+
+> ["foo", "bar", "baz"]
+. .join(",")
+. .toUpperCase()
+. .split(",")
+\u001B[0;32m[ "FOO"
+. "BAR"
+. "BAZ"
+. "XXX" ]\u001B[0m
+\u001B[0;31m["FOO", "BAR", "BAZ"]\u001B[0m
+
+Unexpected result on line 156:
+
+> "the rewriter should not rely"
+\u001B[0;32m"on automatic semicolon insertion"\u001B[0m
+\u001B[0;31m"the rewriter should not rely"\u001B[0m
+
 `,
       stderr: ''});
 
 cli ('bin/doctest test/shared/index.js test/shared/index.coffee')
     ({code: 1,
       stdout: `running doctests in test/shared/index.js...
-......x.x...........x........x
-FAIL: expected 5 on line 31 (got 4)
-FAIL: expected ! TypeError on line 38 (got 0)
-FAIL: expected 9.5 on line 97 (got 5)
-FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
+......x.x...........x.......xx
+
+Unexpected result on line 31:
+
+> two + two
+\u001B[0;32m5\u001B[0m
+\u001B[0;31m4\u001B[0m
+
+Unexpected result on line 38:
+
+> [].length
+\u001B[0;32m! TypeError\u001B[0m
+\u001B[0;31m0\u001B[0m
+
+Unexpected result on line 97:
+
+>10 -
+..5
+\u001B[0;32m9.5\u001B[0m
+\u001B[0;31m5\u001B[0m
+
+Unexpected result on lines 149-152:
+
+> ["foo", "bar", "baz"]
+. .join(",")
+. .toUpperCase()
+. .split(",")
+\u001B[0;32m[ "FOO",
+. "BAR",
+. "BAZ",
+. "XXX" ]\u001B[0m
+\u001B[0;31m["FOO", "BAR", "BAZ"]\u001B[0m
+
+Unexpected result on line 156:
+
+> "the rewriter should not rely"
+\u001B[0;32m"on automatic semicolon insertion"\u001B[0m
+\u001B[0;31m"the rewriter should not rely"\u001B[0m
+
 running doctests in test/shared/index.coffee...
-......x.x...........x........x
-FAIL: expected 5 on line 31 (got 4)
-FAIL: expected ! TypeError on line 38 (got 0)
-FAIL: expected 9.5 on line 97 (got 5)
-FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
+......x.x...........x.......xx
+
+Unexpected result on line 31:
+
+> two + two
+\u001B[0;32m5\u001B[0m
+\u001B[0;31m4\u001B[0m
+
+Unexpected result on line 38:
+
+> [].length
+\u001B[0;32m! TypeError\u001B[0m
+\u001B[0;31m0\u001B[0m
+
+Unexpected result on line 97:
+
+>10 -
+..5
+\u001B[0;32m9.5\u001B[0m
+\u001B[0;31m5\u001B[0m
+
+Unexpected result on lines 149-152:
+
+> ["foo", "bar", "baz"]
+. .join(",")
+. .toUpperCase()
+. .split(",")
+\u001B[0;32m[ "FOO"
+. "BAR"
+. "BAZ"
+. "XXX" ]\u001B[0m
+\u001B[0;31m["FOO", "BAR", "BAZ"]\u001B[0m
+
+Unexpected result on line 156:
+
+> "the rewriter should not rely"
+\u001B[0;32m"on automatic semicolon insertion"\u001B[0m
+\u001B[0;31m"the rewriter should not rely"\u001B[0m
+
+`,
+      stderr: ''});
+
+cli ('bin/doctest test/exceptions/index.js')
+    ({code: 1,
+      stdout: `running doctests in test/exceptions/index.js...
+.xxxxx.x.xx
+
+Unexpected result on line 6:
+
+> new Error()
+\u001B[0;32mnew Error('Invalid value')\u001B[0m
+\u001B[0;31mnew Error ("")\u001B[0m
+
+Unexpected result on line 9:
+
+> new Error('Invalid value')
+\u001B[0;32mnew Error()\u001B[0m
+\u001B[0;31mnew Error ("Invalid value")\u001B[0m
+
+Unexpected result on line 12:
+
+> new Error('Invalid value')
+\u001B[0;32mnew Error('XXX')\u001B[0m
+\u001B[0;31mnew Error ("Invalid value")\u001B[0m
+
+Unexpected result on line 15:
+
+> new Error('Invalid value')
+\u001B[0;32m! Error: Invalid value\u001B[0m
+\u001B[0;31mnew Error ("Invalid value")\u001B[0m
+
+Unexpected result on line 18:
+
+> sqrt(-1)
+\u001B[0;32mnew Error('Invalid value')\u001B[0m
+\u001B[0;31m! Error: Invalid value\u001B[0m
+
+Unexpected result on line 24:
+
+> null.length
+\u001B[0;32m! Error\u001B[0m
+\u001B[0;31m! TypeError: Cannot read property 'length' of null\u001B[0m
+
+Unexpected result on line 30:
+
+> sqrt(-1)
+\u001B[0;32m! Error: XXX\u001B[0m
+\u001B[0;31m! Error: Invalid value\u001B[0m
+
+Unexpected result on line 33:
+
+> 'foo' + 'bar'
+\u001B[0;32mfoobar\u001B[0m
+\u001B[0;31m"foobar"\u001B[0m
+
 `,
       stderr: ''});
 
@@ -225,6 +417,7 @@ cli ('bin/doctest test/bin/executable')
 cli ('bin/doctest --type js test/bin/executable')
     (stdout (`running doctests in test/bin/executable...
 .
+
 `));
 
 cli ('bin/doctest --module xxx file.js')
@@ -234,23 +427,32 @@ cli ('bin/doctest --module xxx file.js')
 cli ('bin/doctest --module esm lib/doctest.js')
     (stdout (`running doctests in lib/doctest.js...
 ...
+
 `));
 
 cli ('bin/doctest --module esm test/esm/index.js')
     (stdout (`running doctests in test/esm/index.js...
 .
+
 `));
 
 cli ('bin/doctest --module esm test/esm/dependencies.js')
     (stdout (`running doctests in test/esm/dependencies.js...
 .
+
 `));
 
 cli ('bin/doctest --module esm test/esm/incorrect.js')
     ({code: 1,
       stdout: `running doctests in test/esm/incorrect.js...
 x
-FAIL: expected 32 on line 4 (got "0°F")
+
+Unexpected result on line 4:
+
+> toFahrenheit (0)
+\u001B[0;32m32\u001B[0m
+\u001B[0;31m"0°F"\u001B[0m
+
 `,
       stderr: ''});
 
@@ -410,5 +612,4 @@ cli ('bin/doctest --print --module commonjs test/commonjs/exports/index.js')
   })();
 
   (module.exports || exports).__doctest = __doctest;
-})();
-`));
+})();`));

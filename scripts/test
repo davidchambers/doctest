@@ -17,5 +17,6 @@ node_modules/.bin/c8 \
 
 find test \
   -name results.js \
+  -not -path 'test/shared/*' \
   | xargs -n 1 dirname \
   | xargs node --experimental-modules scripts/verify-results.js

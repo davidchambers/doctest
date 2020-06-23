@@ -148,7 +148,8 @@ global = 'global'
   // . .split(",")
   // [ "FOO",
   // . "BAR",
-  // . "BAZ" ]
+  // . "BAZ",
+  // . "XXX" ]
 
   29, 'the rewriter should not rely on automatic semicolon insertion'
   // > "the rewriter should not rely"
