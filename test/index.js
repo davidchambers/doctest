@@ -18,6 +18,7 @@ import resultsCommonJsExports from './commonjs/exports/results.js';
 import resultsCommonJsModuleExports from './commonjs/module.exports/results.js';
 import resultsCommonJsRequire from './commonjs/require/results.js';
 import resultsCommonJsStrict from './commonjs/strict/results.js';
+import resultsContiguity from './contiguity/results.js';
 import resultsEs2015 from './es2015/results.js';
 import resultsEs2018 from './es2018/results.js';
 import resultsEsmTranscribe from './esm/transcribe/results.js';
@@ -159,6 +160,14 @@ jsi (resultsEsmTranscribe)
     ('test/esm/transcribe/index.js')
     ({module: 'esm',
       prefix: '.'});
+
+jsi (resultsContiguity)
+    ('test/contiguity/index.js')
+    ({});
+
+jsi (resultsContiguity)
+    ('test/contiguity/index.coffee')
+    ({});
 
 cli ('bin/doctest')
     (stderr (`error: No files for doctesting provided
