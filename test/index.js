@@ -8,9 +8,6 @@ const Z = require ('sanctuary-type-classes');
 const doctest = require ('..');
 
 
-//    unlines :: Array String -> String
-const unlines = lines => lines.reduce ((s, line) => `${s}${line}\n`, '');
-
 let gray  = '';
 let green = '';
 let red   = '';
@@ -90,81 +87,70 @@ const moduleTests = Promise.all ([
 testCommand ('bin/doctest', {
   status: 1,
   stdout: '',
-  stderr: unlines ([
-    'error: No files for doctesting provided',
-  ]),
+  stderr: `error: No files for doctesting provided
+`,
 });
 
 testCommand ('bin/doctest --xxx', {
   status: 1,
   stdout: '',
-  stderr: unlines ([
-    "error: unknown option `--xxx'",
-  ]),
+  stderr: `error: unknown option \`--xxx'
+`,
 });
 
 testCommand ('bin/doctest file.js --type', {
   status: 1,
   stdout: '',
-  stderr: unlines ([
-    "error: option `-t, --type <type>' argument missing",
-  ]),
+  stderr: `error: option \`-t, --type <type>' argument missing
+`,
 });
 
 testCommand ('bin/doctest file.js --type xxx', {
   status: 1,
   stdout: '',
-  stderr: unlines ([
-    "error: Invalid type `xxx'",
-  ]),
+  stderr: `error: Invalid type \`xxx'
+`,
 });
 
 testCommand ('bin/doctest test/shared/index.js', {
   status: 1,
-  stdout: unlines ([
-    'running doctests in test/shared/index.js...',
-    '......x.x...........x........x',
-    'FAIL: expected 5 on line 31 (got 4)',
-    'FAIL: expected ! TypeError on line 38 (got 0)',
-    'FAIL: expected 9.5 on line 97 (got 5)',
-    'FAIL: expected "on automatic semicolon insertion" on line 155 ' +
-      '(got "the rewriter should not rely")',
-  ]),
+  stdout: `running doctests in test/shared/index.js...
+......x.x...........x........x
+FAIL: expected 5 on line 31 (got 4)
+FAIL: expected ! TypeError on line 38 (got 0)
+FAIL: expected 9.5 on line 97 (got 5)
+FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
+`,
   stderr: '',
 });
 
 testCommand ('bin/doctest test/shared/index.coffee', {
   status: 1,
-  stdout: unlines ([
-    'running doctests in test/shared/index.coffee...',
-    '......x.x...........x........x',
-    'FAIL: expected 5 on line 31 (got 4)',
-    'FAIL: expected ! TypeError on line 38 (got 0)',
-    'FAIL: expected 9.5 on line 97 (got 5)',
-    'FAIL: expected "on automatic semicolon insertion" on line 155 ' +
-      '(got "the rewriter should not rely")',
-  ]),
+  stdout: `running doctests in test/shared/index.coffee...
+......x.x...........x........x
+FAIL: expected 5 on line 31 (got 4)
+FAIL: expected ! TypeError on line 38 (got 0)
+FAIL: expected 9.5 on line 97 (got 5)
+FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
+`,
   stderr: '',
 });
 
 testCommand ('bin/doctest test/shared/index.js test/shared/index.coffee', {
   status: 1,
-  stdout: unlines ([
-    'running doctests in test/shared/index.js...',
-    '......x.x...........x........x',
-    'FAIL: expected 5 on line 31 (got 4)',
-    'FAIL: expected ! TypeError on line 38 (got 0)',
-    'FAIL: expected 9.5 on line 97 (got 5)',
-    'FAIL: expected "on automatic semicolon insertion" on line 155 ' +
-      '(got "the rewriter should not rely")',
-    'running doctests in test/shared/index.coffee...',
-    '......x.x...........x........x',
-    'FAIL: expected 5 on line 31 (got 4)',
-    'FAIL: expected ! TypeError on line 38 (got 0)',
-    'FAIL: expected 9.5 on line 97 (got 5)',
-    'FAIL: expected "on automatic semicolon insertion" on line 155 ' +
-      '(got "the rewriter should not rely")',
-  ]),
+  stdout: `running doctests in test/shared/index.js...
+......x.x...........x........x
+FAIL: expected 5 on line 31 (got 4)
+FAIL: expected ! TypeError on line 38 (got 0)
+FAIL: expected 9.5 on line 97 (got 5)
+FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
+running doctests in test/shared/index.coffee...
+......x.x...........x........x
+FAIL: expected 5 on line 31 (got 4)
+FAIL: expected ! TypeError on line 38 (got 0)
+FAIL: expected 9.5 on line 97 (got 5)
+FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
+`,
   stderr: '',
 });
 
@@ -177,158 +163,149 @@ testCommand ('bin/doctest --silent test/shared/index.js', {
 testCommand ('bin/doctest test/bin/executable', {
   status: 1,
   stdout: '',
-  stderr: unlines ([
-    'error: Cannot infer type from extension',
-  ]),
+  stderr: `error: Cannot infer type from extension
+`,
 });
 
 testCommand ('bin/doctest --type js test/bin/executable', {
   status: 0,
-  stdout: unlines ([
-    'running doctests in test/bin/executable...',
-    '.',
-  ]),
+  stdout: `running doctests in test/bin/executable...
+.
+`,
   stderr: '',
 });
 
 testCommand ('bin/doctest --module commonjs lib/doctest.js', {
   status: 0,
-  stdout: unlines ([
-    'running doctests in lib/doctest.js...',
-    '...',
-  ]),
+  stdout: `running doctests in lib/doctest.js...
+...
+`,
   stderr: '',
 });
 
 testCommand ('bin/doctest --module esm test/esm/index.mjs', {
   status: 0,
-  stdout: unlines ([
-    'running doctests in test/esm/index.mjs...',
-    '.',
-  ]),
+  stdout: `running doctests in test/esm/index.mjs...
+.
+`,
   stderr: '',
 });
 
 testCommand ('bin/doctest --module esm test/esm/dependencies.mjs', {
   status: 0,
-  stdout: unlines ([
-    'running doctests in test/esm/dependencies.mjs...',
-    '.',
-  ]),
+  stdout: `running doctests in test/esm/dependencies.mjs...
+.
+`,
   stderr: '',
 });
 
 testCommand ('bin/doctest --module esm test/esm/incorrect.mjs', {
   status: 1,
-  stdout: unlines ([
-    'running doctests in test/esm/incorrect.mjs...',
-    'x',
-    'FAIL: expected 32 on line 4 (got "0°F")',
-  ]),
+  stdout: `running doctests in test/esm/incorrect.mjs...
+x
+FAIL: expected 32 on line 4 (got "0°F")
+`,
   stderr: '',
 });
 
 testCommand ('bin/doctest --print test/commonjs/exports/index.js', {
   status: 0,
-  stdout: unlines ([
-    '',
-    '__doctest.enqueue({',
-    '  type: "input",',
-    '  thunk: () => {',
-    '    return exports.identity(42);',
-    '  },',
-    '});',
-    '',
-    '__doctest.enqueue({',
-    '  type: "output",',
-    '  ":": 2,',
-    '  "!": false,',
-    '  thunk: () => {',
-    '    return 42;',
-    '  },',
-    '});',
-    '',
-    'exports.identity = function(x) {',
-    '  return x;',
-    '};',
-  ]),
+  stdout: `
+__doctest.enqueue({
+  type: "input",
+  thunk: () => {
+    return exports.identity(42);
+  },
+});
+
+__doctest.enqueue({
+  type: "output",
+  ":": 2,
+  "!": false,
+  thunk: () => {
+    return 42;
+  },
+});
+
+exports.identity = function(x) {
+  return x;
+};
+`,
   stderr: '',
 });
 
 testCommand ('bin/doctest --print --module amd test/amd/index.js', {
   status: 0,
-  stdout: unlines ([
-    '',
-    'define(function() {',
-    '  // Convert degrees Celsius to degrees Fahrenheit.',
-    '  //',
-    '',
-    '__doctest.enqueue({',
-    '  type: "input",',
-    '  thunk: () => {',
-    '    return toFahrenheit(0);',
-    '  },',
-    '});',
-    '',
-    '__doctest.enqueue({',
-    '  type: "output",',
-    '  ":": 5,',
-    '  "!": false,',
-    '  thunk: () => {',
-    '    return 32;',
-    '  },',
-    '});',
-    '',
-    '  function toFahrenheit(degreesCelsius) {',
-    '    return degreesCelsius * 9 / 5 + 32;',
-    '  }',
-    '  return toFahrenheit;',
-    '});',
-    '',
-    'function define(...args) {',
-    '  args[args.length - 1]();',
-    '}',
-  ]),
+  stdout: `
+define(function() {
+  // Convert degrees Celsius to degrees Fahrenheit.
+  //
+
+__doctest.enqueue({
+  type: "input",
+  thunk: () => {
+    return toFahrenheit(0);
+  },
+});
+
+__doctest.enqueue({
+  type: "output",
+  ":": 5,
+  "!": false,
+  thunk: () => {
+    return 32;
+  },
+});
+
+  function toFahrenheit(degreesCelsius) {
+    return degreesCelsius * 9 / 5 + 32;
+  }
+  return toFahrenheit;
+});
+
+function define(...args) {
+  args[args.length - 1]();
+}
+`,
   stderr: '',
 });
 
 testCommand ('bin/doctest --print --module commonjs test/commonjs/exports/index.js', {
   status: 0,
-  stdout: unlines ([
-    'void (() => {',
-    '',
-    '  const __doctest = {',
-    '    require,',
-    '    queue: [],',
-    '    enqueue: function(io) { this.queue.push(io); },',
-    '  };',
-    '',
-    '  void (() => {',
-    '',
-    '    __doctest.enqueue({',
-    '      type: "input",',
-    '      thunk: () => {',
-    '        return exports.identity(42);',
-    '      },',
-    '    });',
-    '',
-    '    __doctest.enqueue({',
-    '      type: "output",',
-    '      ":": 2,',
-    '      "!": false,',
-    '      thunk: () => {',
-    '        return 42;',
-    '      },',
-    '    });',
-    '',
-    '    exports.identity = function(x) {',
-    '      return x;',
-    '    };',
-    '  })();',
-    '',
-    '  (module.exports || exports).__doctest = __doctest;',
-    '})();',
-  ]),
+  stdout: `void (() => {
+
+  const __doctest = {
+    require,
+    queue: [],
+    enqueue: function(io) { this.queue.push(io); },
+  };
+
+  void (() => {
+
+    __doctest.enqueue({
+      type: "input",
+      thunk: () => {
+        return exports.identity(42);
+      },
+    });
+
+    __doctest.enqueue({
+      type: "output",
+      ":": 2,
+      "!": false,
+      thunk: () => {
+        return 42;
+      },
+    });
+
+    exports.identity = function(x) {
+      return x;
+    };
+  })();
+
+  (module.exports || exports).__doctest = __doctest;
+})();
+`,
   stderr: '',
 });
 
