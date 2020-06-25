@@ -6,13 +6,13 @@ export default ({Test, Line, Correct, Success}) => [
        (Correct (Success ('string'))),
 
   Test ('__filename is absolute')
-       ([Line (8) ('> path.isAbsolute (__filename)')])
+       ([Line (8) ('> path.isAbsolute __filename')])
        ([Line (9) ('true')])
        (Correct (Success (true))),
 
   Test ('__filename is correct')
-       ([Line (11) ('> path.relative (process.cwd (), __filename)')])
-       ([Line (12) ("'test/commonjs/__filename/index.js'")])
-       (Correct (Success ('test/commonjs/__filename/index.js'))),
+       ([Line (11) ('> path.relative process.cwd(), __filename')])
+       ([Line (12) ("'test/commonjs/__filename/index.coffee'")])
+       (Correct (Success ('test/commonjs/__filename/index.coffee'))),
 
 ];

@@ -11,7 +11,8 @@ const flags = idx >= 0 && idx < args.length - 1;
 require ('child_process')
 .spawn (
   process.execPath,
-  [...(flags ? args[idx + 1].split (/\s+/) : []),
+  ['--experimental-vm-modules',
+   ...(flags ? args[idx + 1].split (/\s+/) : []),
    '--',
    path.resolve (__dirname, '..', 'lib', 'command.js'),
    ...(flags ? [...(args.slice (0, idx)), ...(args.slice (idx + 2))] : args)],

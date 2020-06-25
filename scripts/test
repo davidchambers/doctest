@@ -13,4 +13,4 @@ node_modules/.bin/c8 \
   --reporter text \
   --reporter html \
   $(printf ' --include %s' "${files[@]}") \
-  node -- node_modules/.bin/oletus -- test/index.js
+  node --experimental-vm-modules -- node_modules/.bin/oletus -- test/index.js
