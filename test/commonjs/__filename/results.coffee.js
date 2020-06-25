@@ -1,11 +1,11 @@
 export default [
   {
-    description: '__dirname is defined',
+    description: '__filename is defined',
     doctest: {
       correct: true,
       input: {
         lines: [
-          {number: 3, text: '> typeof __dirname'},
+          {number: 3, text: '> typeof __filename'},
         ],
         throws: false,
         result: 'string',
@@ -20,12 +20,12 @@ export default [
     },
   },
   {
-    description: '__dirname is absolute',
+    description: '__filename is absolute',
     doctest: {
       correct: true,
       input: {
         lines: [
-          {number: 8, text: '> path.isAbsolute (__dirname)'},
+          {number: 8, text: '> path.isAbsolute __filename'},
         ],
         throws: false,
         result: true,
@@ -40,22 +40,22 @@ export default [
     },
   },
   {
-    description: '__dirname is correct',
+    description: '__filename is correct',
     doctest: {
       correct: true,
       input: {
         lines: [
-          {number: 11, text: '> path.relative (process.cwd (), __dirname)'},
+          {number: 11, text: '> path.relative process.cwd(), __filename'},
         ],
         throws: false,
-        result: 'test/commonjs/__dirname',
+        result: 'test/commonjs/__filename/index.coffee',
       },
       output: {
         lines: [
-          {number: 12, text: "'test/commonjs/__dirname'"},
+          {number: 12, text: "'test/commonjs/__filename/index.coffee'"},
         ],
         throws: false,
-        result: 'test/commonjs/__dirname',
+        result: 'test/commonjs/__filename/index.coffee',
       },
     },
   },

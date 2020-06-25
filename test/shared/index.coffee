@@ -88,7 +88,7 @@ do ->
   # 25 # comment
 
   20: 'variable in creation context is not accessible'
-  # > typeof text
+  # > typeof Z
   # "undefined"
 
   21: '"." should not follow leading "." in multiline expressions'

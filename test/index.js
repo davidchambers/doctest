@@ -64,6 +64,10 @@ jsi (resultsSharedCoffee)
     ('test/shared/index.coffee')
     ({});
 
+jsi (resultsSharedCoffee)
+    ('test/shared/index.coffee')
+    ({type: 'coffee'});
+
 jsi (resultsLineEndings)
     ('test/line-endings/CR.js')
     ({});
@@ -435,7 +439,7 @@ cli ('bin/doctest --module xxx file.js')
 
 cli ('bin/doctest --module esm lib/doctest.js')
     (stdout (`running doctests in lib/doctest.js...
-...
+
 
 `));
 
@@ -466,14 +470,13 @@ Unexpected result on line 4:
       stderr: ''});
 
 cli ('bin/doctest --module esm --print test/esm/index.js')
-    (stdout (`
-export const __doctest = {
+    (stdout (`export const __doctest = {
   queue: [],
   enqueue: function(io) { this.queue.push(io); },
 };
 
-// Convert degrees Celsius to degrees Fahrenheit.
-//
+
+
 
 __doctest.enqueue({
   input: {
@@ -498,10 +501,10 @@ __doctest.enqueue({
   },
 });
 
+
 export function toFahrenheit(degreesCelsius) {
   return degreesCelsius * 9 / 5 + 32;
 }
-
 `));
 
 cli ('bin/doctest --module esm --silent test/esm/index.js')
@@ -536,17 +539,17 @@ __doctest.enqueue({
   },
 });
 
+
 exports.identity = function(x) {
   return x;
 };
 `));
 
 cli ('bin/doctest --print --module amd test/amd/index.js')
-    (stdout (`
-define(function() {
-  // Convert degrees Celsius to degrees Fahrenheit.
-  //
-
+    (stdout (`define(function() {
+  
+  
+  
 __doctest.enqueue({
   input: {
     lines: [
@@ -570,55 +573,41 @@ __doctest.enqueue({
   },
 });
 
+  
   function toFahrenheit(degreesCelsius) {
     return degreesCelsius * 9 / 5 + 32;
   }
   return toFahrenheit;
 });
-
-function define(...args) {
-  args[args.length - 1]();
-}
 `));
 
 cli ('bin/doctest --print --module commonjs test/commonjs/exports/index.js')
-    (stdout (`void (() => {
+    (stdout (`
+__doctest.enqueue({
+  input: {
+    lines: [
+      {number: 1, text: '> exports.identity(42)'},
+    ],
+    thunk: () => {
+      return (
+        exports.identity(42)
+      );
+    },
+  },
+  output: {
+    lines: [
+      {number: 2, text: '42'},
+    ],
+    thunk: () => {
+      return (
+        42
+      );
+    },
+  },
+});
 
-  const __doctest = {
-    require,
-    queue: [],
-    enqueue: function(io) { this.queue.push(io); },
-  };
 
-  void (() => {
-
-    __doctest.enqueue({
-      input: {
-        lines: [
-          {number: 1, text: '> exports.identity(42)'},
-        ],
-        thunk: () => {
-          return (
-            exports.identity(42)
-          );
-        },
-      },
-      output: {
-        lines: [
-          {number: 2, text: '42'},
-        ],
-        thunk: () => {
-          return (
-            42
-          );
-        },
-      },
-    });
-
-    exports.identity = function(x) {
-      return x;
-    };
-  })();
-
-  (module.exports || exports).__doctest = __doctest;
-})();`));
+exports.identity = function(x) {
+  return x;
+};
+`));

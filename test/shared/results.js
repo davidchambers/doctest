@@ -387,7 +387,7 @@ export default [
       correct: true,
       input: {
         lines: [
-          {number: 91, text: '> typeof text'},
+          {number: 91, text: '> typeof Z'},
         ],
         throws: false,
         result: 'undefined',

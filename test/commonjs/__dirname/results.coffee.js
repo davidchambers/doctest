@@ -25,7 +25,7 @@ export default [
       correct: true,
       input: {
         lines: [
-          {number: 8, text: '> path.isAbsolute (__dirname)'},
+          {number: 8, text: '> path.isAbsolute __dirname'},
         ],
         throws: false,
         result: true,
@@ -45,7 +45,7 @@ export default [
       correct: true,
       input: {
         lines: [
-          {number: 11, text: '> path.relative (process.cwd (), __dirname)'},
+          {number: 11, text: '> path.relative process.cwd(), __dirname'},
         ],
         throws: false,
         result: 'test/commonjs/__dirname',

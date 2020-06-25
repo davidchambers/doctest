@@ -32,6 +32,8 @@ const renames = {
 
 //    additions :: StrMap Integer
 const additions = {
+  'test/commonjs/__dirname': 2,
+  'test/commonjs/__filename': 2,
   'test/exceptions': 1,
 };
 
