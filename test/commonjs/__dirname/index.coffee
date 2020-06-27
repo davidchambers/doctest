@@ -1,0 +1,4 @@
+
+
+# > typeof __dirname
+# 'string'

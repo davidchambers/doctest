@@ -13,6 +13,9 @@ import require from '../lib/require.js';
 
 const resultsAmd = require ('../test/amd/results.json');
 const resultsBin = require ('../test/bin/results.json');
+const resultsCommonJsDirname = require ('../test/commonjs/__dirname/results.json');
+const resultsCommonJsDoctestRequire = require ('../test/commonjs/__doctest.require/results.json');
+const resultsCommonJsFilename = require ('../test/commonjs/__filename/results.json');
 const resultsCommonJsExports = require ('../test/commonjs/exports/results.json');
 const resultsCommonJsModuleExports = require ('../test/commonjs/module.exports/results.json');
 const resultsCommonJsRequire = require ('../test/commonjs/require/results.json');
@@ -127,6 +130,18 @@ jsi (resultsCommonJsModuleExports)
 
 jsi (resultsCommonJsStrict)
     ('test/commonjs/strict/index.js')
+    ({module: 'commonjs'});
+
+jsi (resultsCommonJsDirname)
+    ('test/commonjs/__dirname/index.js')
+    ({module: 'commonjs'});
+
+jsi (resultsCommonJsFilename)
+    ('test/commonjs/__filename/index.js')
+    ({module: 'commonjs'});
+
+jsi (resultsCommonJsDoctestRequire)
+    ('test/commonjs/__doctest.require/index.js')
     ({module: 'commonjs'});
 
 jsi (resultsBin)
