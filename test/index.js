@@ -1,11 +1,10 @@
-'use strict';
+import {execSync} from 'child_process';
+import {resolve} from 'path';
 
-const {execSync} = require ('child_process');
-const {resolve} = require ('path');
+import Z from 'sanctuary-type-classes';
 
-const Z = require ('sanctuary-type-classes');
-
-const doctest = require ('..');
+import doctest from '../lib/doctest.js';
+import require from '../lib/require.js';
 
 
 let gray  = '';
@@ -176,7 +175,7 @@ testCommand ('bin/doctest --type js test/bin/executable', {
   stderr: '',
 });
 
-testCommand ('bin/doctest --module commonjs lib/doctest.js', {
+testCommand ('bin/doctest --module esm lib/doctest.js', {
   status: 0,
   stdout: `running doctests in lib/doctest.js...
 ...

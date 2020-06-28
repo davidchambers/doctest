@@ -14,7 +14,7 @@ require ('child_process')
   ['--experimental-modules',
    ...(flags ? args[idx + 1].split (/\s+/) : []),
    '--',
-   path.resolve (__dirname, '..', 'lib', 'command.mjs'),
+   path.resolve (__dirname, '..', 'lib', 'command.js'),
    ...(flags ? [...(args.slice (0, idx)), ...(args.slice (idx + 2))] : args)],
   {cwd: process.cwd (), env: process.env, stdio: [0, 1, 2]}
 )

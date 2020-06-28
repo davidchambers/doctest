@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euf -o pipefail
 
-node -- test/index.js
+node --experimental-modules -- test/index.js
