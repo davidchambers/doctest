@@ -12,14 +12,15 @@
     "doctests",
     "test"
   ],
-  "main": "./lib/doctest",
+  "type": "module",
+  "main": "./lib/doctest.js",
   "bin": "./bin/doctest",
   "repository": {
     "type": "git",
     "url": "git://github.com/davidchambers/doctest.git"
   },
   "engines": {
-    "node": ">=10.2.0"
+    "node": ">=12.22.0"
   },
   "dependencies": {
     "acorn": "8.5.x",
