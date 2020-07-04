@@ -40,10 +40,15 @@ function printResult(actual, expected, message) {
 }
 
 
+var defaultOptions = {
+  logFunction: []
+};
+
 function testModule(path, options) {
   var type = (path.split ('.')).pop ();
   var expecteds = require (pathlib.resolve (path, '..', 'results.json'));
-  return (doctest (path, options)).then (function(actuals) {
+  return (doctest (path, Object.assign ({}, defaultOptions, options)))
+  .then (function(actuals) {
     for (var idx = 0; idx < expecteds.length; idx += 1) {
       printResult (actuals[idx],
                    expecteds[idx][1],
@@ -199,6 +204,50 @@ testCommand ('bin/doctest --type js test/bin/executable', {
   stderr: ''
 });
 
+testCommand ('bin/doctest --log-function stdout --log-function stderr test/shared/async.js', {
+  status: 0,
+  stdout: unlines ([
+    'running doctests in test/shared/async.js...',
+    '....'
+  ]),
+  stderr: ''
+});
+
+testCommand ('bin/doctest --module commonjs --log-function stdout --log-function stderr test/shared/async.js', {
+  status: 0,
+  stdout: unlines ([
+    'running doctests in test/shared/async.js...',
+    '....'
+  ]),
+  stderr: ''
+});
+
+testCommand ('bin/doctest --log-function stdout --log-function stderr test/shared/async.coffee', {
+  status: 0,
+  stdout: unlines ([
+    'running doctests in test/shared/async.coffee...',
+    '....'
+  ]),
+  stderr: ''
+});
+
+testCommand ('bin/doctest --log-function stdout --log-function stderr test/shared/logging.js', {
+  status: 1,
+  stdout: unlines ([
+    'running doctests in test/shared/logging.js...',
+    '...........xx.xxxx..x..x..',
+    'FAIL: expected [stdout]: 2 on line 42 (got 3)',
+    'FAIL: expected 3 on line 43 (got no output)',
+    'FAIL: expected 3 on line 49 (got [stdout]: 2)',
+    'FAIL: expected no output on line - (got 3)',
+    'FAIL: expected [stdout]: 2 on line 54 (got [stdout]: 1)',
+    'FAIL: expected [stdout]: 1 on line 55 (got [stdout]: 2)',
+    'FAIL: expected [stderr]: 2 on line 62 (got [stdout]: 2)',
+    'FAIL: expected [stdout]: 1 on line 69 (got no output fast enough)'
+  ]),
+  stderr: ''
+});
+
 testCommand ('bin/doctest --module commonjs lib/doctest.js', {
   status: 0,
   stdout: unlines ([
@@ -236,21 +285,49 @@ testCommand ('bin/doctest --module esm test/esm/incorrect.mjs', {
   stderr: ''
 });
 
+testCommand ('bin/doctest --module esm test/esm/async.mjs', {
+  status: 1,
+  stdout: unlines ([
+    'running doctests in test/esm/async.mjs...',
+    'x',
+    'FAIL: expected undefined on line 6 (got ! ReferenceError: stdout is not defined)'
+  ]),
+  stderr: ''
+});
+
+testCommand ('bin/doctest --module esm --log-function stdout --log-function stderr test/esm/async.mjs', {
+  status: 0,
+  stdout: unlines ([
+    'running doctests in test/esm/async.mjs...',
+    '....'
+  ]),
+  stderr: ''
+});
+
 testCommand ('bin/doctest --print test/commonjs/exports/index.js', {
   status: 0,
   stdout: unlines ([
     '__doctest.enqueue({',
     '  type: "input",',
     '  thunk: function() {',
-    '    return exports.identity(42);',
+    '    return (',
+    '      exports.identity(42)',
+    '    );',
     '  }',
     '});',
     '__doctest.enqueue({',
     '  type: "output",',
-    '  ":": 2,',
     '  "!": false,',
     '  thunk: function() {',
-    '    return 42;',
+    '    return [',
+    '      {',
+    '        loc: 2,',
+    '        channel: null,',
+    '        value: (',
+    '          42',
+    '        )',
+    '      }',
+    '    ];',
     '  }',
     '});',
     'exports.identity = function(x) {',
@@ -269,15 +346,24 @@ testCommand ('bin/doctest --print --module amd test/amd/index.js', {
     '  __doctest.enqueue({',
     '  type: "input",',
     '  thunk: function() {',
-    '    return toFahrenheit(0);',
+    '    return (',
+    '      toFahrenheit(0)',
+    '    );',
     '  }',
     '});',
     '__doctest.enqueue({',
     '  type: "output",',
-    '  ":": 5,',
     '  "!": false,',
     '  thunk: function() {',
-    '    return 32;',
+    '    return [',
+    '      {',
+    '        loc: 5,',
+    '        channel: null,',
+    '        value: (',
+    '          32',
+    '        )',
+    '      }',
+    '    ];',
     '  }',
     '});',
     '  function toFahrenheit(degreesCelsius) {',
@@ -312,15 +398,69 @@ testCommand ('bin/doctest --print --module commonjs test/commonjs/exports/index.
     '    __doctest.enqueue({',
     '      type: "input",',
     '      thunk: function() {',
-    '        return exports.identity(42);',
+    '        return (',
+    '          exports.identity(42)',
+    '        );',
     '      }',
     '    });',
     '    __doctest.enqueue({',
     '      type: "output",',
-    '      ":": 2,',
     '      "!": false,',
     '      thunk: function() {',
-    '        return 42;',
+    '        return [',
+    '          {',
+    '            loc: 2,',
+    '            channel: null,',
+    '            value: (',
+    '              42',
+    '            )',
+    '          }',
+    '        ];',
+    '      }',
+    '    });',
+    '    exports.identity = function(x) {',
+    '      return x;',
+    '    };',
+    '  }.call(this);',
+    '',
+    '  (module.exports || exports).__doctest = __doctest;',
+    '}.call(this);'
+  ]),
+  stderr: ''
+});
+
+testCommand ('bin/doctest --print --module commonjs --log-function stdout --log-function stderr test/commonjs/exports/index.js', {
+  status: 0,
+  stdout: unlines ([
+    'void function() {',
+    '  var __doctest = {',
+    '    require: require,',
+    '    queue: [],',
+    '    enqueue: function(io) { this.queue.push(io); }',
+    '  };',
+    '',
+    '  void function() {',
+    '    __doctest.enqueue({',
+    '      type: "input",',
+    '      thunk: function(stdout, stderr) {',
+    '        return (',
+    '          exports.identity(42)',
+    '        );',
+    '      }',
+    '    });',
+    '    __doctest.enqueue({',
+    '      type: "output",',
+    '      "!": false,',
+    '      thunk: function() {',
+    '        return [',
+    '          {',
+    '            loc: 2,',
+    '            channel: null,',
+    '            value: (',
+    '              42',
+    '            )',
+    '          }',
+    '        ];',
     '      }',
     '    });',
     '    exports.identity = function(x) {',
