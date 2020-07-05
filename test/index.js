@@ -1,144 +1,192 @@
-import {execSync} from 'child_process';
-import {resolve} from 'path';
+import {strictEqual} from 'assert';
+import {exec} from 'child_process';
+import {relative} from 'path';
+import {promisify} from 'util';
 
+import test from 'oletus';
+import show from 'sanctuary-show';
 import Z from 'sanctuary-type-classes';
 
 import doctest from '../lib/doctest.js';
 import require from '../lib/require.js';
 
 
-let gray  = '';
-let green = '';
-let red   = '';
-let reset = '';
-if (!process.env.NODE_DISABLE_COLORS && process.platform !== 'win32') {
-  gray  = '\u001B[0;37m';
-  green = '\u001B[0;32m';
-  red   = '\u001B[0;31m';
-  reset = '\u001B[0m';
-}
+const resultsAmd = require ('../test/amd/results.json');
+const resultsBin = require ('../test/bin/results.json');
+const resultsCommonJsExports = require ('../test/commonjs/exports/results.json');
+const resultsCommonJsModuleExports = require ('../test/commonjs/module.exports/results.json');
+const resultsCommonJsRequire = require ('../test/commonjs/require/results.json');
+const resultsCommonJsStrict = require ('../test/commonjs/strict/results.json');
+const resultsEs2015 = require ('../test/es2015/results.json');
+const resultsEs2018 = require ('../test/es2018/results.json');
+const resultsEsmTranscribe = require ('../test/esm/transcribe/results.json');
+const resultsExceptions = require ('../test/exceptions/results.json');
+const resultsFantasyLand = require ('../test/fantasy-land/results.json');
+const resultsLineEndings = require ('../test/line-endings/results.json');
+const resultsShared = require ('../test/shared/results.json');
+const resultsStatements = require ('../test/statements/results.json');
+const resultsTranscribe = require ('../test/transcribe/results.json');
 
-let failures = 0;
 
-const printResult = (actual, expected, message) => {
-  if (Z.equals (actual, expected)) {
-    console.log (`${green} \u2714 ${gray} ${message}${reset}`);
-  } else {
-    failures += 1;
-    console.warn (`${red} \u2718 ${gray} ${message}${reset}`);
-    console.log (`${gray}      expected: ${green}${expected}${reset}`);
-    console.log (`${gray}      received: ${red}${actual}${reset}`);
-  }
+const eq = actual => expected => {
+  strictEqual (show (actual), show (expected));
+  strictEqual (Z.equals (actual, expected), true);
 };
 
-const testModule = (path, options) => {
-  const type = (path.split ('.')).pop ();
-  return doctest (options) (path)
-  .then (actuals => {
-    require (resolve (path, '..', 'results.json'))
-    .forEach (([description, expected], idx) => {
-      printResult (actuals[idx], expected, `${description} [${type}]`);
-    });
+const jsi = results => path => options => {
+  results.forEach (([description, expected], idx) => {
+    test (`${relative ('test', path)} \u001B[2m›\u001B[0m ${description}`, () =>
+      doctest ({silent: true, ...options}) (path)
+      .then (actuals => { eq (actuals[idx]) (expected); })
+    );
   });
 };
 
-const testCommand = (command, expected) => {
-  const actual = (() => {
-    const options = {encoding: 'utf8', stdio: 'pipe'};
-    try {
-      return {
-        status: 0,
-        stdout: execSync (`${command} --nodejs --no-warnings`, options),
-        stderr: '',
-      };
-    } catch (err) {
-      return err;
-    }
-  }) ();
-  printResult (actual.status, expected.status, `${command} [status]`);
-  printResult (actual.stdout, expected.stdout, `${command} [stdout]`);
-  printResult (actual.stderr, expected.stderr, `${command} [stderr]`);
+const cli = command => expected => {
+  test (command, () =>
+    promisify (exec) (`${command} --nodejs --no-warnings`)
+    .then (({stdout, stderr}) =>    { eq ({code: 0, stdout, stderr}) (expected); },
+           ({stdout, stderr, code}) => { eq ({code, stdout, stderr}) (expected); })
+  );
 };
 
-const moduleTests = Promise.all ([
-  testModule ('test/shared/index.js', {silent: true}),
-  testModule ('test/shared/index.coffee', {silent: true}),
-  testModule ('test/line-endings/CR.js', {silent: true}),
-  testModule ('test/line-endings/CR.coffee', {silent: true}),
-  testModule ('test/line-endings/CR+LF.js', {silent: true}),
-  testModule ('test/line-endings/CR+LF.coffee', {silent: true}),
-  testModule ('test/line-endings/LF.js', {silent: true}),
-  testModule ('test/line-endings/LF.coffee', {silent: true}),
-  testModule ('test/exceptions/index.js', {silent: true}),
-  testModule ('test/statements/index.js', {silent: true}),
-  testModule ('test/fantasy-land/index.js', {silent: true}),
-  testModule ('test/transcribe/index.js', {prefix: '.', openingDelimiter: '```javascript', closingDelimiter: '```', silent: true}),
-  testModule ('test/transcribe/index.coffee', {prefix: '.', openingDelimiter: '```coffee', closingDelimiter: '```', silent: true}),
-  testModule ('test/amd/index.js', {module: 'amd', silent: true}),
-  testModule ('test/commonjs/require/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/commonjs/exports/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/commonjs/strict/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/bin/executable', {type: 'js', silent: true}),
-  testModule ('test/es2015/index.js', {silent: true}),
-  testModule ('test/es2018/index.js', {silent: true}),
-]);
+const stdout = stdout => ({code: 0, stdout, stderr: ''});
+const stderr = stderr => ({code: 1, stdout: '', stderr});
 
-testCommand ('bin/doctest', {
-  status: 1,
-  stdout: '',
-  stderr: `error: No files for doctesting provided
-`,
-});
+jsi (resultsShared)
+    ('test/shared/index.js')
+    ({});
 
-testCommand ('bin/doctest --xxx', {
-  status: 1,
-  stdout: '',
-  stderr: `error: unknown option \`--xxx'
-`,
-});
+jsi (resultsShared)
+    ('test/shared/index.coffee')
+    ({});
 
-testCommand ('bin/doctest file.js --type', {
-  status: 1,
-  stdout: '',
-  stderr: `error: option \`-t, --type <type>' argument missing
-`,
-});
+jsi (resultsLineEndings)
+    ('test/line-endings/CR.js')
+    ({});
 
-testCommand ('bin/doctest file.js --type xxx', {
-  status: 1,
-  stdout: '',
-  stderr: `error: Invalid type \`xxx'
-`,
-});
+jsi (resultsLineEndings)
+    ('test/line-endings/CR.coffee')
+    ({});
 
-testCommand ('bin/doctest test/shared/index.js', {
-  status: 1,
-  stdout: `running doctests in test/shared/index.js...
+jsi (resultsLineEndings)
+    ('test/line-endings/CR+LF.js')
+    ({});
+
+jsi (resultsLineEndings)
+    ('test/line-endings/CR+LF.coffee')
+    ({});
+
+jsi (resultsLineEndings)
+    ('test/line-endings/LF.js')
+    ({});
+
+jsi (resultsLineEndings)
+    ('test/line-endings/LF.coffee')
+    ({});
+
+jsi (resultsExceptions)
+    ('test/exceptions/index.js')
+    ({});
+
+jsi (resultsStatements)
+    ('test/statements/index.js')
+    ({});
+
+jsi (resultsFantasyLand)
+    ('test/fantasy-land/index.js')
+    ({});
+
+jsi (resultsTranscribe)
+    ('test/transcribe/index.js')
+    ({prefix: '.',
+      openingDelimiter: '```javascript',
+      closingDelimiter: '```'});
+
+jsi (resultsTranscribe)
+    ('test/transcribe/index.coffee')
+    ({prefix: '.',
+      openingDelimiter: '```coffee',
+      closingDelimiter: '```'});
+
+jsi (resultsAmd)
+    ('test/amd/index.js')
+    ({module: 'amd'});
+
+jsi (resultsCommonJsRequire)
+    ('test/commonjs/require/index.js')
+    ({module: 'commonjs'});
+
+jsi (resultsCommonJsExports)
+    ('test/commonjs/exports/index.js')
+    ({module: 'commonjs'});
+
+jsi (resultsCommonJsModuleExports)
+    ('test/commonjs/module.exports/index.js')
+    ({module: 'commonjs'});
+
+jsi (resultsCommonJsStrict)
+    ('test/commonjs/strict/index.js')
+    ({module: 'commonjs'});
+
+jsi (resultsBin)
+    ('test/bin/executable')
+    ({type: 'js'});
+
+jsi (resultsEs2015)
+    ('test/es2015/index.js')
+    ({});
+
+jsi (resultsEs2018)
+    ('test/es2018/index.js')
+    ({});
+
+jsi (resultsEsmTranscribe)
+    ('test/esm/transcribe/index.mjs')
+    ({module: 'esm',
+      prefix: '.'});
+
+cli ('bin/doctest')
+    (stderr (`error: No files for doctesting provided
+`));
+
+cli ('bin/doctest --xxx')
+    (stderr (`error: unknown option \`--xxx'
+`));
+
+cli ('bin/doctest file.js --type')
+    (stderr (`error: option \`-t, --type <type>' argument missing
+`));
+
+cli ('bin/doctest file.js --type xxx')
+    (stderr (`error: Invalid type \`xxx'
+`));
+
+cli ('bin/doctest test/shared/index.js')
+    ({code: 1,
+      stdout: `running doctests in test/shared/index.js...
 ......x.x...........x........x
 FAIL: expected 5 on line 31 (got 4)
 FAIL: expected ! TypeError on line 38 (got 0)
 FAIL: expected 9.5 on line 97 (got 5)
 FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
 `,
-  stderr: '',
-});
+      stderr: ''});
 
-testCommand ('bin/doctest test/shared/index.coffee', {
-  status: 1,
-  stdout: `running doctests in test/shared/index.coffee...
+cli ('bin/doctest test/shared/index.coffee')
+    ({code: 1,
+      stdout: `running doctests in test/shared/index.coffee...
 ......x.x...........x........x
 FAIL: expected 5 on line 31 (got 4)
 FAIL: expected ! TypeError on line 38 (got 0)
 FAIL: expected 9.5 on line 97 (got 5)
 FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
 `,
-  stderr: '',
-});
+      stderr: ''});
 
-testCommand ('bin/doctest test/shared/index.js test/shared/index.coffee', {
-  status: 1,
-  stdout: `running doctests in test/shared/index.js...
+cli ('bin/doctest test/shared/index.js test/shared/index.coffee')
+    ({code: 1,
+      stdout: `running doctests in test/shared/index.js...
 ......x.x...........x........x
 FAIL: expected 5 on line 31 (got 4)
 FAIL: expected ! TypeError on line 38 (got 0)
@@ -151,66 +199,88 @@ FAIL: expected ! TypeError on line 38 (got 0)
 FAIL: expected 9.5 on line 97 (got 5)
 FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
 `,
-  stderr: '',
-});
+      stderr: ''});
 
-testCommand ('bin/doctest --silent test/shared/index.js', {
-  status: 1,
-  stdout: '',
-  stderr: '',
-});
+cli ('bin/doctest --silent test/shared/index.js')
+    (stderr (''));
 
-testCommand ('bin/doctest test/bin/executable', {
-  status: 1,
-  stdout: '',
-  stderr: `error: Cannot infer type from extension
-`,
-});
+cli ('bin/doctest test/bin/executable')
+    (stderr (`error: Cannot infer type from extension
+`));
 
-testCommand ('bin/doctest --type js test/bin/executable', {
-  status: 0,
-  stdout: `running doctests in test/bin/executable...
+cli ('bin/doctest --type js test/bin/executable')
+    (stdout (`running doctests in test/bin/executable...
 .
-`,
-  stderr: '',
-});
+`));
 
-testCommand ('bin/doctest --module esm lib/doctest.js', {
-  status: 0,
-  stdout: `running doctests in lib/doctest.js...
+cli ('bin/doctest --module xxx file.js')
+    (stderr (`error: Invalid module \`xxx'
+`));
+
+cli ('bin/doctest --module esm lib/doctest.js')
+    (stdout (`running doctests in lib/doctest.js...
 ...
-`,
-  stderr: '',
-});
+`));
 
-testCommand ('bin/doctest --module esm test/esm/index.mjs', {
-  status: 0,
-  stdout: `running doctests in test/esm/index.mjs...
+cli ('bin/doctest --module esm test/esm/index.mjs')
+    (stdout (`running doctests in test/esm/index.mjs...
 .
-`,
-  stderr: '',
-});
+`));
 
-testCommand ('bin/doctest --module esm test/esm/dependencies.mjs', {
-  status: 0,
-  stdout: `running doctests in test/esm/dependencies.mjs...
+cli ('bin/doctest --module esm test/esm/dependencies.mjs')
+    (stdout (`running doctests in test/esm/dependencies.mjs...
 .
-`,
-  stderr: '',
-});
+`));
 
-testCommand ('bin/doctest --module esm test/esm/incorrect.mjs', {
-  status: 1,
-  stdout: `running doctests in test/esm/incorrect.mjs...
+cli ('bin/doctest --module esm test/esm/incorrect.mjs')
+    ({code: 1,
+      stdout: `running doctests in test/esm/incorrect.mjs...
 x
 FAIL: expected 32 on line 4 (got "0°F")
 `,
-  stderr: '',
+      stderr: ''});
+
+cli ('bin/doctest --module esm --print test/esm/index.mjs')
+    (stdout (`
+export const __doctest = {
+  queue: [],
+  enqueue: function(io) { this.queue.push(io); },
+};
+
+// Convert degrees Celsius to degrees Fahrenheit.
+//
+
+__doctest.enqueue({
+  type: "input",
+  thunk: () => {
+    return toFahrenheit (0);
+  },
 });
 
-testCommand ('bin/doctest --print test/commonjs/exports/index.js', {
-  status: 0,
-  stdout: `
+__doctest.enqueue({
+  type: "output",
+  ":": 4,
+  "!": false,
+  thunk: () => {
+    return 32;
+  },
+});
+
+export function toFahrenheit(degreesCelsius) {
+  return degreesCelsius * 9 / 5 + 32;
+}
+
+`));
+
+cli ('bin/doctest --module esm --silent test/esm/index.mjs')
+    (stdout (''));
+
+cli ('bin/doctest --module esm --type xxx test/esm/index.mjs')
+    (stderr (`error: Cannot use file type when module is "esm"
+`));
+
+cli ('bin/doctest --print test/commonjs/exports/index.js')
+    (stdout (`
 __doctest.enqueue({
   type: "input",
   thunk: () => {
@@ -230,13 +300,10 @@ __doctest.enqueue({
 exports.identity = function(x) {
   return x;
 };
-`,
-  stderr: '',
-});
+`));
 
-testCommand ('bin/doctest --print --module amd test/amd/index.js', {
-  status: 0,
-  stdout: `
+cli ('bin/doctest --print --module amd test/amd/index.js')
+    (stdout (`
 define(function() {
   // Convert degrees Celsius to degrees Fahrenheit.
   //
@@ -266,13 +333,10 @@ __doctest.enqueue({
 function define(...args) {
   args[args.length - 1]();
 }
-`,
-  stderr: '',
-});
+`));
 
-testCommand ('bin/doctest --print --module commonjs test/commonjs/exports/index.js', {
-  status: 0,
-  stdout: `void (() => {
+cli ('bin/doctest --print --module commonjs test/commonjs/exports/index.js')
+    (stdout (`void (() => {
 
   const __doctest = {
     require,
@@ -305,15 +369,4 @@ testCommand ('bin/doctest --print --module commonjs test/commonjs/exports/index.
 
   (module.exports || exports).__doctest = __doctest;
 })();
-`,
-  stderr: '',
-});
-
-moduleTests.then (() => {
-  process.stdout.write (
-    failures === 0 ? `\n  ${green}0 test failures${reset}\n\n` :
-    failures === 1 ? `\n  ${red}1 test failure${reset}\n\n` :
-    /* otherwise */  `\n  ${red}${failures} test failures${reset}\n\n`
-  );
-  process.exit (failures === 0 ? 0 : 1);
-});
+`));

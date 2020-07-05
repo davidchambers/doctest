@@ -1,4 +1,16 @@
 #!/usr/bin/env bash
 set -euf -o pipefail
 
-node --experimental-modules -- test/index.js
+CI=true \
+node_modules/.bin/c8 \
+  --check-coverage \
+  --branches    "$(node --print 'process.versions.node === "12.0.0" ? 90 : 98')" \
+  --functions   0 \
+  --lines       0 \
+  --statements  0 \
+  --reporter    text \
+  --reporter    html \
+  $(find lib -name '*.js' | sort | xargs printf ' --include %s') \
+  node \
+    --experimental-modules \
+    -- node_modules/.bin/oletus -- test/index.js

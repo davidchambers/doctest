@@ -21,6 +21,10 @@
       }
     },
     {
+      "files": ["test/**/*.{js,mjs}"],
+      "globals": {"suite": "off", "test": "off"}
+    },
+    {
       "files": ["test/commonjs/**/index.js"],
       "parserOptions": {"sourceType": "script"}
     }
