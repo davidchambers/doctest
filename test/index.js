@@ -432,6 +432,54 @@ cli ('bin/doctest --type js test/bin/executable')
 
 `));
 
+cli ('bin/doctest --log-function stdout --log-function stderr test/shared/async.js')
+    (stdout (`running doctests in test/shared/async.js...
+....
+`));
+
+cli ('bin/doctest --module commonjs --log-function stdout --log-function stderr test/shared/async.js')
+    (stdout (`running doctests in test/shared/async.js...
+....
+`));
+
+cli ('bin/doctest --log-function stdout --log-function stderr test/shared/async.coffee')
+    (stdout (`running doctests in test/shared/async.coffee...
+....
+`));
+
+cli ('bin/doctest --log-function stdout --log-function stderr test/shared/logging.js')
+    ({status: 1,
+      stdout: `running doctests in test/shared/logging.js...
+...........xx.xxxx..x..x..
+FAIL: expected [stdout]: 2 on line 42 (got 3)
+FAIL: expected 3 on line 43 (got no output)
+FAIL: expected 3 on line 49 (got [stdout]: 2)
+FAIL: expected no output on line - (got 3)
+FAIL: expected [stdout]: 2 on line 54 (got [stdout]: 1)
+FAIL: expected [stdout]: 1 on line 55 (got [stdout]: 2)
+FAIL: expected [stderr]: 2 on line 62 (got [stdout]: 2)
+FAIL: expected [stdout]: 1 on line 69 (got no output fast enough)
+
+`,
+      stderr: ''});
+
+cli ('bin/doctest --module esm test/esm/async.mjs')
+    ({status: 1,
+      stdout: `running doctests in test/esm/async.mjs...
+x
+FAIL: expected undefined on line 6 (got ! ReferenceError: stdout is not defined)
+
+`,
+      stderr: ''});
+
+cli ('bin/doctest --module esm --log-function stdout --log-function stderr test/esm/async.mjs')
+    ({status: 0,
+      stdout: `running doctests in test/esm/async.mjs...
+....
+
+`,
+      stderr: ''});
+
 cli ('bin/doctest --module xxx file.js')
     (stderr (`Error: Invalid module "xxx"
 `));
@@ -526,16 +574,19 @@ __doctest.enqueue({
       );
     },
   },
-  output: {
-    lines: [
-      {number: 2, text: '42'},
-    ],
-    thunk: () => {
-      return (
-        42
-      );
+  output: [
+    {
+      lines: [
+        {number: 2, text: '42'},
+      ],
+      channel: null,
+      thunk: () => {
+        return (
+          42
+        );
+      },
     },
-  },
+  ],
 });
 
 
@@ -560,16 +611,19 @@ __doctest.enqueue({
       );
     },
   },
-  output: {
-    lines: [
-      {number: 5, text: '32'},
-    ],
-    thunk: () => {
-      return (
-        32
-      );
+  output: [
+    {
+      lines: [
+        {number: 5, text: '32'},
+      ],
+      channel: null,
+      thunk: () => {
+        return (
+          32
+        );
+      },
     },
-  },
+  ],
 });
 
   
@@ -593,20 +647,64 @@ __doctest.enqueue({
       );
     },
   },
-  output: {
-    lines: [
-      {number: 2, text: '42'},
-    ],
-    thunk: () => {
-      return (
-        42
-      );
+  output: [
+    {
+      lines: [
+        {number: 2, text: '42'},
+      ],
+      channel: null,
+      thunk: () => {
+        return (
+          42
+        );
+      },
     },
-  },
+  ],
 });
 
 
 exports.identity = function(x) {
   return x;
 };
+`));
+
+cli ('bin/doctest --print --module commonjs --log-function stdout --log-function stderr test/commonjs/exports/index.js')
+    (stdout (`void function() {
+  var __doctest = {
+    require: require,
+    queue: [],
+    enqueue: function(io) { this.queue.push(io); }
+  };
+
+  void function() {
+    __doctest.enqueue({
+      input: {
+        thunk: function(stdout, stderr) {
+          return (
+            exports.identity(42)
+          );
+        }
+      },
+      output: [
+        {
+          lines: [
+            {number: 2, text: '42'},
+          ],
+          channel: null,
+          thunk: () => {
+            return (
+              42
+            );
+          }
+        }
+      ],
+    });
+
+    exports.identity = function(x) {
+      return x;
+    };
+  }.call(this);
+
+  (module.exports || exports).__doctest = __doctest;
+}.call(this);
 `));
