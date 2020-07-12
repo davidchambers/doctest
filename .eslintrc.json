@@ -5,7 +5,9 @@
   "globals": {
     "Promise": "readonly",
     "console": "readonly",
-    "process": "readonly"
+    "process": "readonly",
+    "setTimeout": "readonly",
+    "clearTimeout": "readonly"
   },
   "overrides": [
     {

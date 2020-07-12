@@ -536,7 +536,7 @@ __doctest.enqueue({
       );
     },
   },
-  output: {
+  outputs: {
     lines: [
       {number: 4, text: '32'},
     ],
@@ -574,7 +574,7 @@ __doctest.enqueue({
       );
     },
   },
-  output: [
+  outputs: [
     {
       lines: [
         {number: 2, text: '42'},
@@ -611,7 +611,7 @@ __doctest.enqueue({
       );
     },
   },
-  output: [
+  outputs: [
     {
       lines: [
         {number: 5, text: '32'},
@@ -647,7 +647,7 @@ __doctest.enqueue({
       );
     },
   },
-  output: [
+  outputs: [
     {
       lines: [
         {number: 2, text: '42'},
@@ -685,7 +685,7 @@ cli ('bin/doctest --print --module commonjs --log-function stdout --log-function
           );
         }
       },
-      output: [
+      outputs: [
         {
           lines: [
             {number: 2, text: '42'},
