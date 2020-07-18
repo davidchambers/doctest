@@ -1,3 +1,12 @@
 !/.eslint.js
-/test/**/*.js
-!/test/index.js
+/test/amd/index.js
+/test/commonjs/exports/index.js
+/test/commonjs/module.exports/index.js
+/test/commonjs/require/index.js
+/test/exceptions/index.js
+/test/fantasy-land/index.js
+/test/harmony/index.js
+/test/line-endings/CR+LF.js
+/test/line-endings/CR.js
+/test/shared/index.js
+/test/transcribe/index.js
