@@ -81,7 +81,8 @@ const moduleTests = Promise.all ([
   testModule ('test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true}),
   testModule ('test/commonjs/strict/index.js', {module: 'commonjs', silent: true}),
   testModule ('test/bin/executable', {type: 'js', silent: true}),
-  testModule ('test/harmony/index.js', {silent: true}),
+  testModule ('test/es2015/index.js', {silent: true}),
+  testModule ('test/es2018/index.js', {silent: true}),
 ]);
 
 testCommand ('bin/doctest', {
