@@ -1,5 +1,6 @@
-function crash(){
-  throw new Error;
+// eslint-disable-next-line no-unused-vars
+function crash() {
+  throw new Error ();
 }
 
 // Synchronous log with output
