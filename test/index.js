@@ -83,6 +83,7 @@ const moduleTests = Promise.all ([
   testModule ('test/bin/executable', {type: 'js', silent: true}),
   testModule ('test/es2015/index.js', {silent: true}),
   testModule ('test/es2018/index.js', {silent: true}),
+  testModule ('test/es2020/index.js', {silent: true}),
 ]);
 
 testCommand ('bin/doctest', {

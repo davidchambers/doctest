@@ -22,7 +22,7 @@
     "node": ">=10.0.0"
   },
   "dependencies": {
-    "acorn": "7.3.x",
+    "acorn": "8.0.x",
     "coffeescript": "1.12.x",
     "commander": "2.20.x",
     "sanctuary-show": "1.0.x",
