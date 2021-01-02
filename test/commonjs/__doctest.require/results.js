@@ -3,20 +3,20 @@ export default [
     description: '__doctest.require',
     doctest: {
       correct: true,
-      input: {
+      actual: [{
+        channel: null,
         lines: [
           {number: 5, text: "> (new url.URL ('https://sanctuary.js.org/')).hostname"},
         ],
-        throws: false,
-        result: 'sanctuary.js.org',
-      },
-      output: {
+        value: {throws: false, result: 'sanctuary.js.org'},
+      }],
+      expected: [{
+        channel: null,
         lines: [
           {number: 6, text: "'sanctuary.js.org'"},
         ],
-        throws: false,
-        result: 'sanctuary.js.org',
-      },
+        value: {throws: false, result: 'sanctuary.js.org'},
+      }],
     },
   },
 ];

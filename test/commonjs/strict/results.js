@@ -3,20 +3,20 @@ export default [
     description: "preserves 'use strict' directive",
     doctest: {
       correct: true,
-      input: {
+      actual: [{
+        channel: null,
         lines: [
           {number: 3, text: '> (function() { return this; }())'},
         ],
-        throws: false,
-        result: undefined,
-      },
-      output: {
+        value: {throws: false, result: undefined},
+      }],
+      expected: [{
+        channel: null,
         lines: [
           {number: 4, text: 'undefined'},
         ],
-        throws: false,
-        result: undefined,
-      },
+        value: {throws: false, result: undefined},
+      }],
     },
   },
 ];

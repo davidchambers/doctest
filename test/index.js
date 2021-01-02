@@ -1,4 +1,4 @@
-import {strictEqual} from 'assert';
+import {strictEqual, deepStrictEqual} from 'assert';
 import {exec} from 'child_process';
 import {relative} from 'path';
 import {promisify} from 'util';
@@ -32,6 +32,7 @@ import resultsTranscribe from './transcribe/results.js';
 
 
 const eq = actual => expected => {
+  // deepStrictEqual (actual, expected);
   strictEqual (show (actual), show (expected));
   strictEqual (Z.equals (actual, expected), true);
 };
@@ -39,7 +40,7 @@ const eq = actual => expected => {
 const jsi = results => path => options => {
   results.forEach (({description, doctest: expected}, idx) => {
     test (`${relative ('test', path)} \u001B[2m›\u001B[0m ${description}`, () =>
-      doctest ({silent: true, ...options}) (path)
+      doctest ({silent: true, logFunction: [], ...options}) (path)
       .then (actuals => { eq (actuals[idx]) (expected); })
     );
   });
@@ -56,122 +57,122 @@ const cli = command => expected => {
 const stdout = stdout => ({code: 0, stdout, stderr: ''});
 const stderr = stderr => ({code: 1, stdout: '', stderr});
 
-// jsi (resultsSharedJs)
-//     ('test/shared/index.js')
-//     ({});
+jsi (resultsSharedJs)
+    ('test/shared/index.js')
+    ({});
 
-// jsi (resultsSharedCoffee)
-//     ('test/shared/index.coffee')
-//     ({});
+jsi (resultsSharedCoffee)
+    ('test/shared/index.coffee')
+    ({});
 
-// jsi (resultsSharedCoffee)
-//     ('test/shared/index.coffee')
-//     ({type: 'coffee'});
+jsi (resultsSharedCoffee)
+    ('test/shared/index.coffee')
+    ({type: 'coffee'});
 
-// jsi (resultsLineEndings)
-//     ('test/line-endings/CR.js')
-//     ({});
+jsi (resultsLineEndings)
+    ('test/line-endings/CR.js')
+    ({});
 
-// jsi (resultsLineEndings)
-//     ('test/line-endings/CR.coffee')
-//     ({});
+jsi (resultsLineEndings)
+    ('test/line-endings/CR.coffee')
+    ({});
 
-// jsi (resultsLineEndings)
-//     ('test/line-endings/CR+LF.js')
-//     ({});
+jsi (resultsLineEndings)
+    ('test/line-endings/CR+LF.js')
+    ({});
 
-// jsi (resultsLineEndings)
-//     ('test/line-endings/CR+LF.coffee')
-//     ({});
+jsi (resultsLineEndings)
+    ('test/line-endings/CR+LF.coffee')
+    ({});
 
-// jsi (resultsLineEndings)
-//     ('test/line-endings/LF.js')
-//     ({});
+jsi (resultsLineEndings)
+    ('test/line-endings/LF.js')
+    ({});
 
-// jsi (resultsLineEndings)
-//     ('test/line-endings/LF.coffee')
-//     ({});
+jsi (resultsLineEndings)
+    ('test/line-endings/LF.coffee')
+    ({});
 
-// jsi (resultsExceptions)
-//     ('test/exceptions/index.js')
-//     ({});
+jsi (resultsExceptions)
+    ('test/exceptions/index.js')
+    ({});
 
-// jsi (resultsStatements)
-//     ('test/statements/index.js')
-//     ({});
+jsi (resultsStatements)
+    ('test/statements/index.js')
+    ({});
 
-// jsi (resultsFantasyLand)
-//     ('test/fantasy-land/index.js')
-//     ({module: 'esm'});
+jsi (resultsFantasyLand)
+    ('test/fantasy-land/index.js')
+    ({module: 'esm'});
 
-// jsi (resultsTranscribe)
-//     ('test/transcribe/index.js')
-//     ({prefix: '.',
-//       openingDelimiter: '```javascript',
-//       closingDelimiter: '```'});
+jsi (resultsTranscribe)
+    ('test/transcribe/index.js')
+    ({prefix: '.',
+      openingDelimiter: '```javascript',
+      closingDelimiter: '```'});
 
-// jsi (resultsTranscribe)
-//     ('test/transcribe/index.coffee')
-//     ({prefix: '.',
-//       openingDelimiter: '```coffee',
-//       closingDelimiter: '```'});
+jsi (resultsTranscribe)
+    ('test/transcribe/index.coffee')
+    ({prefix: '.',
+      openingDelimiter: '```coffee',
+      closingDelimiter: '```'});
 
-// jsi (resultsAmd)
-//     ('test/amd/index.js')
-//     ({module: 'amd'});
+jsi (resultsAmd)
+    ('test/amd/index.js')
+    ({module: 'amd'});
 
-// jsi (resultsCommonJsRequire)
-//     ('test/commonjs/require/index.js')
-//     ({module: 'commonjs'});
+jsi (resultsCommonJsRequire)
+    ('test/commonjs/require/index.js')
+    ({module: 'commonjs'});
 
-// jsi (resultsCommonJsExports)
-//     ('test/commonjs/exports/index.js')
-//     ({module: 'commonjs'});
+jsi (resultsCommonJsExports)
+    ('test/commonjs/exports/index.js')
+    ({module: 'commonjs'});
 
-// jsi (resultsCommonJsModuleExports)
-//     ('test/commonjs/module.exports/index.js')
-//     ({module: 'commonjs'});
+jsi (resultsCommonJsModuleExports)
+    ('test/commonjs/module.exports/index.js')
+    ({module: 'commonjs'});
 
-// jsi (resultsCommonJsStrict)
-//     ('test/commonjs/strict/index.js')
-//     ({module: 'commonjs'});
+jsi (resultsCommonJsStrict)
+    ('test/commonjs/strict/index.js')
+    ({module: 'commonjs'});
 
-// jsi (resultsCommonJsDirname)
-//     ('test/commonjs/__dirname/index.js')
-//     ({module: 'commonjs'});
+jsi (resultsCommonJsDirname)
+    ('test/commonjs/__dirname/index.js')
+    ({module: 'commonjs'});
 
-// jsi (resultsCommonJsFilename)
-//     ('test/commonjs/__filename/index.js')
-//     ({module: 'commonjs'});
+jsi (resultsCommonJsFilename)
+    ('test/commonjs/__filename/index.js')
+    ({module: 'commonjs'});
 
-// jsi (resultsCommonJsDoctestRequire)
-//     ('test/commonjs/__doctest.require/index.js')
-//     ({module: 'commonjs'});
+jsi (resultsCommonJsDoctestRequire)
+    ('test/commonjs/__doctest.require/index.js')
+    ({module: 'commonjs'});
 
-// jsi (resultsBin)
-//     ('test/bin/executable')
-//     ({type: 'js'});
+jsi (resultsBin)
+    ('test/bin/executable')
+    ({type: 'js'});
 
-// jsi (resultsEs2015)
-//     ('test/es2015/index.js')
-//     ({});
+jsi (resultsEs2015)
+    ('test/es2015/index.js')
+    ({});
 
-// jsi (resultsEs2018)
-//     ('test/es2018/index.js')
-//     ({});
+jsi (resultsEs2018)
+    ('test/es2018/index.js')
+    ({});
 
-// jsi (resultsEsmTranscribe)
-//     ('test/esm/transcribe/index.js')
-//     ({module: 'esm',
-//       prefix: '.'});
+jsi (resultsEsmTranscribe)
+    ('test/esm/transcribe/index.js')
+    ({module: 'esm',
+      prefix: '.'});
 
-// jsi (resultsContiguity)
-//     ('test/contiguity/index.js')
-//     ({});
+jsi (resultsContiguity)
+    ('test/contiguity/index.js')
+    ({});
 
-// jsi (resultsContiguity)
-//     ('test/contiguity/index.coffee')
-//     ({});
+jsi (resultsContiguity)
+    ('test/contiguity/index.coffee')
+    ({});
 
 cli ('bin/doctest')
     (stdout (''));
@@ -432,36 +433,61 @@ cli ('bin/doctest --type js test/bin/executable')
 
 `));
 
-// cli ('bin/doctest --log-function stdout --log-function stderr test/shared/async.js')
-//     (stdout (`running doctests in test/shared/async.js...
-// ....
-// `));
+cli ('bin/doctest --log-function stdout --log-function stderr test/shared/async.js')
+    (stdout (`running doctests in test/shared/async.js...
+....
 
-// cli ('bin/doctest --module commonjs --log-function stdout --log-function stderr test/shared/async.js')
-//     (stdout (`running doctests in test/shared/async.js...
-// ....
-// `));
+`));
 
-// cli ('bin/doctest --log-function stdout --log-function stderr test/shared/async.coffee')
-//     (stdout (`running doctests in test/shared/async.coffee...
-// ....
-// `));
+cli ('bin/doctest --module commonjs --log-function stdout --log-function stderr test/shared/async.js')
+    (stdout (`running doctests in test/shared/async.js...
+....
 
-// cli ('bin/doctest --log-function stdout --log-function stderr test/shared/logging.js')
-//     ({status: 1,
-//       stdout: `running doctests in test/shared/logging.js...
-// ...........xx.xxxx..x..x..
-// FAIL: expected [stdout]: 2 on line 42 (got 3)
-// FAIL: expected 3 on line 43 (got no output)
-// FAIL: expected 3 on line 49 (got [stdout]: 2)
-// FAIL: expected no output on line - (got 3)
-// FAIL: expected [stdout]: 2 on line 54 (got [stdout]: 1)
-// FAIL: expected [stdout]: 1 on line 55 (got [stdout]: 2)
-// FAIL: expected [stderr]: 2 on line 62 (got [stdout]: 2)
-// FAIL: expected [stdout]: 1 on line 69 (got no output fast enough)
+`));
 
-// `,
-//       stderr: ''});
+cli ('bin/doctest --log-function stdout --log-function stderr test/shared/async.coffee')
+    (stdout (`running doctests in test/shared/async.coffee...
+....
+
+`));
+
+cli ('bin/doctest --log-function stdout --log-function stderr test/shared/logging.js')
+    ({status: 1,
+      stdout: `running doctests in test/shared/logging.js...
+.........x.xxxx........
+
+Unexpected result on line 34:
+
+> (stdout (1), 3)
+\u001B[0;32m2\u001B[0m
+\u001B[0;31m3\u001B[0m
+
+Unexpected result on line 41:
+
+> (stdout (1), stdout (2), 3)
+\u001B[0;32m3\u001B[0m
+\u001B[0;31m2\u001B[0m
+
+Unexpected result on an unknown line:
+
+> (stdout (1), stdout (2), 3)
+\u001B[0;32m<expected nothing>\u001B[0m
+\u001B[0;31m3\u001B[0m
+
+Unexpected result on line 46:
+
+> (stdout (1), stdout (2), 3)
+\u001B[0;32m2\u001B[0m
+\u001B[0;31m1\u001B[0m
+
+Unexpected result on line 47:
+
+> (stdout (1), stdout (2), 3)
+\u001B[0;32m1\u001B[0m
+\u001B[0;31m2\u001B[0m
+
+`,
+      stderr: ''});
 
 // cli ('bin/doctest --module esm test/esm/async.mjs')
 //     ({status: 1,
@@ -678,7 +704,7 @@ __doctest.enqueue({
     lines: [
       {number: 1, text: '> exports.identity(42)'},
     ],
-    thunk: () => {
+    thunk: (stdout, stderr) => {
       return (
         exports.identity(42)
       );

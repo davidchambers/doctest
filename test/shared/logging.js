@@ -27,15 +27,6 @@ function crash() {
 // ! Error
 // [stdout]: 1
 
-// Output on non-existent channels is ignored
-//
-// > (stdout (1), 2)
-// [spam]: "hi"
-// [stdout]: 1
-// [spam]: "lalala"
-// 2
-// [spam]: "whatever"
-
 // Failure due to not enough output
 //
 // > (stdout (1), 3)
@@ -74,3 +65,10 @@ function crash() {
 // > (setTimeout (stdout, 80, 1), 2)
 // 2
 // [stdout]: 1
+
+// Unrelated output-lookalikes
+//
+// > 21 + 21
+// 42
+//
+// [Fluture]: https://github.com/fluture-js/Fluture

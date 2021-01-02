@@ -3,20 +3,20 @@ export default [
     description: 'output line immediately following input line',
     doctest: {
       correct: true,
-      input: {
+      actual: [{
+        channel: null,
         lines: [
           {number: 15, text: '> zero (42)'},
         ],
-        throws: false,
-        result: 0,
-      },
-      output: {
+        value: {throws: false, result: 0},
+      }],
+      expected: [{
+        channel: null,
         lines: [
           {number: 16, text: '0'},
         ],
-        throws: false,
-        result: 0,
-      },
+        value: {throws: false, result: 0},
+      }],
     },
   },
 ];

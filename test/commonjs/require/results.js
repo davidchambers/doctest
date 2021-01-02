@@ -3,20 +3,20 @@ export default [
     description: 'require another CommonJS module',
     doctest: {
       correct: true,
-      input: {
+      actual: [{
+        channel: null,
         lines: [
           {number: 1, text: '> typeof $require("assert")'},
         ],
-        throws: false,
-        result: 'function',
-      },
-      output: {
+        value: {throws: false, result: 'function'},
+      }],
+      expected: [{
+        channel: null,
         lines: [
           {number: 2, text: '"function"'},
         ],
-        throws: false,
-        result: 'function',
-      },
+        value: {throws: false, result: 'function'},
+      }],
     },
   },
 ];

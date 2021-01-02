@@ -14,10 +14,3 @@ node_modules/.bin/c8 \
   node \
     --experimental-modules \
     -- node_modules/.bin/oletus -- test/index.js
-
-find test \
-  -name results.js \
-  -not -path 'test/contiguity/*' \
-  -not -path 'test/shared/*' \
-  | xargs -n 1 dirname \
-  | xargs node --experimental-modules scripts/verify-results.js

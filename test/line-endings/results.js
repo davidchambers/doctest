@@ -3,20 +3,20 @@ export default [
     description: 'correct line number reported irrespective of line endings',
     doctest: {
       correct: true,
-      input: {
+      actual: [{
+        channel: null,
         lines: [
           {number: 1, text: '> 2 * 3 * 7'},
         ],
-        throws: false,
-        result: 42,
-      },
-      output: {
+        value: {throws: false, result: 42},
+      }],
+      expected: [{
+        channel: null,
         lines: [
           {number: 2, text: '42'},
         ],
-        throws: false,
-        result: 42,
-      },
+        value: {throws: false, result: 42},
+      }],
     },
   },
 ];
