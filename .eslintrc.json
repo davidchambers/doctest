@@ -6,6 +6,7 @@
     "Promise": "readonly",
     "console": "readonly",
     "process": "readonly",
+    "setImmediate": "readonly",
     "setTimeout": "readonly",
     "clearTimeout": "readonly"
   },

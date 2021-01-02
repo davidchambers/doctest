@@ -1,4 +1,4 @@
-import {strictEqual, deepStrictEqual} from 'assert';
+import {strictEqual} from 'assert';
 import {exec} from 'child_process';
 import {relative} from 'path';
 import {promisify} from 'util';
