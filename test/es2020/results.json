@@ -1,0 +1,20 @@
+[
+  [
+    "optional chaining",
+    [
+      true,
+      "undefined",
+      "undefined",
+      4
+    ]
+  ],
+  [
+    "nullish coalescing",
+    [
+      true,
+      "{}",
+      "{}",
+      6
+    ]
+  ]
+]
