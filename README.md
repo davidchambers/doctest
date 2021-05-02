@@ -121,6 +121,37 @@ Each doctest has access to variables in its scope chain.
   - [Grunt](http://gruntjs.com/):
       [paolodm/grunt-doctest](https://github.com/paolodm/grunt-doctest)
 
+### Gotchas
+
+Result lines are obligatory. In the file you are going to test, a line is
+**obligatory** even if the output you expect is empty.
+
+This does not work:
+
+```javascript
+// > pipe(id, console.log)("Hello");
+let pipe = (...fns) => (x) => fns.reduce((v, f) => f(v), x);
+```
+
+This does work:
+
+```javascript
+// > pipe(id, console.log)("Hello");
+//
+let pipe = (...fns) => (x) => fns.reduce((v, f) => f(v), x);
+```
+
+If this rule is violated, mysterious errors are reported. Examples include:
+
+- `error: Line 34: Unexpected identifier`, and
+- `error: Line 16: Unexpected token :`.
+
+Line numbers above refer to empty lines in the source file and tend to be
+difficult to relate to particular lines of your file.
+
+If you encounter a similar error, check if there is a, possibly empty,
+comment line after each test you defined.
+
 ### Running the test suite
 
 ```console
