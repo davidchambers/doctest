@@ -118,7 +118,7 @@ Each doctest has access to variables in its scope chain.
 
 ### Integrations
 
-  - [Grunt](http://gruntjs.com/):
+  - [Grunt](https://gruntjs.com/):
       [paolodm/grunt-doctest](https://github.com/paolodm/grunt-doctest)
 
 ### Running the test suite
@@ -129,4 +129,4 @@ $ npm test
 ```
 
 
-[1]: http://docs.python.org/library/doctest.html
+[1]: https://docs.python.org/library/doctest.html
