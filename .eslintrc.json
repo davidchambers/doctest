@@ -7,6 +7,14 @@
   },
   "overrides": [
     {
+      "files": ["README.md"],
+      "globals": {"doctest": "readonly"},
+      "rules": {
+        "no-extra-semi": ["off"],
+        "no-unused-vars": ["error", {"varsIgnorePattern": "^(toFahrenheit)$"}]
+      }
+    },
+    {
       "files": ["lib/doctest.js"],
       "rules": {
         "no-multiple-empty-lines": ["error", {"max": 2, "maxEOF": 0}],
