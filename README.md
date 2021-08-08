@@ -35,7 +35,7 @@ $ npm install doctest
 Test a module via JavaScript API:
 
 ```javascript
-> doctest ('lib/temperature.js', {})
+> doctest ({}) ('lib/temperature.js')
 ```
 
 Test a module via command-line interface:
@@ -57,7 +57,7 @@ The exit code is 0 if all tests pass, 1 otherwise.
 Specify module system via JavaScript API:
 
 ```javascript
-> doctest ('path/to/amd/module.js', {module: 'amd'})
+> doctest ({module: 'amd'}) ('path/to/amd/module.js')
 ```
 
 Specify module system via command-line interface:
