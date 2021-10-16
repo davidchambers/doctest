@@ -17,7 +17,8 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm install
       - run: |
-          npm install doctest standard --save-dev
+          # npm install doctest --save-dev
+          npm install standard --save-dev
           npx doctest **/*.js
           npx standard
           npm ci
