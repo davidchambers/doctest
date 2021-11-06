@@ -83,6 +83,9 @@ const moduleTests = Promise.all ([
   testModule ('test/bin/executable', {type: 'js', silent: true}),
   testModule ('test/es2015/index.js', {silent: true}),
   testModule ('test/es2018/index.js', {silent: true}),
+  Number ((process.versions.node.split ('.'))[0]) >= 14
+  ? testModule ('test/es2020/index.js', {silent: true})
+  : Promise.resolve (undefined),
 ]);
 
 testCommand ('bin/doctest', {
