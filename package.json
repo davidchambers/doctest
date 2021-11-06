@@ -29,7 +29,7 @@
     "sanctuary-type-classes": "12.1.x"
   },
   "devDependencies": {
-    "babel-eslint": "10.0.x",
+    "babel-eslint": "10.1.x",
     "sanctuary-scripts": "5.0.x"
   },
   "scripts": {
