@@ -170,10 +170,11 @@ testCommand ('bin/doctest --silent test/shared/index.js', {
 });
 
 testCommand ('bin/doctest test/bin/executable', {
-  status: 1,
-  stdout: '',
-  stderr: `error: Cannot infer type from extension
+  status: 0,
+  stdout: `running doctests in test/bin/executable...
+.
 `,
+  stderr: '',
 });
 
 testCommand ('bin/doctest --type js test/bin/executable', {
