@@ -1,9 +1,10 @@
 {
   "root": true,
   "extends": ["./node_modules/sanctuary-style/eslint-es6.json"],
+  "parserOptions": {"ecmaVersion": 2020, "sourceType": "module"},
   "env": {"node": true},
-  "globals": {
-    "Promise": "readonly"
+  "rules": {
+    "comma-dangle": ["error", {"arrays": "always-multiline", "objects": "always-multiline", "imports": "always-multiline", "exports": "always-multiline", "functions": "never"}]
   },
   "overrides": [
     {
@@ -15,6 +16,10 @@
       }
     },
     {
+      "files": ["bin/doctest"],
+      "parserOptions": {"sourceType": "script"}
+    },
+    {
       "files": ["lib/doctest.js"],
       "rules": {
         "no-multiple-empty-lines": ["error", {"max": 2, "maxEOF": 0}],
@@ -22,8 +27,8 @@
       }
     },
     {
-      "files": ["*.mjs"],
-      "parser": "babel-eslint"
+      "files": ["test/commonjs/**/index.js"],
+      "parserOptions": {"sourceType": "script"}
     }
   ]
 }

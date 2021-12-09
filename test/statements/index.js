@@ -1,5 +1,3 @@
-'use strict';
-
 // > var x = 64
 //
 // > Math.sqrt(x)
