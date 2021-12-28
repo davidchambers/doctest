@@ -1,94 +1,97 @@
-import {execSync} from 'child_process';
-import {resolve} from 'path';
+import {strictEqual} from 'assert';
+import {exec} from 'child_process';
+import {relative} from 'path';
+import {promisify} from 'util';
 
+import test from 'oletus';
+import show from 'sanctuary-show';
 import Z from 'sanctuary-type-classes';
 
 import doctest from '../lib/doctest.js';
 import require from '../lib/require.js';
 
 
-let gray  = '';
-let green = '';
-let red   = '';
-let reset = '';
-if (!process.env.NODE_DISABLE_COLORS && process.platform !== 'win32') {
-  gray  = '\u001B[0;37m';
-  green = '\u001B[0;32m';
-  red   = '\u001B[0;31m';
-  reset = '\u001B[0m';
-}
+const resultsAmd = require ('../test/amd/results.json');
+const resultsBin = require ('../test/bin/results.json');
+const resultsCommonJsDirname = require ('../test/commonjs/__dirname/results.json');
+const resultsCommonJsDoctestRequire = require ('../test/commonjs/__doctest.require/results.json');
+const resultsCommonJsFilename = require ('../test/commonjs/__filename/results.json');
+const resultsCommonJsExports = require ('../test/commonjs/exports/results.json');
+const resultsCommonJsModuleExports = require ('../test/commonjs/module.exports/results.json');
+const resultsCommonJsRequire = require ('../test/commonjs/require/results.json');
+const resultsCommonJsStrict = require ('../test/commonjs/strict/results.json');
+const resultsEs2015 = require ('../test/es2015/results.json');
+const resultsEs2018 = require ('../test/es2018/results.json');
+const resultsEs2020 = require ('../test/es2020/results.json');
+const resultsExceptions = require ('../test/exceptions/results.json');
+const resultsFantasyLand = require ('../test/fantasy-land/results.json');
+const resultsLineEndings = require ('../test/line-endings/results.json');
+const resultsShared = require ('../test/shared/results.json');
+const resultsStatements = require ('../test/statements/results.json');
+const resultsTranscribe = require ('../test/transcribe/results.json');
 
-let failures = 0;
 
-const printResult = (actual, expected, message) => {
-  if (Z.equals (actual, expected)) {
-    console.log (`${green} \u2714 ${gray} ${message}${reset}`);
-  } else {
-    failures += 1;
-    console.warn (`${red} \u2718 ${gray} ${message}${reset}`);
-    console.log (`${gray}      expected: ${green}${expected}${reset}`);
-    console.log (`${gray}      received: ${red}${actual}${reset}`);
-  }
+const eq = actual => expected => {
+  strictEqual (show (actual), show (expected));
+  strictEqual (Z.equals (actual, expected), true);
 };
 
-const testModule = (path, options) => {
-  const type = (path.split ('.')).pop ();
-  return doctest (options) (path)
-  .then (actuals => {
-    require (resolve (path, '..', 'results.json'))
-    .forEach (([description, expected], idx) => {
-      printResult (actuals[idx], expected, `${description} [${type}]`);
-    });
+const testModule = (results, path, options) => {
+  results.forEach (([description, expected], idx) => {
+    test (`${relative ('test', path)} \u001B[2m›\u001B[0m ${description}`, () =>
+      doctest (options) (path)
+      .then (actuals => {
+        eq (actuals[idx]) (expected);
+      })
+    );
   });
 };
 
 const testCommand = (command, expected) => {
-  const actual = (() => {
-    const options = {encoding: 'utf8', stdio: 'pipe'};
-    try {
-      return {
-        status: 0,
-        stdout: execSync (command, options),
-        stderr: '',
-      };
-    } catch (err) {
-      return err;
-    }
-  }) ();
-  printResult (actual.status, expected.status, `${command} [status]`);
-  printResult (actual.stdout, expected.stdout, `${command} [stdout]`);
-  printResult (actual.stderr, expected.stderr, `${command} [stderr]`);
+  test (command, () =>
+    promisify (exec) (command)
+    .then (
+      actual => {
+        eq (0) (expected.status);
+        eq (actual.stdout) (expected.stdout);
+        eq (actual.stderr) (expected.stderr);
+      },
+      actual => {
+        eq (actual.code) (expected.status);
+        eq (actual.stdout) (expected.stdout);
+        eq (actual.stderr) (expected.stderr);
+      }
+    )
+  );
 };
 
-const moduleTests = Promise.all ([
-  testModule ('test/shared/index.js', {silent: true}),
-  testModule ('test/shared/index.coffee', {silent: true}),
-  testModule ('test/line-endings/CR.js', {silent: true}),
-  testModule ('test/line-endings/CR.coffee', {silent: true}),
-  testModule ('test/line-endings/CR+LF.js', {silent: true}),
-  testModule ('test/line-endings/CR+LF.coffee', {silent: true}),
-  testModule ('test/line-endings/LF.js', {silent: true}),
-  testModule ('test/line-endings/LF.coffee', {silent: true}),
-  testModule ('test/exceptions/index.js', {silent: true}),
-  testModule ('test/statements/index.js', {silent: true}),
-  testModule ('test/fantasy-land/index.js', {silent: true}),
-  testModule ('test/transcribe/index.js', {prefix: '.', openingDelimiter: '```javascript', closingDelimiter: '```', silent: true}),
-  testModule ('test/transcribe/index.coffee', {prefix: '.', openingDelimiter: '```coffee', closingDelimiter: '```', silent: true}),
-  testModule ('test/amd/index.js', {module: 'amd', silent: true}),
-  testModule ('test/commonjs/require/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/commonjs/exports/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/commonjs/strict/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/commonjs/__dirname/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/commonjs/__filename/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/commonjs/__doctest.require/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/bin/executable', {type: 'js', silent: true}),
-  testModule ('test/es2015/index.js', {silent: true}),
-  testModule ('test/es2018/index.js', {silent: true}),
-  Number ((process.versions.node.split ('.'))[0]) >= 14
-  ? testModule ('test/es2020/index.js', {silent: true})
-  : Promise.resolve (undefined),
-]);
+testModule (resultsShared, 'test/shared/index.js', {silent: true});
+testModule (resultsShared, 'test/shared/index.coffee', {silent: true});
+testModule (resultsLineEndings, 'test/line-endings/CR.js', {silent: true});
+testModule (resultsLineEndings, 'test/line-endings/CR.coffee', {silent: true});
+testModule (resultsLineEndings, 'test/line-endings/CR+LF.js', {silent: true});
+testModule (resultsLineEndings, 'test/line-endings/CR+LF.coffee', {silent: true});
+testModule (resultsLineEndings, 'test/line-endings/LF.js', {silent: true});
+testModule (resultsLineEndings, 'test/line-endings/LF.coffee', {silent: true});
+testModule (resultsExceptions, 'test/exceptions/index.js', {silent: true});
+testModule (resultsStatements, 'test/statements/index.js', {silent: true});
+testModule (resultsFantasyLand, 'test/fantasy-land/index.js', {silent: true});
+testModule (resultsTranscribe, 'test/transcribe/index.js', {prefix: '.', openingDelimiter: '```javascript', closingDelimiter: '```', silent: true});
+testModule (resultsTranscribe, 'test/transcribe/index.coffee', {prefix: '.', openingDelimiter: '```coffee', closingDelimiter: '```', silent: true});
+testModule (resultsAmd, 'test/amd/index.js', {module: 'amd', silent: true});
+testModule (resultsCommonJsRequire, 'test/commonjs/require/index.js', {module: 'commonjs', silent: true});
+testModule (resultsCommonJsExports, 'test/commonjs/exports/index.js', {module: 'commonjs', silent: true});
+testModule (resultsCommonJsModuleExports, 'test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true});
+testModule (resultsCommonJsStrict, 'test/commonjs/strict/index.js', {module: 'commonjs', silent: true});
+testModule (resultsCommonJsDirname, 'test/commonjs/__dirname/index.js', {module: 'commonjs', silent: true});
+testModule (resultsCommonJsFilename, 'test/commonjs/__filename/index.js', {module: 'commonjs', silent: true});
+testModule (resultsCommonJsDoctestRequire, 'test/commonjs/__doctest.require/index.js', {module: 'commonjs', silent: true});
+testModule (resultsBin, 'test/bin/executable', {type: 'js', silent: true});
+testModule (resultsEs2015, 'test/es2015/index.js', {silent: true});
+testModule (resultsEs2018, 'test/es2018/index.js', {silent: true});
+if (Number ((process.versions.node.split ('.'))[0]) >= 14) {
+  testModule (resultsEs2020, 'test/es2020/index.js', {silent: true});
+}
 
 testCommand ('bin/doctest', {
   status: 1,
@@ -179,6 +182,20 @@ testCommand ('bin/doctest --type js test/bin/executable', {
 .
 `,
   stderr: '',
+});
+
+testCommand ('bin/doctest --module xxx file.js', {
+  status: 1,
+  stdout: '',
+  stderr: `error: Invalid module \`xxx'
+`,
+});
+
+testCommand ('bin/doctest --module esm --type js file.js', {
+  status: 1,
+  stdout: '',
+  stderr: `error: Cannot use file type when module is "esm"
+`,
 });
 
 testCommand ('bin/doctest --module esm lib/doctest.js', {
@@ -313,13 +330,4 @@ testCommand ('bin/doctest --print --module commonjs test/commonjs/exports/index.
 })();
 `,
   stderr: '',
-});
-
-moduleTests.then (() => {
-  process.stdout.write (
-    failures === 0 ? `\n  ${green}0 test failures${reset}\n\n` :
-    failures === 1 ? `\n  ${red}1 test failure${reset}\n\n` :
-    /* otherwise */  `\n  ${red}${failures} test failures${reset}\n\n`
-  );
-  process.exit (failures === 0 ? 0 : 1);
 });

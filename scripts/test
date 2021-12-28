@@ -1,4 +1,16 @@
 #!/usr/bin/env bash
 set -euf -o pipefail
 
-node -- test/index.js
+source "${BASH_SOURCE%/*}/../node_modules/sanctuary-scripts/functions"
+
+set +f ; shopt -s nullglob
+files=($(get source-files))
+set -f ; shopt -u nullglob
+
+node_modules/.bin/c8 \
+  --check-coverage \
+  --100 \
+  --reporter text \
+  --reporter html \
+  $(printf ' --include %s' "${files[@]}") \
+  node -- node_modules/.bin/oletus -- test/index.js

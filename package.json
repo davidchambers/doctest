@@ -31,6 +31,8 @@
   },
   "devDependencies": {
     "babel-eslint": "10.1.x",
+    "c8": "7.10.x",
+    "oletus": "3.2.x",
     "sanctuary-scripts": "5.0.x"
   },
   "scripts": {
