@@ -46,6 +46,8 @@ $ doctest lib/temperature.js
 
 The exit code is 0 if all tests pass, 1 otherwise.
 
+The exit code is 2 if arguments are invalid.
+
 ### Supported module systems
 
 | Module system         | Option        | Node.js       | Dependencies  |

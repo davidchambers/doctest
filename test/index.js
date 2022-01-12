@@ -100,21 +100,21 @@ testCommand ('bin/doctest', {
 });
 
 testCommand ('bin/doctest --xxx', {
-  status: 1,
+  status: 2,
   stdout: '',
-  stderr: `error: unknown option \`--xxx'
+  stderr: `error: unknown option '--xxx'
 `,
 });
 
 testCommand ('bin/doctest file.js --type', {
-  status: 1,
+  status: 2,
   stdout: '',
-  stderr: `error: option \`-t, --type <type>' argument missing
+  stderr: `error: option '-t, --type <type>' argument missing
 `,
 });
 
 testCommand ('bin/doctest file.js --type xxx', {
-  status: 1,
+  status: 2,
   stdout: '',
   stderr: `Error: Invalid type "xxx"
 `,
@@ -185,14 +185,14 @@ testCommand ('bin/doctest --type js test/bin/executable', {
 });
 
 testCommand ('bin/doctest --module xxx file.js', {
-  status: 1,
+  status: 2,
   stdout: '',
   stderr: `Error: Invalid module "xxx"
 `,
 });
 
 testCommand ('bin/doctest --module esm --type js file.js', {
-  status: 1,
+  status: 2,
   stdout: '',
   stderr: `Error: Cannot use file type when module is "esm"
 `,
