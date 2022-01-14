@@ -94,10 +94,9 @@ if (Number ((process.versions.node.split ('.'))[0]) >= 14) {
 }
 
 testCommand ('bin/doctest', {
-  status: 1,
+  status: 0,
   stdout: '',
-  stderr: `error: No files for doctesting provided
-`,
+  stderr: '',
 });
 
 testCommand ('bin/doctest --xxx', {
@@ -117,7 +116,7 @@ testCommand ('bin/doctest file.js --type', {
 testCommand ('bin/doctest file.js --type xxx', {
   status: 1,
   stdout: '',
-  stderr: `error: Invalid type \`xxx'
+  stderr: `Error: Invalid type "xxx"
 `,
 });
 
@@ -188,14 +187,14 @@ testCommand ('bin/doctest --type js test/bin/executable', {
 testCommand ('bin/doctest --module xxx file.js', {
   status: 1,
   stdout: '',
-  stderr: `error: Invalid module \`xxx'
+  stderr: `Error: Invalid module "xxx"
 `,
 });
 
 testCommand ('bin/doctest --module esm --type js file.js', {
   status: 1,
   stdout: '',
-  stderr: `error: Cannot use file type when module is "esm"
+  stderr: `Error: Cannot use file type when module is "esm"
 `,
 });
 
