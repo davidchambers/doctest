@@ -66,18 +66,18 @@ const testCommand = (command, expected) => {
 };
 
 testModule (resultsShared, 'test/shared/index.js', {silent: true});
-testModule (resultsShared, 'test/shared/index.coffee', {silent: true});
+testModule (resultsShared, 'test/shared/index.coffee', {silent: true, coffee: true});
 testModule (resultsLineEndings, 'test/line-endings/CR.js', {silent: true});
-testModule (resultsLineEndings, 'test/line-endings/CR.coffee', {silent: true});
+testModule (resultsLineEndings, 'test/line-endings/CR.coffee', {silent: true, coffee: true});
 testModule (resultsLineEndings, 'test/line-endings/CR+LF.js', {silent: true});
-testModule (resultsLineEndings, 'test/line-endings/CR+LF.coffee', {silent: true});
+testModule (resultsLineEndings, 'test/line-endings/CR+LF.coffee', {silent: true, coffee: true});
 testModule (resultsLineEndings, 'test/line-endings/LF.js', {silent: true});
-testModule (resultsLineEndings, 'test/line-endings/LF.coffee', {silent: true});
+testModule (resultsLineEndings, 'test/line-endings/LF.coffee', {silent: true, coffee: true});
 testModule (resultsExceptions, 'test/exceptions/index.js', {silent: true});
 testModule (resultsStatements, 'test/statements/index.js', {silent: true});
 testModule (resultsFantasyLand, 'test/fantasy-land/index.js', {silent: true});
 testModule (resultsTranscribe, 'test/transcribe/index.js', {prefix: '.', openingDelimiter: '```javascript', closingDelimiter: '```', silent: true});
-testModule (resultsTranscribe, 'test/transcribe/index.coffee', {prefix: '.', openingDelimiter: '```coffee', closingDelimiter: '```', silent: true});
+testModule (resultsTranscribe, 'test/transcribe/index.coffee', {prefix: '.', openingDelimiter: '```coffee', closingDelimiter: '```', silent: true, coffee: true});
 testModule (resultsAmd, 'test/amd/index.js', {module: 'amd', silent: true});
 testModule (resultsCommonJsRequire, 'test/commonjs/require/index.js', {module: 'commonjs', silent: true});
 testModule (resultsCommonJsExports, 'test/commonjs/exports/index.js', {module: 'commonjs', silent: true});
@@ -86,7 +86,7 @@ testModule (resultsCommonJsStrict, 'test/commonjs/strict/index.js', {module: 'co
 testModule (resultsCommonJsDirname, 'test/commonjs/__dirname/index.js', {module: 'commonjs', silent: true});
 testModule (resultsCommonJsFilename, 'test/commonjs/__filename/index.js', {module: 'commonjs', silent: true});
 testModule (resultsCommonJsDoctestRequire, 'test/commonjs/__doctest.require/index.js', {module: 'commonjs', silent: true});
-testModule (resultsBin, 'test/bin/executable', {type: 'js', silent: true});
+testModule (resultsBin, 'test/bin/executable', {silent: true});
 testModule (resultsEs2015, 'test/es2015/index.js', {silent: true});
 testModule (resultsEs2018, 'test/es2018/index.js', {silent: true});
 if (Number ((process.versions.node.split ('.'))[0]) >= 14) {
@@ -106,20 +106,6 @@ testCommand ('bin/doctest --xxx', {
 `,
 });
 
-testCommand ('bin/doctest file.js --type', {
-  status: 1,
-  stdout: '',
-  stderr: `error: option \`-t, --type <type>' argument missing
-`,
-});
-
-testCommand ('bin/doctest file.js --type xxx', {
-  status: 1,
-  stdout: '',
-  stderr: `Error: Invalid type "xxx"
-`,
-});
-
 testCommand ('bin/doctest test/shared/index.js', {
   status: 1,
   stdout: `running doctests in test/shared/index.js...
@@ -132,27 +118,9 @@ FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter
   stderr: '',
 });
 
-testCommand ('bin/doctest test/shared/index.coffee', {
+testCommand ('bin/doctest --coffee test/shared/index.coffee', {
   status: 1,
   stdout: `running doctests in test/shared/index.coffee...
-......x.x...........x........x
-FAIL: expected 5 on line 31 (got 4)
-FAIL: expected ! TypeError on line 38 (got 0)
-FAIL: expected 9.5 on line 97 (got 5)
-FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
-`,
-  stderr: '',
-});
-
-testCommand ('bin/doctest test/shared/index.js test/shared/index.coffee', {
-  status: 1,
-  stdout: `running doctests in test/shared/index.js...
-......x.x...........x........x
-FAIL: expected 5 on line 31 (got 4)
-FAIL: expected ! TypeError on line 38 (got 0)
-FAIL: expected 9.5 on line 97 (got 5)
-FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
-running doctests in test/shared/index.coffee...
 ......x.x...........x........x
 FAIL: expected 5 on line 31 (got 4)
 FAIL: expected ! TypeError on line 38 (got 0)
@@ -176,25 +144,10 @@ testCommand ('bin/doctest test/bin/executable', {
   stderr: '',
 });
 
-testCommand ('bin/doctest --type js test/bin/executable', {
-  status: 0,
-  stdout: `running doctests in test/bin/executable...
-.
-`,
-  stderr: '',
-});
-
 testCommand ('bin/doctest --module xxx file.js', {
   status: 1,
   stdout: '',
   stderr: `Error: Invalid module "xxx"
-`,
-});
-
-testCommand ('bin/doctest --module esm --type js file.js', {
-  status: 1,
-  stdout: '',
-  stderr: `Error: Cannot use file type when module is "esm"
 `,
 });
 
