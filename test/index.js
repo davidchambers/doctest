@@ -331,3 +331,35 @@ testCommand ('bin/doctest --print --module commonjs test/commonjs/exports/index.
 `,
   stderr: '',
 });
+
+testCommand ('bin/doctest test/syntax-errors/index.js', {
+  status: 2,
+  stdout: '',
+  stderr: `SyntaxError: Unexpected token (1:0)
+`,
+});
+
+testCommand ('bin/doctest --print test/syntax-errors/index.js', {
+  status: 2,
+  stdout: '',
+  stderr: `SyntaxError: Unexpected token (1:0)
+`,
+});
+
+testCommand ('bin/doctest test/syntax-errors/index.coffee', {
+  status: 2,
+  stdout: '',
+  stderr: `[stdin]:1:1: error: unexpected %
+%
+^
+`,
+});
+
+testCommand ('bin/doctest --print test/syntax-errors/index.coffee', {
+  status: 2,
+  stdout: '',
+  stderr: `[stdin]:1:1: error: unexpected %
+%
+^
+`,
+});
