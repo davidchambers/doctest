@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "acorn": "8.5.x",
-    "coffeescript": "1.12.x",
+    "coffeescript": "2.6.x",
     "commander": "2.20.x",
     "sanctuary-show": "2.0.x",
     "sanctuary-type-classes": "12.1.x"
