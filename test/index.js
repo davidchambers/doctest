@@ -8,27 +8,25 @@ import show from 'sanctuary-show';
 import Z from 'sanctuary-type-classes';
 
 import doctest from '../lib/doctest.js';
-import require from '../lib/require.js';
 
-
-const resultsAmd = require ('../test/amd/results.json');
-const resultsBin = require ('../test/bin/results.json');
-const resultsCommonJsDirname = require ('../test/commonjs/__dirname/results.json');
-const resultsCommonJsDoctestRequire = require ('../test/commonjs/__doctest.require/results.json');
-const resultsCommonJsFilename = require ('../test/commonjs/__filename/results.json');
-const resultsCommonJsExports = require ('../test/commonjs/exports/results.json');
-const resultsCommonJsModuleExports = require ('../test/commonjs/module.exports/results.json');
-const resultsCommonJsRequire = require ('../test/commonjs/require/results.json');
-const resultsCommonJsStrict = require ('../test/commonjs/strict/results.json');
-const resultsEs2015 = require ('../test/es2015/results.json');
-const resultsEs2018 = require ('../test/es2018/results.json');
-const resultsEs2020 = require ('../test/es2020/results.json');
-const resultsExceptions = require ('../test/exceptions/results.json');
-const resultsFantasyLand = require ('../test/fantasy-land/results.json');
-const resultsLineEndings = require ('../test/line-endings/results.json');
-const resultsShared = require ('../test/shared/results.json');
-const resultsStatements = require ('../test/statements/results.json');
-const resultsTranscribe = require ('../test/transcribe/results.json');
+import resultsAmd from './amd/results.js';
+import resultsBin from './bin/results.js';
+import resultsCommonJsDirname from './commonjs/__dirname/results.js';
+import resultsCommonJsDoctestRequire from './commonjs/__doctest.require/results.js';
+import resultsCommonJsFilename from './commonjs/__filename/results.js';
+import resultsCommonJsExports from './commonjs/exports/results.js';
+import resultsCommonJsModuleExports from './commonjs/module.exports/results.js';
+import resultsCommonJsRequire from './commonjs/require/results.js';
+import resultsCommonJsStrict from './commonjs/strict/results.js';
+import resultsEs2015 from './es2015/results.js';
+import resultsEs2018 from './es2018/results.js';
+import resultsEs2020 from './es2020/results.js';
+import resultsExceptions from './exceptions/results.js';
+import resultsFantasyLand from './fantasy-land/results.js';
+import resultsLineEndings from './line-endings/results.js';
+import resultsShared from './shared/results.js';
+import resultsStatements from './statements/results.js';
+import resultsTranscribe from './transcribe/results.js';
 
 
 const eq = actual => expected => {
