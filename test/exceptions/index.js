@@ -29,6 +29,9 @@
 // > sqrt(-1)
 // ! Error: XXX
 
+// > 'foo' + 'bar'
+// foobar
+
 var sqrt = function(n) {
   if (n >= 0) {
     return Math.sqrt(n);

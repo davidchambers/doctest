@@ -6,6 +6,9 @@ import test from 'oletus';
 import show from 'sanctuary-show';
 import Z from 'sanctuary-type-classes';
 
+import {Incorrect, Correct} from '../lib/Comparison.js';
+import {Failure, Success} from '../lib/Effect.js';
+import {Line} from '../lib/Line.js';
 import doctest from '../lib/doctest.js';
 
 import resultsBin from './bin/results.js';
@@ -33,7 +36,29 @@ const eq = actual => expected => {
   strictEqual (Z.equals (actual, expected), true);
 };
 
-const testModule = (expecteds, path, options) => {
+const Test = description => input => output => comparison => ({
+  description,
+  expected: {
+    lines: {
+      input,
+      output,
+    },
+    comparison,
+  },
+});
+
+const dependencies = {
+  Test,
+  Line,
+  Incorrect,
+  Correct,
+  Failure,
+  Success,
+};
+
+const testModule = (module, path, options) => {
+  const expecteds = module (dependencies);
+
   let promise = null;
   const run = () => (promise ?? (promise = doctest (options) (path)));
 
@@ -48,7 +73,7 @@ const testModule = (expecteds, path, options) => {
     eq (actuals.length) (expecteds.length);
   });
 
-  expecteds.forEach (([description, expected], idx) => {
+  expecteds.forEach (({description, expected}, idx) => {
     test (prefix + description, async () => {
       const actuals = await run ();
       eq (actuals[idx]) (expected);
@@ -119,6 +144,7 @@ testModule (resultsStatements, 'test/statements/index.js', {
 });
 
 testModule (resultsFantasyLand, 'test/fantasy-land/index.js', {
+  module: 'esm',
   silent: true,
 });
 
@@ -282,18 +308,25 @@ testCommand ('bin/doctest --print test/commonjs/exports/index.js', {
   status: 0,
   stdout: `
 __doctest.enqueue({
-  type: "input",
-  thunk: () => {
-    return exports.identity(42);
+  input: {
+    lines: [
+      {number: 1, text: "> exports.identity(42)"},
+    ],
+    thunk: () => {
+      return (
+        exports.identity(42)
+      );
+    },
   },
-});
-
-__doctest.enqueue({
-  type: "output",
-  ":": 2,
-  "!": false,
-  thunk: () => {
-    return 42;
+  output: {
+    lines: [
+      {number: 2, text: "42"},
+    ],
+    thunk: () => {
+      return (
+        42
+      );
+    },
   },
 });
 
@@ -317,18 +350,25 @@ testCommand ('bin/doctest --print --module commonjs test/commonjs/exports/index.
   void (() => {
 
     __doctest.enqueue({
-      type: "input",
-      thunk: () => {
-        return exports.identity(42);
+      input: {
+        lines: [
+          {number: 1, text: "> exports.identity(42)"},
+        ],
+        thunk: () => {
+          return (
+            exports.identity(42)
+          );
+        },
       },
-    });
-
-    __doctest.enqueue({
-      type: "output",
-      ":": 2,
-      "!": false,
-      thunk: () => {
-        return 42;
+      output: {
+        lines: [
+          {number: 2, text: "42"},
+        ],
+        thunk: () => {
+          return (
+            42
+          );
+        },
       },
     });
 
