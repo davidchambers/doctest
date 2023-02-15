@@ -85,9 +85,7 @@ testModule (resultsCommonJsDoctestRequire, 'test/commonjs/__doctest.require/inde
 testModule (resultsBin, 'test/bin/executable', {silent: true});
 testModule (resultsEs2015, 'test/es2015/index.js', {silent: true});
 testModule (resultsEs2018, 'test/es2018/index.js', {silent: true});
-if (Number ((process.versions.node.split ('.'))[0]) >= 14) {
-  testModule (resultsEs2020, 'test/es2020/index.js', {silent: true});
-}
+testModule (resultsEs2020, 'test/es2020/index.js', {silent: true});
 
 testCommand ('bin/doctest', {
   status: 0,
@@ -239,7 +237,7 @@ testCommand ('bin/doctest --print --module commonjs test/commonjs/exports/index.
     };
   })();
 
-  (module.exports || exports).__doctest = __doctest;
+  (module.exports ?? exports).__doctest = __doctest;
 })();
 `,
   stderr: '',
