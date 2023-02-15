@@ -1,4 +1,3 @@
-/test/amd/index.js
 /test/commonjs/exports/index.js
 /test/commonjs/module.exports/index.js
 /test/commonjs/require/index.js
