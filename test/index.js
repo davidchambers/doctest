@@ -9,7 +9,6 @@ import Z from 'sanctuary-type-classes';
 
 import doctest from '../lib/doctest.js';
 
-import resultsAmd from './amd/results.js';
 import resultsBin from './bin/results.js';
 import resultsCommonJsDirname from './commonjs/__dirname/results.js';
 import resultsCommonJsDoctestRequire from './commonjs/__doctest.require/results.js';
@@ -76,7 +75,6 @@ testModule (resultsStatements, 'test/statements/index.js', {silent: true});
 testModule (resultsFantasyLand, 'test/fantasy-land/index.js', {silent: true});
 testModule (resultsTranscribe, 'test/transcribe/index.js', {prefix: '.', openingDelimiter: '```javascript', closingDelimiter: '```', silent: true});
 testModule (resultsTranscribe, 'test/transcribe/index.coffee', {prefix: '.', openingDelimiter: '```coffee', closingDelimiter: '```', silent: true, coffee: true});
-testModule (resultsAmd, 'test/amd/index.js', {module: 'amd', silent: true});
 testModule (resultsCommonJsRequire, 'test/commonjs/require/index.js', {module: 'commonjs', silent: true});
 testModule (resultsCommonJsExports, 'test/commonjs/exports/index.js', {module: 'commonjs', silent: true});
 testModule (resultsCommonJsModuleExports, 'test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true});
@@ -204,42 +202,6 @@ __doctest.enqueue({
 exports.identity = function(x) {
   return x;
 };
-`,
-  stderr: '',
-});
-
-testCommand ('bin/doctest --print --module amd test/amd/index.js', {
-  status: 0,
-  stdout: `
-define(function() {
-  // Convert degrees Celsius to degrees Fahrenheit.
-  //
-
-__doctest.enqueue({
-  type: "input",
-  thunk: () => {
-    return toFahrenheit(0);
-  },
-});
-
-__doctest.enqueue({
-  type: "output",
-  ":": 5,
-  "!": false,
-  thunk: () => {
-    return 32;
-  },
-});
-
-  function toFahrenheit(degreesCelsius) {
-    return degreesCelsius * 9 / 5 + 32;
-  }
-  return toFahrenheit;
-});
-
-function define(...args) {
-  args[args.length - 1]();
-}
 `,
   stderr: '',
 });

@@ -50,14 +50,13 @@ The exit code is 0 if all tests pass, 1 otherwise.
 
 | Module system         | Option        | Node.js       | Dependencies  |
 | --------------------- | ------------- |:-------------:|:-------------:|
-| AMD                   | `amd`         |       ✔︎       |       ✘       |
 | CommonJS              | `commonjs`    |       ✔︎       |       ✔︎       |
 | ECMAScript modules    | `esm`         |       ✔︎       |       ✔︎       |
 
 Specify module system via JavaScript API:
 
 ```javascript
-> doctest ({module: 'amd'}) ('path/to/amd/module.js')
+> doctest ({module: 'esm'}) ('path/to/esm/module.js')
 ```
 
 Specify module system via command-line interface:
