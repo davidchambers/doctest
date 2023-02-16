@@ -1,6 +1,5 @@
 import {strictEqual} from 'assert';
 import {exec} from 'child_process';
-import {relative} from 'path';
 import {promisify} from 'util';
 
 import test from 'oletus';
@@ -34,14 +33,26 @@ const eq = actual => expected => {
   strictEqual (Z.equals (actual, expected), true);
 };
 
-const testModule = (results, path, options) => {
-  results.forEach (([description, expected], idx) => {
-    test (`${relative ('test', path)} \u001B[2m›\u001B[0m ${description}`, () =>
-      doctest (options) (path)
-      .then (actuals => {
-        eq (actuals[idx]) (expected);
-      })
-    );
+const testModule = (expecteds, path, options) => {
+  let promise = null;
+  const run = () => (promise ?? (promise = doctest (options) (path)));
+
+  const b = '\u001B[1m';
+  const x = '\u001B[22m';
+  const prefix = (
+    x + 'doctest (' + show (options) + ') (' + b + show (path) + x + ') › ' + b
+  );
+
+  test (prefix + '.length', async () => {
+    const actuals = await run ();
+    eq (actuals.length) (expecteds.length);
+  });
+
+  expecteds.forEach (([description, expected], idx) => {
+    test (prefix + description, async () => {
+      const actuals = await run ();
+      eq (actuals[idx]) (expected);
+    });
   });
 };
 
