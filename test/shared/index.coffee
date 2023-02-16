@@ -70,7 +70,7 @@ do ->
   # > string
   # "input may span many lines"
 
-  15: 'spaces following "//" and ">" are optional'
+  15: 'spaces following "#" and ">" are optional'
   #>"no spaces"
   #"no spaces"
   16: 'indented doctest'
@@ -85,7 +85,7 @@ do ->
   # "foobar"
   19: 'comment on output line'
   # > 5 * 5
-  # 25
+  # 25 # comment
 
   20: 'variable in creation context is not accessible'
   # > typeof text
@@ -119,21 +119,21 @@ do ->
   # "FOO BAR"
   #
 
-  25: 'JS ONLY: multiline comment with leading asterisks'
-  #
-  # > 1 + 2 * 3 * 4
-  # 25
-  # > 1 * 2 + 3 + 4 * 5
-  # 25
-  #
 
-  26: 'JS ONLY: multiline comment with leading asterisks and wrapped input'
-  #
-  # > (fib = (n) -> switch n
-  # .    when 0, 1 then n
-  # .    else fib(n - 2) + fib(n - 1)) 10
-  # 55
-  #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   27: 'multiline output'
   # > ["foo", "bar", "baz"]
@@ -149,8 +149,3 @@ do ->
   # [ "FOO"
   # . "BAR"
   # . "BAZ" ]
-
-  29: 'the rewriter should not rely on automatic semicolon insertion'
-  # > "the rewriter should not rely"
-  # "on automatic semicolon insertion"
-  (4 + 4)

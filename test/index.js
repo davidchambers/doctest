@@ -23,7 +23,8 @@ import resultsEs2020 from './es2020/results.js';
 import resultsExceptions from './exceptions/results.js';
 import resultsFantasyLand from './fantasy-land/results.js';
 import resultsLineEndings from './line-endings/results.js';
-import resultsShared from './shared/results.js';
+import resultsSharedCoffee from './shared/results.coffee.js';
+import resultsSharedJs from './shared/results.js';
 import resultsStatements from './statements/results.js';
 import resultsTranscribe from './transcribe/results.js';
 
@@ -62,11 +63,11 @@ const testCommand = (command, expected) => {
   );
 };
 
-testModule (resultsShared, 'test/shared/index.js', {
+testModule (resultsSharedJs, 'test/shared/index.js', {
   silent: true,
 });
 
-testModule (resultsShared, 'test/shared/index.coffee', {
+testModule (resultsSharedCoffee, 'test/shared/index.coffee', {
   coffee: true,
   silent: true,
 });
@@ -204,11 +205,10 @@ FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter
 testCommand ('bin/doctest --coffee test/shared/index.coffee', {
   status: 1,
   stdout: `running doctests in test/shared/index.coffee...
-......x.x...........x........x
+......x.x...........x.....
 FAIL: expected 5 on line 31 (got 4)
 FAIL: expected ! TypeError on line 38 (got 0)
 FAIL: expected 9.5 on line 97 (got 5)
-FAIL: expected "on automatic semicolon insertion" on line 155 (got "the rewriter should not rely")
 `,
   stderr: '',
 });
