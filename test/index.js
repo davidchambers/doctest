@@ -62,30 +62,119 @@ const testCommand = (command, expected) => {
   );
 };
 
-testModule (resultsShared, 'test/shared/index.js', {silent: true});
-testModule (resultsShared, 'test/shared/index.coffee', {silent: true, coffee: true});
-testModule (resultsLineEndings, 'test/line-endings/CR.js', {silent: true});
-testModule (resultsLineEndings, 'test/line-endings/CR.coffee', {silent: true, coffee: true});
-testModule (resultsLineEndings, 'test/line-endings/CR+LF.js', {silent: true});
-testModule (resultsLineEndings, 'test/line-endings/CR+LF.coffee', {silent: true, coffee: true});
-testModule (resultsLineEndings, 'test/line-endings/LF.js', {silent: true});
-testModule (resultsLineEndings, 'test/line-endings/LF.coffee', {silent: true, coffee: true});
-testModule (resultsExceptions, 'test/exceptions/index.js', {silent: true});
-testModule (resultsStatements, 'test/statements/index.js', {silent: true});
-testModule (resultsFantasyLand, 'test/fantasy-land/index.js', {silent: true});
-testModule (resultsTranscribe, 'test/transcribe/index.js', {prefix: '.', openingDelimiter: '```javascript', closingDelimiter: '```', silent: true});
-testModule (resultsTranscribe, 'test/transcribe/index.coffee', {prefix: '.', openingDelimiter: '```coffee', closingDelimiter: '```', silent: true, coffee: true});
-testModule (resultsCommonJsRequire, 'test/commonjs/require/index.js', {module: 'commonjs', silent: true});
-testModule (resultsCommonJsExports, 'test/commonjs/exports/index.js', {module: 'commonjs', silent: true});
-testModule (resultsCommonJsModuleExports, 'test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true});
-testModule (resultsCommonJsStrict, 'test/commonjs/strict/index.js', {module: 'commonjs', silent: true});
-testModule (resultsCommonJsDirname, 'test/commonjs/__dirname/index.js', {module: 'commonjs', silent: true});
-testModule (resultsCommonJsFilename, 'test/commonjs/__filename/index.js', {module: 'commonjs', silent: true});
-testModule (resultsCommonJsDoctestRequire, 'test/commonjs/__doctest.require/index.js', {module: 'commonjs', silent: true});
-testModule (resultsBin, 'test/bin/executable', {silent: true});
-testModule (resultsEs2015, 'test/es2015/index.js', {silent: true});
-testModule (resultsEs2018, 'test/es2018/index.js', {silent: true});
-testModule (resultsEs2020, 'test/es2020/index.js', {silent: true});
+testModule (resultsShared, 'test/shared/index.js', {
+  silent: true,
+});
+
+testModule (resultsShared, 'test/shared/index.coffee', {
+  coffee: true,
+  silent: true,
+});
+
+testModule (resultsLineEndings, 'test/line-endings/CR.js', {
+  silent: true,
+});
+
+testModule (resultsLineEndings, 'test/line-endings/CR.coffee', {
+  coffee: true,
+  silent: true,
+});
+
+testModule (resultsLineEndings, 'test/line-endings/CR+LF.js', {
+  silent: true,
+});
+
+testModule (resultsLineEndings, 'test/line-endings/CR+LF.coffee', {
+  coffee: true,
+  silent: true,
+});
+
+testModule (resultsLineEndings, 'test/line-endings/LF.js', {
+  silent: true,
+});
+
+testModule (resultsLineEndings, 'test/line-endings/LF.coffee', {
+  coffee: true,
+  silent: true,
+});
+
+testModule (resultsExceptions, 'test/exceptions/index.js', {
+  silent: true,
+});
+
+testModule (resultsStatements, 'test/statements/index.js', {
+  silent: true,
+});
+
+testModule (resultsFantasyLand, 'test/fantasy-land/index.js', {
+  silent: true,
+});
+
+testModule (resultsTranscribe, 'test/transcribe/index.js', {
+  prefix: '.',
+  openingDelimiter: '```javascript',
+  closingDelimiter: '```',
+  silent: true,
+});
+
+testModule (resultsTranscribe, 'test/transcribe/index.coffee', {
+  coffee: true,
+  prefix: '.',
+  openingDelimiter: '```coffee',
+  closingDelimiter: '```',
+  silent: true,
+});
+
+testModule (resultsCommonJsRequire, 'test/commonjs/require/index.js', {
+  module: 'commonjs',
+  silent: true,
+});
+
+testModule (resultsCommonJsExports, 'test/commonjs/exports/index.js', {
+  module: 'commonjs',
+  silent: true,
+});
+
+testModule (resultsCommonJsModuleExports, 'test/commonjs/module.exports/index.js', {
+  module: 'commonjs',
+  silent: true,
+});
+
+testModule (resultsCommonJsStrict, 'test/commonjs/strict/index.js', {
+  module: 'commonjs',
+  silent: true,
+});
+
+testModule (resultsCommonJsDirname, 'test/commonjs/__dirname/index.js', {
+  module: 'commonjs',
+  silent: true,
+});
+
+testModule (resultsCommonJsFilename, 'test/commonjs/__filename/index.js', {
+  module: 'commonjs',
+  silent: true,
+});
+
+testModule (resultsCommonJsDoctestRequire, 'test/commonjs/__doctest.require/index.js', {
+  module: 'commonjs',
+  silent: true,
+});
+
+testModule (resultsBin, 'test/bin/executable', {
+  silent: true,
+});
+
+testModule (resultsEs2015, 'test/es2015/index.js', {
+  silent: true,
+});
+
+testModule (resultsEs2018, 'test/es2018/index.js', {
+  silent: true,
+});
+
+testModule (resultsEs2020, 'test/es2020/index.js', {
+  silent: true,
+});
 
 testCommand ('bin/doctest', {
   status: 0,
