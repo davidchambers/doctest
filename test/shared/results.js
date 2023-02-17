@@ -260,4 +260,13 @@ export default [
       149,
     ],
   ],
+  [
+    'the rewriter should not rely on automatic semicolon insertion',
+    [
+      false,
+      '"the rewriter should not rely"',
+      '"on automatic semicolon insertion"',
+      155,
+    ],
+  ],
 ];
