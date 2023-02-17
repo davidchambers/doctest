@@ -253,25 +253,25 @@ testCommand ('bin/doctest --module esm lib/doctest.js', {
   stderr: '',
 });
 
-testCommand ('bin/doctest --module esm test/esm/index.mjs', {
+testCommand ('bin/doctest --module esm test/esm/index.js', {
   status: 0,
-  stdout: `running doctests in test/esm/index.mjs...
+  stdout: `running doctests in test/esm/index.js...
 .
 `,
   stderr: '',
 });
 
-testCommand ('bin/doctest --module esm test/esm/dependencies.mjs', {
+testCommand ('bin/doctest --module esm test/esm/dependencies.js', {
   status: 0,
-  stdout: `running doctests in test/esm/dependencies.mjs...
+  stdout: `running doctests in test/esm/dependencies.js...
 .
 `,
   stderr: '',
 });
 
-testCommand ('bin/doctest --module esm test/esm/incorrect.mjs', {
+testCommand ('bin/doctest --module esm test/esm/incorrect.js', {
   status: 1,
-  stdout: `running doctests in test/esm/incorrect.mjs...
+  stdout: `running doctests in test/esm/incorrect.js...
 x
 FAIL: expected 32 on line 4 (got "0°F")
 `,
