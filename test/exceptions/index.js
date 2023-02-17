@@ -17,10 +17,10 @@
 // > sqrt(-1)
 // new Error('Invalid value')
 
-// > null.length
-// ! TypeError
+// > 0..toString(1)
+// ! RangeError
 
-// > null.length
+// > 0..toString(1)
 // ! Error
 
 // > sqrt(-1)

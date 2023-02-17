@@ -63,11 +63,11 @@ export default [
     ],
   ],
   [
-    'TypeError captured and reported',
+    'RangeError captured and reported',
     [
       true,
-      '! TypeError',
-      '! TypeError',
+      '! RangeError',
+      '! RangeError',
       35,
     ],
   ],

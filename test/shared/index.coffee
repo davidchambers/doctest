@@ -30,9 +30,9 @@ do ->
   # > two + two
   # 5
 
-  8: 'TypeError captured and reported'
-  # > null.length
-  # ! TypeError
+  8: 'RangeError captured and reported'
+  # > 0.toString 1
+  # ! RangeError
   9: 'TypeError expected but not reported'
   # > [].length
   # ! TypeError

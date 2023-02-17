@@ -57,8 +57,8 @@ export default [
     'evaluating input throws exception as expected, of expected type',
     [
       true,
-      '! TypeError',
-      '! TypeError',
+      '! RangeError',
+      '! RangeError',
       21,
     ],
   ],
@@ -66,7 +66,7 @@ export default [
     'evaluating input throws exception as expected, of unexpected type',
     [
       false,
-      '! TypeError',
+      '! RangeError',
       '! Error',
       24,
     ],
