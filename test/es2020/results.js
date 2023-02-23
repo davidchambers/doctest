@@ -1,11 +1,8 @@
-export default [
-  [
-    'nullish coalescing operator',
-    [
-      true,
-      '"default"',
-      '"default"',
-      2,
-    ],
-  ],
+export default ({Test, Line, Correct, Success}) => [
+
+  Test ('nullish coalescing operator')
+       ([Line (1) ("> null ?? 'default'")])
+       ([Line (2) ("'default'")])
+       (Correct (Success ('default'))),
+
 ];

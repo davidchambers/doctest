@@ -1,11 +1,8 @@
-export default [
-  [
-    '__filename is defined',
-    [
-      true,
-      '"string"',
-      '"string"',
-      4,
-    ],
-  ],
+export default ({Test, Line, Correct, Success}) => [
+
+  Test ('__filename is defined')
+       ([Line (3) ('> typeof __filename')])
+       ([Line (4) ("'string'")])
+       (Correct (Success ('string'))),
+
 ];
