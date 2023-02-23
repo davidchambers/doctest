@@ -19,6 +19,7 @@ import resultsCommonJsExports from './commonjs/exports/results.js';
 import resultsCommonJsModuleExports from './commonjs/module.exports/results.js';
 import resultsCommonJsRequire from './commonjs/require/results.js';
 import resultsCommonJsStrict from './commonjs/strict/results.js';
+import resultsContiguity from './contiguity/results.js';
 import resultsEs2015 from './es2015/results.js';
 import resultsEs2018 from './es2018/results.js';
 import resultsEs2020 from './es2020/results.js';
@@ -211,6 +212,15 @@ testModule (resultsEs2018, 'test/es2018/index.js', {
 });
 
 testModule (resultsEs2020, 'test/es2020/index.js', {
+  silent: true,
+});
+
+testModule (resultsContiguity, 'test/contiguity/index.js', {
+  silent: true,
+});
+
+testModule (resultsContiguity, 'test/contiguity/index.coffee', {
+  coffee: true,
   silent: true,
 });
 
