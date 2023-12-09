@@ -12,9 +12,11 @@ import {Line} from '../lib/Line.js';
 import doctest from '../lib/doctest.js';
 
 import resultsBin from './bin/results.js';
-import resultsCommonJsDirname from './commonjs/__dirname/results.js';
+import resultsCommonJsDirnameCoffee from './commonjs/__dirname/results.coffee.js';
+import resultsCommonJsDirnameJs from './commonjs/__dirname/results.js';
 import resultsCommonJsDoctestRequire from './commonjs/__doctest.require/results.js';
-import resultsCommonJsFilename from './commonjs/__filename/results.js';
+import resultsCommonJsFilenameCoffee from './commonjs/__filename/results.coffee.js';
+import resultsCommonJsFilenameJs from './commonjs/__filename/results.js';
 import resultsCommonJsExports from './commonjs/exports/results.js';
 import resultsCommonJsModuleExports from './commonjs/module.exports/results.js';
 import resultsCommonJsRequire from './commonjs/require/results.js';
@@ -23,6 +25,7 @@ import resultsContiguity from './contiguity/results.js';
 import resultsEs2015 from './es2015/results.js';
 import resultsEs2018 from './es2018/results.js';
 import resultsEs2020 from './es2020/results.js';
+import resultsEsmGlobals from './esm/globals/results.js';
 import resultsExceptions from './exceptions/results.js';
 import resultsFantasyLand from './fantasy-land/results.js';
 import resultsLineEndings from './line-endings/results.js';
@@ -184,13 +187,25 @@ testModule (resultsCommonJsStrict, 'test/commonjs/strict/index.js', {
   silent: true,
 });
 
-testModule (resultsCommonJsDirname, 'test/commonjs/__dirname/index.js', {
+testModule (resultsCommonJsDirnameJs, 'test/commonjs/__dirname/index.js', {
   module: 'commonjs',
   silent: true,
 });
 
-testModule (resultsCommonJsFilename, 'test/commonjs/__filename/index.js', {
+testModule (resultsCommonJsDirnameCoffee, 'test/commonjs/__dirname/index.coffee', {
   module: 'commonjs',
+  coffee: true,
+  silent: true,
+});
+
+testModule (resultsCommonJsFilenameJs, 'test/commonjs/__filename/index.js', {
+  module: 'commonjs',
+  silent: true,
+});
+
+testModule (resultsCommonJsFilenameCoffee, 'test/commonjs/__filename/index.coffee', {
+  module: 'commonjs',
+  coffee: true,
   silent: true,
 });
 
@@ -212,6 +227,11 @@ testModule (resultsEs2018, 'test/es2018/index.js', {
 });
 
 testModule (resultsEs2020, 'test/es2020/index.js', {
+  silent: true,
+});
+
+testModule (resultsEsmGlobals, 'test/esm/globals/index.js', {
+  module: 'esm',
   silent: true,
 });
 
@@ -349,46 +369,33 @@ exports.identity = function(x) {
 
 testCommand ('bin/doctest --print --module commonjs test/commonjs/exports/index.js', {
   status: 0,
-  stdout: `void (() => {
+  stdout: `
+__doctest.enqueue({
+  input: {
+    lines: [
+      {number: 1, text: "> exports.identity(42)"},
+    ],
+    thunk: () => {
+      return (
+        exports.identity(42)
+      );
+    },
+  },
+  output: {
+    lines: [
+      {number: 2, text: "42"},
+    ],
+    thunk: () => {
+      return (
+        42
+      );
+    },
+  },
+});
 
-  const __doctest = {
-    require,
-    queue: [],
-    enqueue: function(io) { this.queue.push(io); },
-  };
-
-  void (() => {
-
-    __doctest.enqueue({
-      input: {
-        lines: [
-          {number: 1, text: "> exports.identity(42)"},
-        ],
-        thunk: () => {
-          return (
-            exports.identity(42)
-          );
-        },
-      },
-      output: {
-        lines: [
-          {number: 2, text: "42"},
-        ],
-        thunk: () => {
-          return (
-            42
-          );
-        },
-      },
-    });
-
-    exports.identity = function(x) {
-      return x;
-    };
-  })();
-
-  (module.exports ?? exports).__doctest = __doctest;
-})();
+exports.identity = function(x) {
+  return x;
+};
 `,
   stderr: '',
 });
