@@ -27,7 +27,7 @@
     "coffeescript": "2.7.x",
     "commander": "2.20.x",
     "sanctuary-show": "3.0.x",
-    "sanctuary-type-classes": "12.1.x"
+    "sanctuary-type-classes": "13.0.x"
   },
   "devDependencies": {
     "babel-eslint": "10.1.x",
