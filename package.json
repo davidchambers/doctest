@@ -30,7 +30,7 @@
     "sanctuary-type-classes": "13.0.x"
   },
   "devDependencies": {
-    "c8": "7.10.x",
+    "c8": "8.0.x",
     "oletus": "3.2.x",
     "sanctuary-scripts": "5.0.x"
   },
