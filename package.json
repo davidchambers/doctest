@@ -20,7 +20,7 @@
     "url": "git://github.com/davidchambers/doctest.git"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "dependencies": {
     "acorn": "8.11.x",

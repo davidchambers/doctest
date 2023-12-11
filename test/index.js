@@ -1,6 +1,6 @@
-import {strictEqual} from 'assert';
-import {exec} from 'child_process';
-import {promisify} from 'util';
+import {strictEqual} from 'node:assert';
+import {exec} from 'node:child_process';
+import {promisify} from 'node:util';
 
 import test from 'oletus';
 import show from 'sanctuary-show';

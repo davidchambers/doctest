@@ -1,6 +1,6 @@
 // Convert degrees Celsius to degrees Fahrenheit.
 //
-// > import util from 'util'
+// > import util from 'node:util'
 // > util.inspect (toFahrenheit (0))
 // '32'
 export function toFahrenheit(degreesCelsius) {
