@@ -32,7 +32,7 @@
   "devDependencies": {
     "c8": "8.0.x",
     "oletus": "4.0.x",
-    "sanctuary-scripts": "5.0.x"
+    "sanctuary-scripts": "6.0.x"
   },
   "scripts": {
     "doctest": "sanctuary-doctest",

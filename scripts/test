@@ -3,9 +3,9 @@ set -euf -o pipefail
 
 source "${BASH_SOURCE%/*}/../node_modules/sanctuary-scripts/functions"
 
-set +f ; shopt -s nullglob
+set +f ; shopt -s globstar nullglob
 files=($(get source-files))
-set -f ; shopt -u nullglob
+set -f ; shopt -u globstar nullglob
 
 node_modules/.bin/c8 \
   --check-coverage \
