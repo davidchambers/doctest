@@ -1,9 +1,9 @@
 # Contributing
 
-1.  Update local master branch:
+1.  Update local main branch:
 
-        $ git checkout master
-        $ git pull upstream master
+        $ git checkout main
+        $ git pull upstream main
 
 2.  Create feature branch:
 
