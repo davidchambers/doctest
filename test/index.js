@@ -304,7 +304,7 @@ testCommand ('bin/doctest --module xxx file.js', {
 testCommand ('bin/doctest --module esm lib/doctest.js', {
   status: 0,
   stdout: `running doctests in lib/doctest.js...
-...
+
 `,
   stderr: '',
 });
