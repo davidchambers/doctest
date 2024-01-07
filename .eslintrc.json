@@ -8,14 +8,6 @@
   },
   "overrides": [
     {
-      "files": ["README.md"],
-      "globals": {"doctest": "readonly"},
-      "rules": {
-        "no-extra-semi": ["off"],
-        "no-unused-vars": ["error", {"varsIgnorePattern": "^(toFahrenheit)$"}]
-      }
-    },
-    {
       "files": ["bin/doctest"],
       "parserOptions": {"sourceType": "script"}
     },
@@ -27,8 +19,15 @@
       }
     },
     {
+      "files": ["test/**/*.js"],
+      "rules": {
+        "max-len": ["off"]
+      }
+    },
+    {
       "files": ["test/commonjs/**/index.js"],
-      "parserOptions": {"sourceType": "script"}
+      "parserOptions": {"sourceType": "script"},
+      "globals": {"__doctest": "readonly"}
     }
   ]
 }
