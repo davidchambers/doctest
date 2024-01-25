@@ -2,21 +2,26 @@
 
 'use strict';
 
-const path = require ('path');
+const {spawn} = require ('node:child_process');
+const path = require ('node:path');
+const process = require ('node:process');
 
-const args = process.argv.slice (2);
-const idx = args.indexOf ('--nodejs');
-const flags = idx >= 0 && idx < args.length - 1;
+const command = process.execPath;
 
-require ('child_process')
-.spawn (
-  process.execPath,
-  ['--experimental-import-meta-resolve',
-   '--experimental-vm-modules',
-   ...(flags ? args[idx + 1].split (/\s+/) : []),
-   '--',
-   path.resolve (__dirname, '..', 'lib', 'command.js'),
-   ...(flags ? [...(args.slice (0, idx)), ...(args.slice (idx + 2))] : args)],
-  {cwd: process.cwd (), env: process.env, stdio: [0, 1, 2]}
-)
+const args = [
+  ...process.execArgv,
+  '--experimental-import-meta-resolve',
+  '--experimental-vm-modules',
+  '--',
+  path.resolve (__dirname, '..', 'lib', 'command.js'),
+  ...(process.argv.slice (2)),
+];
+
+const options = {
+  cwd: process.cwd (),
+  env: process.env,
+  stdio: [0, 1, 2],
+};
+
+spawn (command, args, options)
 .on ('exit', process.exit);
