@@ -104,20 +104,20 @@ do ->
   # ..... .5
   # 1234.5
 
-  23: 'TODO: multiline comment'
-  #
-  # > 3 ** 3 - 2 ** 2
-  # 23
-  #
+  23: 'multiline comment'
+  ###
+    > 3 ** 3 - 2 ** 2
+    23
+  ###
 
-  24: 'TODO: multiline comment with wrapped input'
-  #
-  # > (["foo", "bar", "baz"]
-  # .  .slice(0, -1)
-  # .  .join(" ")
-  # .  .toUpperCase())
-  # "FOO BAR"
-  #
+  24: 'multiline comment with wrapped input'
+  ###
+    > (["foo", "bar", "baz"]
+    .  .slice(0, -1)
+    .  .join(" ")
+    .  .toUpperCase())
+    "FOO BAR"
+  ###
 
 
 
